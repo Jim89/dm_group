@@ -22,7 +22,7 @@ nw <- igraph_to_networkD3(graph, group = rep(1, V(graph) %>% length()))
 nw$links$value <- E(graph)$weight
 
 # Plot the network
-forceNetwork(Links = nw$links,
+net <- forceNetwork(Links = nw$links,
              Nodes = nw$nodes,
              colourScale = JS("d3.scale.category20()"),
              Source = "source",
@@ -36,3 +36,5 @@ forceNetwork(Links = nw$links,
              legend = F,
              bounded = F,
              zoom = TRUE)
+
+
