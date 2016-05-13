@@ -5,6 +5,8 @@ library(dplyr)
 library(RPostgreSQL)
 library(tidyr)
 library(ggplot2)
+library(igraph)
+library(networkD3)
 
 db <- src_postgres(dbname = "dm")
 
@@ -35,8 +37,13 @@ sum_tabl <- tbl(db, "summary_table")
 
 # Step 2 - run the analysis -----------------------------------------------
 
+# Main body
 source("./jim/01_rfm.R")
 source("./jim/02_get_contacts.R")
 source("./jim/03_attributable_sales.R")
 source("./jim/04_orders_per_cust.R")
 source("./jim/05_rfm_to_stats.R")
+
+
+# Perform network analysis step
+source("./jim/10_nework.R")
