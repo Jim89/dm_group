@@ -32,3 +32,11 @@ lines <- tbl(db, "lines_clean")
 orders <- tbl(db, "orders_clean")
 contacts <- tbl(db, "contacts_clean")
 sum_tabl <- tbl(db, "summary_table")
+
+# Step 2 - run the analysis -----------------------------------------------
+
+source("./jim/01_rfm.R")
+source("./jim/02_get_contacts.R")
+source("./jim/03_attributable_sales.R")
+source("./jim/04_orders_per_cust.R")
+source("./jim/05_rfm_to_stats.R")
