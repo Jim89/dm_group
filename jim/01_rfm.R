@@ -52,4 +52,4 @@ email_2_rfm <- get_custs("email_second_half") %>% cust_rfm()
 
 # Catalogue customers
 cat_1_rfm <- get_custs("cat_first_half") %>% cust_rfm()
-cat2_rfm <- get_custs("cat_second_half") %>% cust_rfm()
+cat_2_rfm <- get_custs("cat_second_half") %>% cust_rfm()
