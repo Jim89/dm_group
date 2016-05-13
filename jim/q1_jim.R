@@ -79,3 +79,17 @@ type_summary <- orders_to_types %>%
                 summarise(total_orders = scales::comma(sum(orders)),
                           total_spend = scales::comma(sum(spend)),
                           avg_spend_per = mean(spend_per_order))
+
+
+# Step 4 - model order type vs. spend -------------------------------------
+method_fit <- lines %>% 
+    group_by(ordernum) %>% 
+    summarise(items = n(),
+              spend = sum(line_dollars)) %>% 
+    inner_join(orders) %>% 
+    collect() %>% 
+    mutate(order_method = as.factor(order_method)) %>% 
+    lm(spend ~ order_method, data = .)
+
+method_tidy <- broom::tidy(method_fit)
+method_glance <- broom::glance(method_fit)
