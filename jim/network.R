@@ -33,6 +33,8 @@ outdeg <- sum_tabl %>%
     mutate(out_deg = ifelse(is.na(out_deg), 0, out_deg),
            od = ntile(out_deg, 5))
 
+outdeg <- copy_to(db, outdeg, temporary = FALSE)
+
 # Step 3 - visualise ------------------------------------------------------
 # Subset the data slightly
 to_plot <- graph_data %>% filter(weight >= 5) %>% 
