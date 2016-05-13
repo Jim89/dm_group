@@ -23,3 +23,6 @@ cat_1_att <- attributable_sales("cat_first_half", 100)
 cat_2_att <- attributable_sales("cat_second_half", 100)
 
 
+# Step 2 - clean up -------------------------------------------------------
+rm(attributable_sales)
+gc()
