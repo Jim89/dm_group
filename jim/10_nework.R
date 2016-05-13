@@ -1,6 +1,4 @@
 # Step 0 - prep env -------------------------------------------------------
-library(networkD3)
-library(igraph)
 
 # Step 1 - prepare data ---------------------------------------------------
 graph_data <- lines %>%
@@ -29,12 +27,14 @@ rm(graph)
 outdeg <- sum_tabl %>% 
     select(cust_id) %>% 
     collect() %>% 
-    left_join(outdeg) %>% 
+    left_join(outdeg, by = c("cust_id" = "cust_id")) %>% 
     mutate(out_deg = ifelse(is.na(out_deg), 0, out_deg),
            od = ntile(out_deg, 5))
 
+# Write to db if it doesn't exist
+if(sum(class(tbl(db, "outdeg")) == "tbl_sql") == 0) {
 outdeg <- copy_to(db, outdeg, temporary = FALSE)
-
+}
 # Step 3 - visualise ------------------------------------------------------
 # Subset the data slightly
 to_plot <- graph_data %>% filter(weight >= 5) %>% 
@@ -66,8 +66,31 @@ net <- forceNetwork(Links = nw$links,
              bounded = F,
              zoom = TRUE)
 
+# Step 4 - Visualise reln between gifts and spend -------------------------
+purchase_stats <- orders %>% 
+    group_by(cust_id) %>% 
+    summarise(orders = n()) %>% 
+    left_join(lines %>% group_by(cust_id) %>% summarise(spend = sum(line_dollars))) %>% 
+    collect()
 
-# Step 4 - clean up -------------------------------------------------------
+purchase_stats <- outdeg %>% 
+    left_join(purchase_stats, by = c("cust_id" = "cust_id"))
+
+gift_spend_rel <- purchase_stats %>% 
+    ggplot(aes(x = out_deg, y = spend)) +
+    geom_point(aes(size = orders), colour = "steelblue", alpha = 0.5) +
+    scale_y_continuous(labels = scales::comma) +
+    xlab("Gift recipients (out-degree centrality)") +
+    ylab("Total spend (£)") +
+    guides(size = guide_legend(title = "Total orders")) +
+    geom_smooth(alpha = 0.75, colour = "firebrick") +
+    theme_jim
+
+fit <- lm(spend ~ out_deg + orders, data = purchase_stats)
+tidy_fit <- broom::tidy(fit)
+glance_fit <- broom::glance(fit)
+
+# Step 5 - clean up -------------------------------------------------------
 rm(to_plot, nw)
 gc()
 
