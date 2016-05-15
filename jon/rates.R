@@ -59,8 +59,38 @@ rates$numberCatalogued<-as.numeric(rates$numberCatalogued)
 rates$numberCatResponded<- as.numeric(rates$numberCatResponded)
 rates$C_responseRate <-round((rates$numberCatResponded/rates$numberCatalogued)*100,2)
 
-write.csv(rates,"rates.csv",row.names = FALSE)
+#write.csv(rates,"rates.csv",row.names = FALSE)
 
 #Step 2) Graphs
+rates<-read.csv("rates.csv")
 
+library(ggplot2)
 
+# Set up theme object for Jim's pretty plots:)
+theme_jim <-  theme(legend.position = "bottom",
+                    axis.text.y = element_text(size = 16, colour = "black"),
+                    axis.text.x = element_text(size = 16, colour = "black"),
+                    legend.text = element_text(size = 16),
+                    legend.title = element_text(size = 16),
+                    title = element_text(size = 16),
+                    strip.text = element_text(size = 16, colour = "black"),
+                    strip.background = element_rect(fill = "white"),
+                    panel.grid.minor.x = element_blank(),
+                    panel.grid.major.x = element_line(colour = "grey", linetype = "dotted"),
+                    panel.grid.minor.y = element_line(colour = "lightgrey", linetype = "dotted"),
+                    panel.grid.major.y = element_line(colour = "grey", linetype = "dotted"),
+                    panel.margin.y = unit(0.1, units = "in"),
+                    panel.background = element_rect(fill = "white", colour = "lightgrey"),
+                    panel.border = element_rect(colour = "black", fill = NA))
+
+Emails <- rates %>% 
+  ggplot(aes(x = season, y =responseRate )) +
+  geom_point(shape = 21, colour = "#666666", fill = "#e6ab02", size = 3.5, 
+             stroke = .75, position = "jitter", alpha = .5) +
+  scale_y_continuous(labels = scales::comma) +
+  xlab("Season") +
+  ylab("Response Rate for Email Marketing Customers %") +
+  theme_jim
+
+Catalogues <- 
+  qplot(data=rates,x = season, y =C_responseRate )
