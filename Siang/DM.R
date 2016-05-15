@@ -15,7 +15,7 @@ empty_as_na <- function(x){if("factor" %in% class(x)) x <- as.character(x) ifels
 
 #Replace blank with NA
 contacts<- contacts %>% mutate_each(funs(empty_as_na)) 
-linea<- lines %>% mutate_each(funs(empty_as_na)) 
+lines<- lines %>% mutate_each(funs(empty_as_na)) 
 orders<- orders %>% mutate_each(funs(empty_as_na)) 
 summary<- summary %>% mutate_each(funs(empty_as_na)) 
 
@@ -48,3 +48,27 @@ new_data <- data %>% filter(!is.na(StoreDist),!is.na(sum_dollar_retail))
 
 #Export data
 write.csv(data,file="data.csv")
+
+#Read data
+data <- read_csv("data.csv",col_names = TRUE,col_types = NULL,skip=0)
+
+#Run model 
+attach(data)
+model1 <- lm(sum_dollar_total~StoreDist)
+summary(model1)
+model2 <- lm(sum_dollar_retail~StoreDist)
+summary(model2)
+model3 <- lm(sum_dollar_nongift~StoreDist)
+summary(model3)mo
+model4 <- lm(sum_dollar_gift~StoreDist)
+summary(model4)
+model5 <- lm(sum_dollar_nongift~StoreDist+I+M+P+ST)
+summary(model5)
+model6 <- lm(sum_dollar_gift~StoreDist+I+M+P+ST)
+summary(model6)
+model7 <- lm(sum_dollar_retail~StoreDist+I+M+P+ST)
+summary(model7)
+model8 <- lm(StoreDist~I+M+P+ST)
+summary(model8)
+model9 <- lm(ST~StoreDist)
+summary(model9)
