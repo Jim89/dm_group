@@ -28,7 +28,7 @@ attach(data)
 knitr::include_graphics("ordermethod.png")
 ```
 
-Figure 1 shows the average distance from the customer’s address to the nearest company store and the results were broken down by the type of their order methods. Comparing to the channels of internet, mail and phone, customers who purchase products via retail channel (store) generally have an address that is nearest to the store. Customers who purchase through mail via catalog channel have the highest average store distance. Overall, customers who do not purchase directly at the retail store mostly live relatively far away from their nearest company store.
+Figure 1 shows the average distance from the customer’s address to the nearest company store and the results were broken down by the type of their order methods. Comparing to the channels of internet, mail and phone, customers who purchase products via retail channel (store) generally have an address that is nearest to the store. Customers who purchase through mail via catalog channel have the highest average store distance. Overall, customers who do not purchase directly at the retail store live relatively far away from their nearest company store.
 
 #####**Part 2** - Store Distance vs Customer Spending
 
@@ -92,7 +92,7 @@ tidy(model214)
 glance(model214)
 ```
 
-Results for all four scenarios are similar. Although the p-values of store distance in all four models are very significant, the R-squared and estimate are considerably low. That implies the indepedent variable - store distance might be statistically significant but it is not economically significant at all, which was also supported by the scatter plot where no trend was observed in the graphs.
+Results for all four scenarios are similar. Although the p-values of store distance in all four models are very significant, the R-squared and estimate are considerably low. That implies the independent variable - store distance might be statistically significant but it is not economically significant at all, which was also supported by the scatter plot where no trend was observed in the graphs.
 
 
 **Part 2.2 Frequency of Purchase**
