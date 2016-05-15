@@ -1,5 +1,7 @@
 ---
 title: "Digital Marketing Analytics"
+author: "Siangyang Lau"
+date: "15 May 2016"
 output: 
   html_document:
           fig_caption: yes
