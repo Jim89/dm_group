@@ -14,7 +14,7 @@ library(dplyr)
 library(broom)
 library(car)
 library(knitr)
-setwd("~/desktop/DM")
+setwd("~/desktop/resources")
 #read files
 data <- read_csv("data.csv",col_names = TRUE,col_types = NULL,skip=0)
 attach(data)
@@ -101,7 +101,7 @@ A new attempt to investigate the relationship between customer spending and stor
 
 **2.2.1** Retail Store
 ```{r}
-model221 <- lm(ST~StoreDist)
+model221 <- lm(frequency_store~StoreDist)
 ```
 
 ```{r, echo=FALSE, out.width = 300, out.height= 300, fig.retina = NULL, fig.align='center', fig.cap="Figure 6: Frequency of purchase via retail store"}
@@ -115,7 +115,7 @@ kable(glance(model221), caption = "Table 10: Regression Statistics", digits = 3)
 
 **2.2.2** Phone
 ```{r}
-model222 <- lm(P~StoreDist)
+model222 <- lm(frequency_phone~StoreDist)
 ```
 
 ```{r, echo=FALSE, out.width = 300, out.height= 300, fig.retina = NULL, fig.align='center', fig.cap="Figure 7: Frequency of purchase via phone"}
@@ -129,7 +129,7 @@ kable(glance(model222), caption = "Table 12: Regression Statistics", digits = 3)
 
 **2.2.3** Mail
 ```{r}
-model223 <- lm(M~StoreDist)
+model223 <- lm(frequency_mail~StoreDist)
 ```
 
 ```{r, echo=FALSE, out.width = 300, out.height= 300, fig.retina = NULL, fig.align='center', fig.cap="Figure 8: Frequency of purchase via mail"}
@@ -143,7 +143,7 @@ kable(glance(model223), caption = "Table 14: Regression Statistics", digits = 3)
 
 **2.2.4** Internet
 ```{r}
-model224 <- lm(I~StoreDist)
+model224 <- lm(frequency_internet~StoreDist)
 ```
 
 ```{r, echo=FALSE, out.width = 300, out.height= 300, fig.retina = NULL, fig.align='center', fig.cap="Figure 9: Frequency of purchase via internet"}
