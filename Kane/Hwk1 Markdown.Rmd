@@ -1,0 +1,151 @@
+---
+title: "Digital Marketing Hwk1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+"Does sales changes based on the presence of children's various age in the household"?
+
+Through my question, I attempt to answer the question on whether there is a correlation between the number of children in a household and the children's age with spending in the store. The data that was given to us contains a boolean variable 'Y' or 'N' on whether the customer has a child between certain ages, namely between the age of 0 to 2, 6 to 11, 12 to 16 and 17 to 18.
+
+The first thing I did was to extract the data using SQL as follows:
+
+
+```{r include=FALSE}
+library(dplyr)
+library(broom)
+library(car)
+library(knitr)
+require("RPostgreSQL")
+```
+```{r sql}
+
+drv <- dbDriver("PostgreSQL")
+
+con <- dbConnect(drv, dbname="marketing",host="localhost",port=5432,user="postgres",password="ballball0")
+df <- dbGetQuery(con,
+                          "SELECT avg(line_dollars),COUNT(DISTINCT summary.cust_id), 
+                          Child0_2, Child3_5, Child6_11, Child12_16, Child17_18 
+                          from summary inner join lines on summary.cust_id = lines.cust_id
+                          where Child0_2 IS NOT NULL group by Child0_2, Child3_5, Child6_11, Child12_16, Child17_18
+                          order by avg desc")
+```
+
+Thereafter I created some functions to convert the 'Y' and 'N' into boolean numbers 1 and 0
+``` {r convert boolean}
+df$child0_2 <- ifelse(df$child0_2=="Y", 1, 0)
+df$child3_5 <- ifelse(df$child3_5=="Y", 1, 0)
+df$child6_11 <- ifelse(df$child6_11=="Y", 1, 0)
+df$child12_16 <- ifelse(df$child12_16=="Y", 1, 0)
+df$child17_18 <- ifelse(df$child17_18=="Y", 1, 0)
+```
+
+The next bit is to make the dummy variables into something that is useful. For example predict how many children there are in each household. This is slightly inaccurate as a family could have numerous kids with the age bewteen 0 and 2 but in my data will only consider it to be one child. 
+
+Another function I did is to create strings that combines all the children categories there are into one string. The string will represent the ages of kids in the household. 
+
+``` {r functions}
+calculateChildrenNum <- function(Child0_2, Child3_5, Child6_11, Child12_16, Child17_18){
+  x = 0
+  if (Child0_2 == 1){
+  x = x + 1
+  }
+  if (Child3_5 == 1){
+    x = x + 1
+  }
+  if (Child6_11 == 1){
+    x = x + 1
+  }
+  if (Child12_16 == 1){
+    x = x + 1
+  }
+  if (Child17_18 == 1){
+    x = x + 1
+  }
+   x
+}
+
+createChildrenString <- function(Child0_2, Child3_5, Child6_11, Child12_16, Child17_18){
+  x = "child"
+  if (Child0_2 == 1){
+    x = paste(x, "0_2,")
+  }
+  if (Child3_5 == 1){
+    x = paste(x, "3_5,")
+  }
+  if (Child6_11 == 1){
+    x = paste(x, "6_11,")
+  }
+  if (Child12_16 == 1){
+    x = paste(x, "12_16,")
+  }
+  if (Child17_18 == 1){
+    x = paste(x, "17_18")
+  }
+  x
+}
+
+df$childrenNum = apply(df[,c('child0_2', 'child3_5', 'child6_11', 'child12_16', 'child17_18')], 1, function(x) calculateChildrenNum(x[1],x[2],x[3],x[4],x[5]))
+df$childString = apply(df[,c('child0_2', 'child3_5', 'child6_11', 'child12_16', 'child17_18')], 1, function(x) createChildrenString(x[1],x[2],x[3],x[4],x[5]))
+
+```
+
+## Visualization
+
+I put the data into tableau to visualize the data to see if there are any trends I can find. In the first visualization which is created by different strings. I have filtered away any categories in which the count of transactions is less than 1000 as small datasets could be inaccurate. As seen, it seems that no children has the highest spending in average. It also seems that if a family has a child around the age of 6-11, the spending will be more.
+
+![](childrenbasedonstring.png)
+
+For the next visualization, it takes into account how many children a household has based on the dummy variables. Here a trend shows that the less children a family have the more the family actually spends. This does make sense as a family probably have less money to spend on gifts if they have to take care of their children. 
+
+![](averagespendingperchildren.png)
+
+## Regression
+
+In order to test whether the less children you have means that you will spend less in this store, I have regress the child category against the amount they spend to see if there are any trends. The intercepts represents when a family has no kids and the other categories represent the age of the kids.
+
+```{r pressure}
+
+df <- dbGetQuery(con,
+                 "SELECT line_dollars, Child0_2, Child3_5, Child6_11, Child12_16, Child17_18 
+                          from summary inner join lines on summary.cust_id = lines.cust_id
+                          where Child0_2 IS NOT NULL")
+
+df$child0_2 <- ifelse(df$child0_2=="Y", 1, 0)
+df$child3_5 <- ifelse(df$child3_5=="Y", 1, 0)
+df$child6_11 <- ifelse(df$child6_11=="Y", 1, 0)
+df$child12_16 <- ifelse(df$child12_16=="Y", 1, 0)
+df$child17_18 <- ifelse(df$child17_18=="Y", 1, 0)
+
+model = lm(df$line_dollars ~ df$child0_2 + df$child3_5 + df$child6_11 + df$child12_16 + df$child17_18 )
+```
+```{r, echo=FALSE}
+kable(tidy(model), caption = "Table 1: Coefficients", digits = 3)
+kable(glance(model), caption = "Table 2: Regression Statistics", digits = 3)
+```
+
+Here you can see that the R squared is really low.  Even though the coefficents and tvalue seems to show that there is generally a trend that shows that if there are children the family will spend less, with such a low r square it seems to say that having children is only a small factor of how much the family will spend. This make sense as I have not kept into account other factors such as how rich the family is.
+
+I also did another regression based on the number of children a family has instead of what age the children is. Below the children factor represents the number of kids the household has with the intercept being no kids. 
+
+``` {r factors}
+
+df$childrenNum = apply(df[,c('child0_2', 'child3_5', 'child6_11', 'child12_16', 'child17_18')], 1, function(x) calculateChildrenNum(x[1],x[2],x[3],x[4],x[5]))
+
+df$childrenFactor <- factor(df$childrenNum)
+
+model = lm(df$line_dollars ~ df$childrenFactor)
+
+```
+```{r, echo=FALSE}
+kable(tidy(model), caption = "Table 3: Coefficients", digits = 3)
+kable(glance(model), caption = "Table 4: Regression Statistics", digits = 3)
+
+```
+
+Here again the R squared is really low. However there is a trend that as a family have more children they usually spend less. Again this might be because a family probably have less money to spend on gifts if they have to take care of their children. 
