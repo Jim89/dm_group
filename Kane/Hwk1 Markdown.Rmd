@@ -16,9 +16,14 @@ Through my question, I attempt to answer the question on whether there is a corr
 The first thing I did was to extract the data using SQL as follows:
 
 
-```{r sql}
+```{r include=FALSE}
 library(dplyr)
+library(broom)
+library(car)
+library(knitr)
 require("RPostgreSQL")
+```
+```{r sql}
 
 drv <- dbDriver("PostgreSQL")
 
@@ -118,8 +123,10 @@ df$child12_16 <- ifelse(df$child12_16=="Y", 1, 0)
 df$child17_18 <- ifelse(df$child17_18=="Y", 1, 0)
 
 model = lm(df$line_dollars ~ df$child0_2 + df$child3_5 + df$child6_11 + df$child12_16 + df$child17_18 )
-
-summary(model)
+```
+```{r, echo=FALSE}
+kable(tidy(model), caption = "Table 1: Coefficients", digits = 3)
+kable(glance(model), caption = "Table 2: Regression Statistics", digits = 3)
 ```
 
 Here you can see that the R squared is really low.  Even though the coefficents and tvalue seems to show that there is generally a trend that shows that if there are children the family will spend less, with such a low r square it seems to say that having children is only a small factor of how much the family will spend. This make sense as I have not kept into account other factors such as how rich the family is.
@@ -132,7 +139,12 @@ df$childrenNum = apply(df[,c('child0_2', 'child3_5', 'child6_11', 'child12_16', 
 
 df$childrenFactor <- factor(df$childrenNum)
 
-summary(lm(df$line_dollars ~ df$childrenFactor))
+model = lm(df$line_dollars ~ df$childrenFactor)
+
+```
+```{r, echo=FALSE}
+kable(tidy(model), caption = "Table 3: Coefficients", digits = 3)
+kable(glance(model), caption = "Table 4: Regression Statistics", digits = 3)
 
 ```
 

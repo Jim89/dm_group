@@ -124,18 +124,6 @@ $(document).ready(function () {
 <p>“Does sales changes based on the presence of children’s various age in the household”?</p>
 <p>Through my question, I attempt to answer the question on whether there is a correlation between the number of children in a household and the children’s age with spending in the store. The data that was given to us contains a boolean variable ‘Y’ or ‘N’ on whether the customer has a child between certain ages, namely between the age of 0 to 2, 6 to 11, 12 to 16 and 17 to 18.</p>
 <p>The first thing I did was to extract the data using SQL as follows:</p>
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: 'dplyr'</code></pre>
-<pre><code>## The following objects are masked from 'package:stats':
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>require(&quot;RPostgreSQL&quot;)</code></pre>
-<pre><code>## Loading required package: RPostgreSQL</code></pre>
-<pre><code>## Loading required package: DBI</code></pre>
 <pre class="r"><code>drv &lt;- dbDriver(&quot;PostgreSQL&quot;)
 
 con &lt;- dbConnect(drv, dbname=&quot;marketing&quot;,host=&quot;localhost&quot;,port=5432,user=&quot;postgres&quot;,password=&quot;ballball0&quot;)
@@ -223,61 +211,192 @@ df$child6_11 &lt;- ifelse(df$child6_11==&quot;Y&quot;, 1, 0)
 df$child12_16 &lt;- ifelse(df$child12_16==&quot;Y&quot;, 1, 0)
 df$child17_18 &lt;- ifelse(df$child17_18==&quot;Y&quot;, 1, 0)
 
-model = lm(df$line_dollars ~ df$child0_2 + df$child3_5 + df$child6_11 + df$child12_16 + df$child17_18 )
-
-summary(model)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = df$line_dollars ~ df$child0_2 + df$child3_5 + df$child6_11 + 
-##     df$child12_16 + df$child17_18)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-##  -27.18  -19.18  -10.18    7.82 2912.82 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   28.12820    0.05837 481.904  &lt; 2e-16 ***
-## df$child0_2   -2.59349    0.37021  -7.005 2.46e-12 ***
-## df$child3_5   -1.93387    0.28460  -6.795 1.08e-11 ***
-## df$child6_11  -0.26066    0.21559  -1.209    0.227    
-## df$child12_16 -1.89584    0.19432  -9.756  &lt; 2e-16 ***
-## df$child17_18 -2.92203    0.20219 -14.452  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 39.04 on 550425 degrees of freedom
-## Multiple R-squared:  0.001065,   Adjusted R-squared:  0.001056 
-## F-statistic: 117.4 on 5 and 550425 DF,  p-value: &lt; 2.2e-16</code></pre>
+model = lm(df$line_dollars ~ df$child0_2 + df$child3_5 + df$child6_11 + df$child12_16 + df$child17_18 )</code></pre>
+<table>
+<caption>Table 1: Coefficients</caption>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">28.128</td>
+<td align="right">0.058</td>
+<td align="right">481.904</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">df$child0_2</td>
+<td align="right">-2.593</td>
+<td align="right">0.370</td>
+<td align="right">-7.005</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">df$child3_5</td>
+<td align="right">-1.934</td>
+<td align="right">0.285</td>
+<td align="right">-6.795</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">df$child6_11</td>
+<td align="right">-0.261</td>
+<td align="right">0.216</td>
+<td align="right">-1.209</td>
+<td align="right">0.227</td>
+</tr>
+<tr class="odd">
+<td align="left">df$child12_16</td>
+<td align="right">-1.896</td>
+<td align="right">0.194</td>
+<td align="right">-9.756</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">df$child17_18</td>
+<td align="right">-2.922</td>
+<td align="right">0.202</td>
+<td align="right">-14.452</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table 2: Regression Statistics</caption>
+<thead>
+<tr class="header">
+<th align="right">r.squared</th>
+<th align="right">adj.r.squared</th>
+<th align="right">sigma</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">df</th>
+<th align="right">logLik</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">deviance</th>
+<th align="right">df.residual</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.001</td>
+<td align="right">0.001</td>
+<td align="right">39.037</td>
+<td align="right">117.405</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">-2798085</td>
+<td align="right">5596184</td>
+<td align="right">5596262</td>
+<td align="right">838786599</td>
+<td align="right">550425</td>
+</tr>
+</tbody>
+</table>
 <p>Here you can see that the R squared is really low. Even though the coefficents and tvalue seems to show that there is generally a trend that shows that if there are children the family will spend less, with such a low r square it seems to say that having children is only a small factor of how much the family will spend. This make sense as I have not kept into account other factors such as how rich the family is.</p>
 <p>I also did another regression based on the number of children a family has instead of what age the children is. Below the children factor represents the number of kids the household has with the intercept being no kids.</p>
 <pre class="r"><code>df$childrenNum = apply(df[,c('child0_2', 'child3_5', 'child6_11', 'child12_16', 'child17_18')], 1, function(x) calculateChildrenNum(x[1],x[2],x[3],x[4],x[5]))
 
 df$childrenFactor &lt;- factor(df$childrenNum)
 
-summary(lm(df$line_dollars ~ df$childrenFactor))</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = df$line_dollars ~ df$childrenFactor)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-##  -27.26  -19.26  -10.26    7.74 2912.74 
-## 
-## Coefficients:
-##                     Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)         28.20557    0.05963 473.016   &lt;2e-16 ***
-## df$childrenFactor1  -2.82157    0.15195 -18.569   &lt;2e-16 ***
-## df$childrenFactor2  -2.78115    0.21442 -12.971   &lt;2e-16 ***
-## df$childrenFactor3  -5.09083    0.46165 -11.028   &lt;2e-16 ***
-## df$childrenFactor4  -3.91823    1.62065  -2.418   0.0156 *  
-## df$childrenFactor5 -10.49800    6.79585  -1.545   0.1224    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 39.04 on 550425 degrees of freedom
-## Multiple R-squared:  0.00103,    Adjusted R-squared:  0.001021 
-## F-statistic: 113.5 on 5 and 550425 DF,  p-value: &lt; 2.2e-16</code></pre>
+model = lm(df$line_dollars ~ df$childrenFactor)</code></pre>
+<table>
+<caption>Table 3: Coefficients</caption>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">28.206</td>
+<td align="right">0.060</td>
+<td align="right">473.016</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">df$childrenFactor1</td>
+<td align="right">-2.822</td>
+<td align="right">0.152</td>
+<td align="right">-18.569</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">df$childrenFactor2</td>
+<td align="right">-2.781</td>
+<td align="right">0.214</td>
+<td align="right">-12.971</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">df$childrenFactor3</td>
+<td align="right">-5.091</td>
+<td align="right">0.462</td>
+<td align="right">-11.028</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">df$childrenFactor4</td>
+<td align="right">-3.918</td>
+<td align="right">1.621</td>
+<td align="right">-2.418</td>
+<td align="right">0.016</td>
+</tr>
+<tr class="even">
+<td align="left">df$childrenFactor5</td>
+<td align="right">-10.498</td>
+<td align="right">6.796</td>
+<td align="right">-1.545</td>
+<td align="right">0.122</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table 4: Regression Statistics</caption>
+<thead>
+<tr class="header">
+<th align="right">r.squared</th>
+<th align="right">adj.r.squared</th>
+<th align="right">sigma</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">df</th>
+<th align="right">logLik</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">deviance</th>
+<th align="right">df.residual</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.001</td>
+<td align="right">0.001</td>
+<td align="right">39.038</td>
+<td align="right">113.519</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">-2798095</td>
+<td align="right">5596203</td>
+<td align="right">5596282</td>
+<td align="right">838816177</td>
+<td align="right">550425</td>
+</tr>
+</tbody>
+</table>
 <p>Here again the R squared is really low. However there is a trend that as a family have more children they usually spend less. Again this might be because a family probably have less money to spend on gifts if they have to take care of their children.</p>
 </div>
 
