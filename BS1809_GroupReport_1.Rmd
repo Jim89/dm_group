@@ -7,7 +7,7 @@ output:
     toc: true
     toc_float: true
     code_folding: hide
-    theme: journal
+    theme: spacelab
 ---
 
 # Introduction
@@ -452,7 +452,14 @@ kable(glance(model222), col.names = toproper(glance(model222) %>% names()), digi
 
 ## A3 Summary
 
-Given the results we found during this section, we do not believe that store distance will be a valuable dimension to segment customers by for marketing purposes. We summarised the data, calculating the number of gifts sent by each customer to their gift recipients to create an edgelist graph structure.
+Given the results we found during this section, we do not believe that store distance will be a valuable dimension to segment customers by for marketing purposes. 
+
+
+## Section A4 - Gift giving network
+
+Noting that the data contained information on customers buying each other gifts, we explored the network structure of the gift-giving network to understand if it could be used to help the company's marketing efforts.
+
+We summarised the data, calculating the number of gifts sent by each customer to their gift recipients to create an edgelist graph structure.
 
 ```{r create_edgelist}
 graph_data <- lines %>%
@@ -489,7 +496,7 @@ outdeg <- sum_tabl %>%
            od = ntile(out_deg, 5))
 ```
 
-In the figure below, we present an example of the resulting graph structure. (Note that due to the size of the graph, not all nodes are shown). There is a clear structure to this graph. The majority of nodes are not connected, with most customers sending/receiving gifts to/from a very small number of other customers. Groups are small, with little connection between groups of customers, there are very few chains or cycles in the graph. There are, however, some users who have sent a huge number of gifts and therefore stand out in the network representation. (Click and drag/mousewheel zoom to navigate the network).
+In the figure below, we present an example of the resulting graph structure. (Note that due to the size of the graph, not all nodes are shown). There is a clear structure to this graph. The majority of nodes are not connected, with most customers sending/receiving gifts to/from a very small number of other customers. Groups are small, with little connection between groups of customers, there are very few chains or cycles in the graph. There are, however, some users who have sent a huge number of gifts and therefore stand out in the network representation. (Note that the visualisatin is interactive - click and drag/mousewheel zoom to navigate the network).
 
 ```{r show_graph, message = FALSE, fig.align='center'}
 # Subset the data slightly
@@ -530,7 +537,8 @@ Having viewed the graph structure, we then examined the relationship between the
 purchase_stats <- orders %>% 
     group_by(cust_id) %>% 
     summarise(orders = n()) %>% 
-    left_join(lines %>% group_by(cust_id) %>% summarise(spend = sum(line_dollars))) %>% 
+    left_join(lines %>% group_by(cust_id) %>% summarise(spend = sum(line_dollars)),
+              by = c("cust_id" = "cust_id")) %>% 
     collect()
 
 purchase_stats <- outdeg %>% 
@@ -563,11 +571,8 @@ glance_fit %>% select(2, 3, 4, 5, 6, 8) %>% kable(col.names = c("Adj. R-Squared"
                                                   digits = 3)
 ```
 
-From this model, it is clear that out-degree centality does have a statistically and economically significant effect on total spend, when controlling for number of orders. Therefore we have considered out-degree centrality to be a plausible dimension to segment customers on for marketing purposes, as explored in section C. 
+From this model, it is clear that out-degree centality does have a statistically and economically significant effect on total spend, when controlling for number of orders. The estiamtes are large and statistically significant, and the overall model has a good fit, explaing around 60% of the variation in the data. Therefore we have considered out-degree centrality to be a plausible dimension to segment customers on for marketing purposes, as explored in section C. 
 
-## Section A4 - Gift giving network
-
-Noting that the data contained information on customers buying each other gifts, we explored the network structure of the gift-giving network to understand if it could be used to help the company's marketing efforts.
 
 # Section B - RFM Segmentation
 
