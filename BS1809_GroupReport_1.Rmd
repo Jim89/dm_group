@@ -339,8 +339,8 @@ include_graphics("./Siang/resources/s_internet.png")
 ```
 
 ```{r show_internet_model}
-kable(tidy(model211), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
-kable(glance(model211), col.names = toproper(glance(model211) %>% names()), digits = 3)
+kable(tidy(model211), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 1: Coefficients", digits = 3)
+kable(glance(model211), col.names = toproper(glance(model211) %>% names()), caption = "Table 2: Regression Statistics", digits = 3)
 ```
 
 ### Retail store
@@ -354,8 +354,8 @@ include_graphics("./Siang/resources/s_store.png")
 ```
 
 ```{r show_store_model}
-kable(tidy(model212), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
-kable(glance(model212), col.names = toproper(glance(model212) %>% names()), digits = 3)
+kable(tidy(model212), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"),caption = "Table 3: Coefficients", digits = 3)
+kable(glance(model212), col.names = toproper(glance(model212) %>% names()), caption = "Table 4: Regression Statistics", digits = 3)
 ```
 
 ### Mail
@@ -369,8 +369,8 @@ include_graphics("./Siang/resources/s_mail.png")
 ```
 
 ```{r show_mail_model}
-kable(tidy(model213), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
-kable(glance(model213), col.names = toproper(glance(model213) %>% names()), digits = 3)
+kable(tidy(model213), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 5: Coefficients",digits = 3)
+kable(glance(model213), col.names = toproper(glance(model213) %>% names()),caption = "Table 6: Regression Statistics", digits = 3)
 ```
 
 ### Phone
@@ -384,8 +384,8 @@ include_graphics("./Siang/resources/s_phone.png")
 ```
 
 ```{r show_phone_model}
-kable(tidy(model214), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
-kable(glance(model214), col.names = toproper(glance(model214) %>% names()), digits = 3)
+kable(tidy(model214), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"),caption = "Table 7: Coefficients", digits = 3)
+kable(glance(model214), col.names = toproper(glance(model214) %>% names()),caption = "Table 8: Regression Statistics", digits = 3)
 ```
 
 ## Frequency of purchase {.tabset .tabset-fade}
@@ -405,8 +405,8 @@ include_graphics("./Siang/resources/f_internet.png")
 ```
 
 ```{r, echo=FALSE}
-kable(tidy(model224), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
-kable(glance(model224), col.names = toproper(glance(model224) %>% names()), digits = 3)
+kable(tidy(model224), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 9: Coefficients", digits = 3)
+kable(glance(model224), col.names = toproper(glance(model224) %>% names()),caption = "Table 10: Regression Statistics", digits = 3)
 ```
 
 ### Retail store
@@ -420,8 +420,8 @@ include_graphics("./Siang/resources/f_store.png")
 ```
 
 ```{r}
-kable(tidy(model221), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
-kable(glance(model221), col.names = toproper(glance(model221) %>% names()), digits = 3)
+kable(tidy(model221), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"),caption = "Table 11: Coefficients", digits = 3)
+kable(glance(model221), col.names = toproper(glance(model221) %>% names()), caption = "Table 12: Regression Statistics", digits = 3)
 ```
 
 ### Mail
@@ -435,8 +435,8 @@ include_graphics("./Siang/resources/f_mail.png")
 ```
 
 ```{r}
-kable(tidy(model223), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
-kable(glance(model223), col.names = toproper(glance(model223) %>% names()), digits = 3)
+kable(tidy(model223), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 13: Coefficients", digits = 3)
+kable(glance(model223), col.names = toproper(glance(model223) %>% names()), caption = "Table 14: Regression Statistics", digits = 3)
 ```
 
 ### Phone
@@ -450,8 +450,8 @@ include_graphics("./Siang/resources/f_phone.png")
 ```
 
 ```{r}
-kable(tidy(model222), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
-kable(glance(model222), col.names = toproper(glance(model222) %>% names()), digits = 3)
+kable(tidy(model222), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 15: Coefficients",digits = 3)
+kable(glance(model222), col.names = toproper(glance(model222) %>% names()), caption = "Table 16: Regression Statistics",digits = 3)
 ```
 
 ## A3 Summary
