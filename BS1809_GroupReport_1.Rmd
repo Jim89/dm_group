@@ -37,7 +37,11 @@ library(broom)
 library(readr)
 
 # Set up connection to the Postgres database
-db <- src_postgres(dbname = "dm")
+db <- src_postgres(dbname = "dm", 
+                   host = "localhost", 
+                   port = 5432, 
+                   user = "postgres", 
+                   password = "gy!be1989")
 
 # Set up theme object for prettier plots
 theme_jim <-  theme(legend.position = "bottom",
@@ -533,7 +537,7 @@ net
 
 Having viewed the graph structure, we then examined the relationship between the outdegree centrality of a customer, and their total purchases and total spend. This relationship is shown in figure 12 where a clear positive relationship between gift recipients and total spend is observed. 
 
-```{r gift_spend_plot, fig.cap = "Figure 12: Relationship between gifts sent and total spend. Red line shows linear fit of the data.", out.width=600, out.height=600, fig.align='center', message = FALSE}
+```{r gift_spend_plot, fig.cap = "Figure 12: Relationship between gifts sent and total spend. Red line shows linear fit of the data.", out.width=600, out.height=600, fig.retina = NULL, fig.align='center', message = FALSE}
 purchase_stats <- orders %>% 
     group_by(cust_id) %>% 
     summarise(orders = n()) %>% 
@@ -573,7 +577,303 @@ glance_fit %>% select(2, 3, 4, 5, 6, 8) %>% kable(col.names = c("Adj. R-Squared"
 
 From this model, it is clear that out-degree centality does have a statistically and economically significant effect on total spend, when controlling for number of orders. The estiamtes are large and statistically significant, and the overall model has a good fit, explaing around 60% of the variation in the data. Therefore we have considered out-degree centrality to be a plausible dimension to segment customers on for marketing purposes, as explored in section C. 
 
+## Section A5 - The effect of children
+
+We also investigated the effect of children (of various ages) on customer spending. 
+
+```{r get_kane, eval = FALSE}
+drv <- dbDriver("PostgreSQL")
+
+con <- dbConnect(drv, dbname="dm",host="localhost",port=5432,user="postgres",password="gy!be1989")
+df <- dbGetQuery(con,
+                          "SELECT avg(line_dollars),COUNT(DISTINCT summary.cust_id), 
+                          Child0_2, Child3_5, Child6_11, Child12_16, Child17_18 
+                          from summary inner join lines on summary.cust_id = lines.cust_id
+                          where Child0_2 IS NOT NULL group by Child0_2, Child3_5, Child6_11, Child12_16, Child17_18
+                          order by avg desc")
+```
+
+## Section A6 - Communication levels
+
+We observed that emails were sent intensively during 2007 with a maximum of 48 emails sent to a single customer.
+
+We therefore decided to investigate whether the number of emails/catalogues sent to a customers was correlated with how much they would purchase.
+
+Figure 13 shows the distribution of number of emails and catalogues sent between 2004 and 2007. Each point represents a customer.
+
+```{r kin_email_dist, fig.cap = "Figure 13: Distribution of number of emails and catalogues sent to customers"}
+include_graphics("./Kin/Email and Catalogue Contacts Distribution.png")
+```
+
+```{r kin_get_data, include = FALSE}
+load("./Kin/digital marketing.RData")
+```
+
+We performed a linear regression of sales (dollar spend) on the number of emails and catalogues received.
+
+```{r kin_regression}
+tidy(lm(purchase~mailcount+ctlgcount,data=CandL_R)) %>% 
+    kable(col.names = c("Term", "Estimate", "Std. Error", 
+                        "t-Stat.", "p-Value"),
+          digits = 3)
+
+glance(lm(purchase~mailcount+ctlgcount,data=CandL_R)) %>% 
+    select(2, 3, 4, 5, 6, 8) %>% 
+    kable(col.names = c("Adj. R-Squared", "Sigma", 
+                        "F-stat.", "p-Value", "Deg. Freedom", 
+                        "AIC"),
+          digits = 3)
+```
+
+We see that both number of emails sent and the number of catalogues sent have positive effect on the amount spent by customers. However, the number of emails sent is economically insignificant when compared with the effect of catalogues sent. 
+
+Also, the adjusted R^2^ of the model is very small, indicating that it cannot explain the variation in spending. Considering that people might have different response in different season, further analysis was performed for each month. However, the results were still insignificant, suggesting that sending out contacts more frequently is unlikely to boost sales.
 
 # Section B - RFM Segmentation
+
+## Generating RFM segments
+
+In order to create and test a marketing approach for this data, we first separated email from catalgoue marketing communications. We then further split the data based on the date. The contacts data set contained data from 2005 up to 2007. As such we took the first half of data (i.e. up to 2006-06-30) as one sample, leaving a validation set covering dates 2006-07-01 to 2008-01-01.
+
+```{r split_data, eval = FALSE}
+/* Clean up tables as needed *********/
+drop table if exists email_first_half, email_second_half, cat_first_half, cat_second_half;
+select *
+into email_first_half
+from
+	contacts_clean
+where contact_type = 'E'
+and contact_date <= '2006-06-30';
+
+/*
+select * from email_first_half
+*/
+
+select *
+into email_second_half
+from
+	contacts_clean
+where contact_type = 'E'
+and contact_date > '2006-06-30';
+/*
+select * from email_second_half
+*/
+
+
+select *
+into cat_first_half
+from
+	contacts_clean
+where contact_type = 'C'
+and contact_date <= '2006-06-30';
+/*
+select * from cat_first_half
+*/
+
+select *
+into cat_second_half
+from
+	contacts_clean
+where contact_type = 'C'
+and contact_date > '2006-06-30';
+/*
+select * from cat_second_half
+*/
+```
+
+This generated four data sets. One covering email contacts in the first half of the period for which data were available, one covering email contacts in the second half of the period; one covering catalogue contacts in the first of the period, and one covering catalogue contacts in the second half of the period.
+
+We then calcuted the RFM segment for each customer in each of these four data sets. Recency was calculted using the order that was closest to the end of the period for each data set (2006-06-30 for the first half of the data, and 2008-01-01 for the second period). Frequency was estimated via a simple count of orders that were made in the period. Monetary was the total dollars spent by each customer in the period.
+
+```{r rfm}
+# Define function to pull through specific customers from the db based on table
+get_custs <- function(table_name) {
+    tbl(db, table_name) %>% select(cust_id) %>% distinct()
+}    
+
+# Define function to, given a set of customers, return the rfm segments for them
+cust_rfm <- function(customers, start, stop) {
+    # Compute r
+    r <- lines %>%
+        filter(order_date >= start) %>% 
+        filter(order_date <= stop) %>% 
+        inner_join(customers, by = c("cust_id" = "cust_id")) %>% 
+        group_by(cust_id) %>% 
+        summarise(most_recent = max(order_date)) %>% 
+        collect() %>% 
+        mutate(age = difftime(stop, most_recent, units = "days"),
+               age = as.numeric(age),
+               age = ifelse(age < 0, Inf, age),
+               r = ntile(age, 5))
+    
+    # Compute f
+    f <- lines %>% 
+        filter(order_date >= start) %>% 
+        filter(order_date <= stop) %>% 
+        inner_join(customers, by = c("cust_id" = "cust_id")) %>% 
+        group_by(cust_id) %>% 
+        summarise(purchases = n()) %>% 
+        collect() %>% 
+        mutate(f = ntile(desc(purchases), 5))
+    
+    # Compute m
+    m <- lines %>% 
+        filter(order_date >= start) %>% 
+        filter(order_date <= stop) %>% 
+        inner_join(customers, by = c("cust_id" = "cust_id")) %>% 
+        group_by(cust_id) %>% 
+        summarise(avg_spend = mean(line_dollars)) %>% 
+        collect() %>% 
+        mutate(m = ntile(desc(avg_spend), 5))
+    
+    # Combine and return
+    rfm <- r %>% 
+        left_join(f, by = c("cust_id" = "cust_id")) %>% 
+        left_join(m, by = c("cust_id" = "cust_id")) %>% 
+        select(cust_id, r, f, m) %>% 
+        rowwise() %>% 
+        mutate(rfm = paste(r, f, m, sep = ""))
+    
+    return(rfm)   
+}    
+
+
+# Step 1 - get rfm for each data split ------------------------------------
+# Emailed customers
+email_1_rfm <- get_custs("email_first_half") %>% cust_rfm(start = "2005-01-01", stop = "2006-07-01")
+email_2_rfm <- get_custs("email_second_half") %>% cust_rfm(start = "2006-07-01", stop = "2008-01-01")
+
+# Catalogue customers
+cat_1_rfm <- get_custs("cat_first_half") %>% cust_rfm(start = "2005-01-01", stop = "2006-07-01")
+cat_2_rfm <- get_custs("cat_second_half") %>% cust_rfm(start = "2006-07-01", stop = "2008-01-01")
+```
+
+For each contact type and customer, we calculated the total number of contacts received by each customer in the period.
+
+```{r get_contacts}
+# Function to get the contacts per customer in the sample
+get_contacts <- function(table_name) {
+    tbl(db, table_name) %>% 
+        select(cust_id, contact_date) %>% 
+        group_by(cust_id) %>% 
+        summarise(contacts = n())
+}
+
+# Step 1 - get the data ---------------------------------------------------
+# Email contacts
+email_1_contacts <- get_contacts("email_first_half")
+email_2_contacts <- get_contacts("email_second_half")
+
+# Catalogue contacts
+cat_1_contacts <- get_contacts("cat_first_half")
+cat_2_contacts <- get_contacts("cat_second_half")
+
+
+# Step 2 - clean up -------------------------------------------------------
+rm(get_contacts)
+```
+
+We then found all purchases that could be attributed to a contact for each contact type, customer, and period. For emails, we attributed all purchases made within 30 days of receipt of an email to that contact, reasoning that any later purchases were probably not due to that contact. For catalogues, we extended the attribution window and attributed all purchases made within 100 days of receipt of the catalogue to that contact. 
+
+```{r attributable_sales}
+# Function to join segmented contacts table together and find attributable sales
+attributable_sales <- function(table_name, interval) {
+sql_cmd <- paste0("order_date between contact_date and (contact_date + interval '", interval, " days')")  
+
+tbl(db, table_name) %>% 
+    left_join(orders, by = c("cust_id" = "cust_id")) %>% 
+    select(cust_id, contact_date, ordernum, order_date) %>% 
+    filter_("order_date" >= "contact_date") %>% 
+    filter(sql(sql_cmd))
+}    
+
+
+# Step 1 - find attributable sales ----------------------------------------
+# Emailed customers - only within 30 days
+email_1_att <- attributable_sales("email_first_half", 30)
+email_2_att <- attributable_sales("email_second_half", 30)
+
+# Catalogue customers - only within 100 days
+cat_1_att <- attributable_sales("cat_first_half", 100)
+cat_2_att <- attributable_sales("cat_second_half", 100)
+
+
+# Step 2 - clean up -------------------------------------------------------
+rm(attributable_sales)
+```
+
+We calculated the total number of attributable orders placed by each customer in ther period, and joined this information, along with the number of contacts to the RFM segment data calculated earlier. Summarising this data to calculate _total_ contacts and _total_ sales per RFM segment enabled us to calculated the _response rate_ \eqref{eq:resp} for each segment.
+
+\begin{equation} \label{eq:resp}
+\text{Response rate} = \dfrac{Orders}{Contacts} * 100
+\end{equation}
+
+```{r orders_per_cust_and_rfm_to_stats}
+
+# Function to count orders per customer
+orders_per_cust <- function(data) {
+    data %>% 
+        select(cust_id, ordernum) %>% 
+        distinct() %>% 
+        group_by(cust_id) %>% 
+        summarise(orders = n())
+}
+
+
+# Step 1 - apply function to get orders per cust --------------------------
+# Emailed customers
+email_1_orders <- orders_per_cust(email_1_att)
+email_2_orders <- orders_per_cust(email_2_att)
+
+# Catalogue customers
+cat_1_orders <- orders_per_cust(cat_1_att)
+cat_2_orders <- orders_per_cust(cat_2_att)
+
+# Step 2 - clean up -------------------------------------------------------
+
+rm(orders_per_cust)
+
+# Create function to combine data summaries in to response rates per rfm
+rfm_to_stats <- function(rfm_data, contacts_data, orders_data) {
+    rfm_data %>% 
+        select(cust_id, rfm) %>% 
+        left_join(contacts_data, by = c("cust_id" = "cust_id"), copy = T) %>% 
+        left_join(orders_data, by = c("cust_id" = "cust_id"), copy = T) %>% 
+        ungroup() %>% 
+        group_by(rfm) %>% 
+        summarise(contacts = sum(contacts, na.rm = T),
+                  orders = sum(orders, na.rm = T)) %>% 
+        mutate(response_rate = (orders/contacts)*100)
+}
+
+# Step 1 - summarise rfm segments -----------------------------------------
+# Emailed customers
+email_1_rfm_stats <- rfm_to_stats(email_1_rfm, email_1_contacts, email_1_orders) 
+email_2_rfm_stats <- rfm_to_stats(email_2_rfm, email_2_contacts, email_2_orders)
+
+# Catalogue customers
+cat_1_rfm_stats <- rfm_to_stats(cat_1_rfm, cat_1_contacts, cat_1_orders) 
+cat_2_rfm_stats <- rfm_to_stats(cat_2_rfm, cat_2_contacts, cat_2_orders)
+```
+
+These statistics are presented below
+
+## {.tabset}
+
+### Emails
+
+```{r email_1}
+DT::datatable(email_1_rfm_stats, colnames = c("RFM", "Contacts", "Orders", "Response Rate"))
+```
+
+### Catalogues
+
+```{r cat_1}
+DT::datatable(cat_1_rfm_stats, colnames = c("RFM", "Contacts", "Orders", "Response Rate"))
+```
+
+## Marketing strategy
+
+
 
 # Section C - RFM Extensions
