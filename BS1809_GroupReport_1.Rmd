@@ -37,11 +37,7 @@ library(broom)
 library(readr)
 
 # Set up connection to the Postgres database
-db <- src_postgres(dbname = "dm", 
-                   host = "localhost", 
-                   port = 5432, 
-                   user = "postgres", 
-                   password = "gy!be1989")
+db <- src_postgres(dbname = "dm")
 
 # Set up theme object for prettier plots
 theme_jim <-  theme(legend.position = "bottom",
@@ -75,6 +71,9 @@ toproper <- function(x) {
   whole <- paste0(first, rest)
   return(whole)
 }
+
+# Set lm tidy coef names
+tidy_names <- c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value")
 ```
 
 # Section A - Exploratory Analysis
@@ -216,7 +215,7 @@ Figure two shows the catalogue marketing response rates for customers who were s
 
 The company sends out broadly consistent numbers of catalogues each spring. They also send more each Fall period. Catalogue response rates show a decreasing trend across the Fall periods. This is perhaps because a consistent consumer base who respond to catalogue marketing have been saturated in the number of catalogues being sent out, leading to a fall in the response rate. Or perhaps catalogue marketing is becoming less effective compared to other forms, such as digital. 
 
-## Section A2 - Spending based on order method
+## Section A2 - Order method and sales
 
 We also looked at sales split down by the different order methods in order to understand the customers' purchasing habits. There are four types of order in the data: internet (I), store (ST), phone (P), and mail (m). Summarising total orders (by items and spend) for these order types generates the summary table below.
 
@@ -265,7 +264,7 @@ In order to understand the statistical effect that order method has on spend, we
 
 ```{r show_fit}
 kable(method_tidy, 
-      col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"),
+      col.names = tidy_names,
       digits = 3)
 ```
 
@@ -318,11 +317,11 @@ attach(data)
 
 In this section we examined if a customers' store distance affected their spending and their order methods. Figure three shows the average distance from the customer’s address to the nearest company store and the results were broken down by the type of their order methods. Comparing to the channels of internet, mail and phone, customers who purchase products via retail channel (store) generally have an address that is nearest to the store. Customers who purchase through mail via catalog channel have the highest average store distance. Overall, customers who do not purchase directly at the retail store live relatively far away from their nearest company store.
 
-```{r, echo=FALSE, out.width = 200, out.height= 200, fig.retina = NULL, fig.align='center', fig.cap="Figure 3: Average Store Distance (miles)"}
+```{r show_siang_order_method_plot, echo=FALSE, out.width = 200, out.height= 200, fig.retina = NULL, fig.align='center', fig.cap="Figure 3: Average Store Distance (miles)"}
 knitr::include_graphics("./Siang/resources/ordermethod.png")
 ```
 
-## Spend based on distance {.tabset .tabset-fade}
+## {.tabset .tabset-fade}
 
 The total spend of each customer was calculated to investigate the relationship between store distance and the total amount of money they spent on the products. Extending the work performed in section A2, the amount of money spent was split into different order channels: retail store, internet, mail and phone. Phone and mail are the two methods by which catalog channel orders are placed. Linear regression and scatter plots were employed to investigate the relationship and identify potential trends.
 
@@ -339,7 +338,7 @@ include_graphics("./Siang/resources/s_internet.png")
 ```
 
 ```{r show_internet_model}
-kable(tidy(model211), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 1: Coefficients", digits = 3)
+kable(tidy(model211), col.names = tidy_names, caption = "Table 1: Coefficients", digits = 3)
 kable(glance(model211), col.names = toproper(glance(model211) %>% names()), caption = "Table 2: Regression Statistics", digits = 3)
 ```
 
@@ -354,7 +353,7 @@ include_graphics("./Siang/resources/s_store.png")
 ```
 
 ```{r show_store_model}
-kable(tidy(model212), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"),caption = "Table 3: Coefficients", digits = 3)
+kable(tidy(model212), col.names = tidy_names,caption = "Table 3: Coefficients", digits = 3)
 kable(glance(model212), col.names = toproper(glance(model212) %>% names()), caption = "Table 4: Regression Statistics", digits = 3)
 ```
 
@@ -369,7 +368,7 @@ include_graphics("./Siang/resources/s_mail.png")
 ```
 
 ```{r show_mail_model}
-kable(tidy(model213), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 5: Coefficients",digits = 3)
+kable(tidy(model213), col.names = tidy_names, caption = "Table 5: Coefficients",digits = 3)
 kable(glance(model213), col.names = toproper(glance(model213) %>% names()),caption = "Table 6: Regression Statistics", digits = 3)
 ```
 
@@ -384,11 +383,11 @@ include_graphics("./Siang/resources/s_phone.png")
 ```
 
 ```{r show_phone_model}
-kable(tidy(model214), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"),caption = "Table 7: Coefficients", digits = 3)
+kable(tidy(model214), col.names = tidy_names,caption = "Table 7: Coefficients", digits = 3)
 kable(glance(model214), col.names = toproper(glance(model214) %>% names()),caption = "Table 8: Regression Statistics", digits = 3)
 ```
 
-## Frequency of purchase {.tabset .tabset-fade}
+## {.tabset .tabset-fade}
 
 A new attempt to investigate the relationship between customer spending and store distance was made, the variable of dollar spent was replaced with frequency of purchase made by customers. The identical methodology and data segmentation was used for the following analysis, using linear regression and scatter plots to investigate the relationship and identify potential trends.
 
@@ -405,7 +404,7 @@ include_graphics("./Siang/resources/f_internet.png")
 ```
 
 ```{r, echo=FALSE}
-kable(tidy(model224), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 9: Coefficients", digits = 3)
+kable(tidy(model224), col.names = tidy_names, caption = "Table 9: Coefficients", digits = 3)
 kable(glance(model224), col.names = toproper(glance(model224) %>% names()),caption = "Table 10: Regression Statistics", digits = 3)
 ```
 
@@ -420,7 +419,7 @@ include_graphics("./Siang/resources/f_store.png")
 ```
 
 ```{r}
-kable(tidy(model221), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"),caption = "Table 11: Coefficients", digits = 3)
+kable(tidy(model221), col.names = tidy_names,caption = "Table 11: Coefficients", digits = 3)
 kable(glance(model221), col.names = toproper(glance(model221) %>% names()), caption = "Table 12: Regression Statistics", digits = 3)
 ```
 
@@ -435,7 +434,7 @@ include_graphics("./Siang/resources/f_mail.png")
 ```
 
 ```{r}
-kable(tidy(model223), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 13: Coefficients", digits = 3)
+kable(tidy(model223), col.names = tidy_names, caption = "Table 13: Coefficients", digits = 3)
 kable(glance(model223), col.names = toproper(glance(model223) %>% names()), caption = "Table 14: Regression Statistics", digits = 3)
 ```
 
@@ -450,11 +449,11 @@ include_graphics("./Siang/resources/f_phone.png")
 ```
 
 ```{r}
-kable(tidy(model222), col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), caption = "Table 15: Coefficients",digits = 3)
+kable(tidy(model222), col.names = tidy_names, caption = "Table 15: Coefficients",digits = 3)
 kable(glance(model222), col.names = toproper(glance(model222) %>% names()), caption = "Table 16: Regression Statistics",digits = 3)
 ```
 
-## A3 Summary
+##
 
 Given the results we found during this section, we do not believe that store distance will be a valuable dimension to segment customers by for marketing purposes. 
 
@@ -568,7 +567,7 @@ fit <- lm(spend ~ out_deg + orders, data = purchase_stats)
 tidy_fit <- tidy(fit)
 glance_fit <- glance(fit)
 
-kable(tidy_fit, col.names = c("Term", "Estimate", "Std. Error", "t-Stat.", "p-Value"), digits = 3)
+kable(tidy_fit, col.names = tidy_names, digits = 3)
 glance_fit %>% select(2, 3, 4, 5, 6, 8) %>% kable(col.names = c("Adj. R-Squared", "Sigma",
                                                                 "F-stat.", "p-Value", 
                                                                 "Deg. Freedom", "AIC"),
@@ -581,6 +580,12 @@ From this model, it is clear that out-degree centality does have a statistically
 
 We also investigated the effect of children (of various ages) on customer spending. 
 
+```{r get_kane_1, include = FALSE}
+load("./Kane/First.RData")
+```
+
+We have adressed the question of whether there is a correlation between the number of children in a household, and the children's age, with customer spending. To do this we used the `Y`/`N` variable on whether the customer has a child between certain ages, namely between the age of 0 to 2, 6 to 11, 12 to 16 and 17 to 18.
+
 ```{r get_kane, eval = FALSE}
 drv <- dbDriver("PostgreSQL")
 
@@ -591,7 +596,120 @@ df <- dbGetQuery(con,
                           from summary inner join lines on summary.cust_id = lines.cust_id
                           where Child0_2 IS NOT NULL group by Child0_2, Child3_5, Child6_11, Child12_16, Child17_18
                           order by avg desc")
+
+df$child0_2 <- ifelse(df$child0_2=="Y", 1, 0)
+df$child3_5 <- ifelse(df$child3_5=="Y", 1, 0)
+df$child6_11 <- ifelse(df$child6_11=="Y", 1, 0)
+df$child12_16 <- ifelse(df$child12_16=="Y", 1, 0)
+df$child17_18 <- ifelse(df$child17_18=="Y", 1, 0)
 ```
+
+In order to make these dummy variables more useful, we combined them in to a single categorical variable. We note a weakness of the data in that a family could have numerous children in a certain age range but the data will only consider it to be one child. 
+
+``` {r calculate_children}
+calculateChildrenNum <- function(Child0_2, Child3_5, Child6_11, Child12_16, Child17_18){
+  x = 0
+  if (Child0_2 == 1){
+  x = x + 1
+  }
+  if (Child3_5 == 1){
+    x = x + 1
+  }
+  if (Child6_11 == 1){
+    x = x + 1
+  }
+  if (Child12_16 == 1){
+    x = x + 1
+  }
+  if (Child17_18 == 1){
+    x = x + 1
+  }
+   x
+}
+
+createChildrenString <- function(Child0_2, Child3_5, Child6_11, Child12_16, Child17_18){
+  x = "child"
+  if (Child0_2 == 1){
+    x = paste(x, "0_2,")
+  }
+  if (Child3_5 == 1){
+    x = paste(x, "3_5,")
+  }
+  if (Child6_11 == 1){
+    x = paste(x, "6_11,")
+  }
+  if (Child12_16 == 1){
+    x = paste(x, "12_16,")
+  }
+  if (Child17_18 == 1){
+    x = paste(x, "17_18")
+  }
+  x
+}
+
+df$childrenNum = apply(df[,c('child0_2', 'child3_5', 'child6_11', 'child12_16', 'child17_18')], 1, function(x) calculateChildrenNum(x[1],x[2],x[3],x[4],x[5]))
+df$childString = apply(df[,c('child0_2', 'child3_5', 'child6_11', 'child12_16', 'child17_18')], 1, function(x) createChildrenString(x[1],x[2],x[3],x[4],x[5]))
+
+```
+
+We then visualised the relationship between customers having children and their average spending. Figure 13 shows that customers with no children have the highest spending on average. It also seems that if a family has a child around the age of 6-11, the spending will be more.
+
+```{r show_kane_vis_1, fig.cap = "Figure 13: Average spend by age range of children in customer family.", fig.align="center"}
+include_graphics("./Kane/childrenbasedonstring.png")
+```
+
+Figure 14 takes into account how _many_ children a household has based on the dummy variables in the data. Here the trend shows that the less children a customer has the more they are likely to spend. This seems reasonable in the context of the data as a family probably have less money to spend on gifts if they have more children. 
+
+```{r show_kane_vis_2, fig.cap = "Figure 14: Average spend by number of children",fig.align="center"}
+include_graphics("./Kane/averagespendingperchidlren.png")
+```
+
+We quantified the trends observed in figures 13 and 14 using regressions.
+
+We first regressed the child categorical variable against the amount spent. The intercepts represents a customer with no children and the other categories represent the age of the children.
+
+```{r show_kane_2, eval = FALSE}
+df <- dbGetQuery(con,
+                 "SELECT line_dollars, Child0_2, Child3_5, Child6_11, Child12_16, Child17_18 
+                          from summary inner join lines on summary.cust_id = lines.cust_id
+                          where Child0_2 IS NOT NULL")
+```
+
+```{r get_kane_2, include = FALSE}
+load("./Kane/Second.RData")
+```
+
+```{r kane_model_1}
+df$child0_2 <- ifelse(df$child0_2=="Y", 1, 0)
+df$child3_5 <- ifelse(df$child3_5=="Y", 1, 0)
+df$child6_11 <- ifelse(df$child6_11=="Y", 1, 0)
+df$child12_16 <- ifelse(df$child12_16=="Y", 1, 0)
+df$child17_18 <- ifelse(df$child17_18=="Y", 1, 0)
+
+model <- lm(df$line_dollars ~ df$child0_2 + df$child3_5 + df$child6_11 + df$child12_16 + df$child17_18 )
+
+kable(tidy(model), caption = "Table 1: Regression Coefficients", digits = 3, col.names = tidy_names)
+kable(glance(model), caption = "Table 2: Regression Statistics", digits = 3, col.names = toproper(glance(model) %>% names()))
+```
+
+Whilst the coefficients of the model are typically significant, the R^2^ value is low.  Even though the coefficents reveal the presence of a trend, such a low R^2^ indicates that having children is only a small factor in determining how much a customer will spend. 
+
+We therefore created a second model, which examined the effect the _number_ of children had on spending.
+
+```{r kane_model_2}
+df$childrenNum <- apply(df[,c('child0_2', 'child3_5', 'child6_11', 'child12_16', 'child17_18')], 1, function(x) calculateChildrenNum(x[1],x[2],x[3],x[4],x[5]))
+
+df$childrenFactor <- factor(df$childrenNum)
+
+model2 <- lm(df$line_dollars ~ df$childrenFactor)
+
+kable(tidy(model2), caption = "Table 3: Coefficients", digits = 3, col_names = tidy_names)
+kable(glance(model2), caption = "Table 4: Regression Statistics", digits =3, col.names = toproper(glance(model2) %>% names()))
+```
+
+Again the R^2^ is really low. However there is a trend that as a customer has more children they spend less. Again this might be because a family probably have less money to spend on gifts if they have to take care of their children. 
+
+Despite this, however, the poor fit of the model likely means that the presence and/or age of children in a customers' household will be a poor dimension for segmentation in a marketing scenario.
 
 ## Section A6 - Communication levels
 
@@ -601,7 +719,7 @@ We therefore decided to investigate whether the number of emails/catalogues sent
 
 Figure 13 shows the distribution of number of emails and catalogues sent between 2004 and 2007. Each point represents a customer.
 
-```{r kin_email_dist, fig.cap = "Figure 13: Distribution of number of emails and catalogues sent to customers"}
+```{r kin_email_dist, fig.cap = "Figure 13: Distribution of number of emails and catalogues sent to customers", fig.align="center"}
 include_graphics("./Kin/Email and Catalogue Contacts Distribution.png")
 ```
 
@@ -738,7 +856,6 @@ cust_rfm <- function(customers, start, stop) {
 }    
 
 
-# Step 1 - get rfm for each data split ------------------------------------
 # Emailed customers
 email_1_rfm <- get_custs("email_first_half") %>% cust_rfm(start = "2005-01-01", stop = "2006-07-01")
 email_2_rfm <- get_custs("email_second_half") %>% cust_rfm(start = "2006-07-01", stop = "2008-01-01")
@@ -759,7 +876,6 @@ get_contacts <- function(table_name) {
         summarise(contacts = n())
 }
 
-# Step 1 - get the data ---------------------------------------------------
 # Email contacts
 email_1_contacts <- get_contacts("email_first_half")
 email_2_contacts <- get_contacts("email_second_half")
@@ -768,8 +884,6 @@ email_2_contacts <- get_contacts("email_second_half")
 cat_1_contacts <- get_contacts("cat_first_half")
 cat_2_contacts <- get_contacts("cat_second_half")
 
-
-# Step 2 - clean up -------------------------------------------------------
 rm(get_contacts)
 ```
 
@@ -787,8 +901,6 @@ tbl(db, table_name) %>%
     filter(sql(sql_cmd))
 }    
 
-
-# Step 1 - find attributable sales ----------------------------------------
 # Emailed customers - only within 30 days
 email_1_att <- attributable_sales("email_first_half", 30)
 email_2_att <- attributable_sales("email_second_half", 30)
@@ -797,8 +909,6 @@ email_2_att <- attributable_sales("email_second_half", 30)
 cat_1_att <- attributable_sales("cat_first_half", 100)
 cat_2_att <- attributable_sales("cat_second_half", 100)
 
-
-# Step 2 - clean up -------------------------------------------------------
 rm(attributable_sales)
 ```
 
@@ -820,7 +930,6 @@ orders_per_cust <- function(data) {
 }
 
 
-# Step 1 - apply function to get orders per cust --------------------------
 # Emailed customers
 email_1_orders <- orders_per_cust(email_1_att)
 email_2_orders <- orders_per_cust(email_2_att)
@@ -828,8 +937,6 @@ email_2_orders <- orders_per_cust(email_2_att)
 # Catalogue customers
 cat_1_orders <- orders_per_cust(cat_1_att)
 cat_2_orders <- orders_per_cust(cat_2_att)
-
-# Step 2 - clean up -------------------------------------------------------
 
 rm(orders_per_cust)
 
@@ -846,7 +953,6 @@ rfm_to_stats <- function(rfm_data, contacts_data, orders_data) {
         mutate(response_rate = (orders/contacts)*100)
 }
 
-# Step 1 - summarise rfm segments -----------------------------------------
 # Emailed customers
 email_1_rfm_stats <- rfm_to_stats(email_1_rfm, email_1_contacts, email_1_orders) 
 email_2_rfm_stats <- rfm_to_stats(email_2_rfm, email_2_contacts, email_2_orders)
