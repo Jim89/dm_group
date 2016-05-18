@@ -980,6 +980,57 @@ DT::datatable(cat_1_rfm_stats, colnames = c("RFM", "Contacts", "Orders", "Respon
 
 ## Marketing strategy
 
+Having found the response rates for customers in each RFM segment for both email and catalogue contacts, we then sought to implement a marketing strategy. 
+
+We first assessed the range of response rates for both emails and catalogues, presented in figures 14 and 15.
+
+```{r email_resp, fig.cap = "Figure 14: The range of email response rates"}
+email_1_rfm_stats %>% 
+    ggplot(aes(x = response_rate)) +
+    geom_histogram(fill = "steelblue", colour = "white", binwidth = .25) +
+    xlab("Response rate (%)") +
+    ylab("") +
+    scale_x_continuous(breaks = seq(0, 7, 1)) +
+    theme_jim
+```
+
+```{r cat_resp, fig.cap = "Figure 15: The range of catalogue response rates"}
+cat_1_rfm_stats %>% 
+    ggplot(aes(x = response_rate)) +
+    geom_histogram(fill = "steelblue", colour = "white", binwidth = 1) +
+    xlab("Response rate (%)") +
+    ylab("") +
+    #scale_x_continuous(breaks = seq(0, 7, 1)) +
+    theme_jim
+```
+
+The range of response rates was much wider for catalogue contacts than those for emails. Given the increased cost of catalogue contacts (relative to emails) we therefore decided to adopt a different strategy for each contact type.
+
+For emails, we decided that we would contact the top 25 segments in terms of response rates. These segments had response rates ranging from around 6% to just under 2%. The segments which we mailed, and their associated response rates are presented below.
+
+```{r email_mailed}
+email_1_rfm_stats %>% 
+    arrange(desc(response_rate)) %>% 
+    mutate(resp_rank = row_number()) %>% 
+    filter(resp_rank <= 25) %>% 
+    select(-resp_rank) %>% 
+    kable(col.names = c("RFM", "Contacts", "Orders", "Response Rate"),
+          digits = 3)
+```
+
+For catalogue contacts, we adopted a different strategy. Due to the high costs involved in mailing catalogues to customers, we decided that we would mail a smaller group of customers. We therefore chose to mail to those segments which had made at least 400 orders, and had a response rate greater than or equal to 20%. (We chose 400 orders as we noted the presence of some segments, such as RFM-345 that had artificially high response rates due to very small values of both orders and contacts). The segments which we mailed, and their associated response rates are presented below.
+
+```{r cat_mailed}
+cat_1_rfm_stats %>% 
+    filter(orders >= 400,
+           response_rate >= 20) %>%
+    arrange(desc(response_rate)) %>% 
+    kable(col.names = c("RFM", "Contacts", "Orders", "Response Rate"),
+          digits = 3)
+```
+
+We then used the second half of the contacts data for both emails and catalogues to validate our mailing strategy. Using the same process as described above, we computed the customer segments and response rates per segment in the second half of the contacts data. We then compared the real response rates with those we had "predicted" from the first half of data. The comparisons of "predicted" with "actual" response rates for the segments which we had decided to mail are presented below.
+
 
 
 # Section C - RFM Extensions
