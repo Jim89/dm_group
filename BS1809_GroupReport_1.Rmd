@@ -24,6 +24,8 @@ This document is split in to three distinct sections, A, B and C. Section A cove
 
 The `SQL` and `R` code used to perform these analyses has been provided as supplementary files, and sections of the `R` code can be viewed in this report using the _Code_ buttons to toggle code viewing.
 
+This document has interactive elements and is best viewed using a modern web brower such as Mozilla Firefox or Google Chrome.
+
 ```{r prep, echo = TRUE, message=FALSE}
 # Load packages
 library(dplyr)
@@ -964,7 +966,7 @@ cat_2_rfm_stats <- rfm_to_stats(cat_2_rfm, cat_2_contacts, cat_2_orders)
 
 These statistics are presented below
 
-## {.tabset}
+## Response rates {.tabset}
 
 ### Emails
 
@@ -984,7 +986,7 @@ Having found the response rates for customers in each RFM segment for both email
 
 We first assessed the range of response rates for both emails and catalogues, presented in figures 14 and 15.
 
-```{r email_resp, fig.cap = "Figure 14: The range of email response rates"}
+```{r email_resp, fig.cap = "Figure 14: The range of email response rates", fig.align="center"}
 email_1_rfm_stats %>% 
     ggplot(aes(x = response_rate)) +
     geom_histogram(fill = "steelblue", colour = "white", binwidth = .25) +
@@ -994,7 +996,7 @@ email_1_rfm_stats %>%
     theme_jim
 ```
 
-```{r cat_resp, fig.cap = "Figure 15: The range of catalogue response rates"}
+```{r cat_resp, fig.cap = "Figure 15: The range of catalogue response rates", fig.align="center"}
 cat_1_rfm_stats %>% 
     ggplot(aes(x = response_rate)) +
     geom_histogram(fill = "steelblue", colour = "white", binwidth = 1) +
@@ -1029,8 +1031,194 @@ cat_1_rfm_stats %>%
           digits = 3)
 ```
 
+## Response comparisons
+
 We then used the second half of the contacts data for both emails and catalogues to validate our mailing strategy. Using the same process as described above, we computed the customer segments and response rates per segment in the second half of the contacts data. We then compared the real response rates with those we had "predicted" from the first half of data. The comparisons of "predicted" with "actual" response rates for the segments which we had decided to mail are presented below.
 
+```{r email_comp}
+email_comp <- email_1_rfm_stats %>% 
+    arrange(desc(response_rate)) %>% 
+    mutate(resp_rank = row_number()) %>% 
+    filter(resp_rank <= 25) %>% 
+    select(-resp_rank) %>% 
+    inner_join(email_2_rfm_stats, by = c("rfm" = "rfm")) %>% 
+    select(rfm, response_rate.x, response_rate.y) %>% 
+    rename(predicted = response_rate.x,
+           actual = response_rate.y) %>% 
+    mutate(difference = actual - predicted) 
 
+email_comp %>% 
+    kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
+          digits = 3,
+          caption = "Table : Difference in predicted and actual response rates for email contacts")
+```
+
+```{r cat_comp}
+cat_comp <- cat_1_rfm_stats %>% 
+    filter(orders >= 400,
+           response_rate >= 20) %>%
+    arrange(desc(response_rate)) %>% 
+    inner_join(cat_2_rfm_stats, by = c("rfm" = "rfm")) %>% 
+    select(rfm, response_rate.x, response_rate.y) %>% 
+    rename(predicted = response_rate.x,
+           actual = response_rate.y) %>% 
+    mutate(difference = actual - predicted) 
+
+cat_comp %>% 
+    kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
+          digits = 3,
+          caption = "Table : Difference in predicted and actual response rates for catalogue contacts")
+```
+
+As can be seen in the tables, whilst our marketing strategy was slightly optimistic (as several "actual" response rates are lower than the predictions), the predictions were not so different as to be useless. The average difference for emails was `r round(mean(email_comp$difference), 2)`% and was `r round(mean(cat_comp$difference), 2)`% for catalogues. These small differences demonstrate the validity of our approach.
+
+We also compared our approach with the response rates observed in the second half of data, to assess if we should have mailed different segments in reality. To do this we applied the same mailing strategy (i.e. top 25 email segments) to the second half of data, and compared it with the results from the first half of data. 
+
+For each segment included in the strategy based on the second half of the data, we mark if it is within the strategy based on the first half of data.
+
+```{r email_comp2}
+would_mail_email_2 <- email_2_rfm_stats %>% 
+    arrange(desc(response_rate)) %>% 
+    mutate(resp_rank = row_number()) %>% 
+    filter(resp_rank <= 25) %>% 
+    select(-resp_rank) 
+
+email_comp2 <- would_mail_email_2 %>% 
+    left_join(email_1_rfm_stats %>% 
+                arrange(desc(response_rate)) %>% 
+                mutate(resp_rank = row_number()) %>% 
+                filter(resp_rank <= 25) %>% 
+                select(-resp_rank), 
+              by = c("rfm" = "rfm")) %>% 
+    select(rfm, response_rate.x, response_rate.y) %>% 
+    mutate(did_mail = ifelse(is.na(response_rate.y), 0, 1)) %>% 
+    select(rfm, response_rate.x, response_rate.y, did_mail) %>% 
+    rename(train_resp = response_rate.x,
+           test_resp = response_rate.y)
+
+email_comp2 %>% 
+    kable(col.names = c("RFM", "Predicted Response", "Actual Response", "In Strategy"),
+          digits = 3,
+          caption = "Table : Comparison of email strategies between first and second half of data")
+```
+
+```{r cat_comp2}
+would_mail_cat_2 <- cat_2_rfm_stats %>% 
+    filter(orders >= 400,
+           response_rate >= 20) %>%
+    arrange(desc(response_rate)) 
+
+cat_comp2 <- would_mail_cat_2 %>% 
+    left_join(cat_1_rfm_stats %>% 
+    filter(orders >= 400,
+           response_rate >= 20) %>%
+    arrange(desc(response_rate)), 
+              by = c("rfm" = "rfm")) %>% 
+    select(rfm, response_rate.x, response_rate.y) %>% 
+    mutate(did_mail = ifelse(is.na(response_rate.y), 0, 1)) %>% 
+    select(rfm, response_rate.x, response_rate.y, did_mail) %>% 
+    rename(train_resp = response_rate.x,
+           test_resp = response_rate.y)
+
+cat_comp2 %>% 
+    kable(col.names = c("RFM", "Predicted Response", "Actual Response", "In Strategy"),
+          digits = 3,
+          caption = "Table : Comparison of catalogue strategies between first and second half of data")
+```
+
+As can be seen in the tables, our strategies are shown to be valid based on applying the same strategies devleoped from the first period to the validation data from the second period. For emails, `r scales::percent(mean(email_comp2$did_mail))` of the segments that should have been chosen in the validation data were chosen in the first period. For catalogues, the same figure is `r scales::percent(mean(cat_comp2$did_mail))`.
+
+## Spend comparisons {.tabset}
+
+Finally, we can compare the spend of each segment in the data from the first and second periods. For emails, our strategy would have resulted in contacting all of the top 10 RFM segments when ranked by total spend of customers in each segment. For catalogues we mailed 80% of the top 5 RFM segments when ranked by total spend of customers in each segment. This helps to further demonstrate the validity of our approach.
+
+### Emails
+
+```{r email_comp_3, message = FALSE, warning = FALSE}
+email_1_stats <- email_1_rfm %>% 
+    left_join(email_1_att %>% collect()) %>% 
+    left_join(lines %>% collect()) %>% 
+    group_by(rfm) %>% 
+    summarise(spend = sum(line_dollars, na.rm = T)) %>% 
+    left_join(email_1_rfm_stats, by = c("rfm" = "rfm")) %>% 
+    arrange(desc(spend)) %>% 
+    mutate(spend_rank = row_number()) %>% 
+    arrange(rfm) %>% collect()
+
+email_2_stats <- email_2_rfm %>% 
+    left_join(email_2_att %>% collect()) %>% 
+    left_join(lines %>% collect()) %>% 
+    group_by(rfm) %>% 
+    summarise(spend = sum(line_dollars, na.rm = T)) %>% 
+    left_join(email_2_rfm_stats, by = c("rfm" = "rfm")) %>% 
+    arrange(desc(spend)) %>% 
+    mutate(spend_rank = row_number()) %>% 
+    arrange(rfm) %>% collect()
+
+email_compare <- email_1_stats %>% 
+    left_join(email_2_stats, by = c("rfm" = "rfm")) %>% 
+    select(rfm, response_rate.x, response_rate.y, spend_rank.x, spend_rank.y) %>% 
+    rename(pred_respon = response_rate.x,
+           act_respon = response_rate.y,
+           pred_spend_rank = spend_rank.x,
+           act_spend_rank = spend_rank.y) %>% 
+    left_join(email_1_rfm_stats %>% 
+    arrange(desc(response_rate)) %>% 
+    mutate(resp_rank = row_number()) %>% 
+    filter(resp_rank <= 25) %>% 
+    select(-resp_rank) %>% 
+                  select(rfm, orders)) %>% 
+    mutate(mailed = ifelse(is.na(orders), 0, 1)) %>% 
+    select(-orders)
+
+DT::datatable(email_compare,
+              colnames = c("RFM", "Predicted Response", "Actual Response",
+                           "Predicted Spend Rank", "Actual Spend Rank", "Mailed"))
+```
+
+### Catalogues
+
+```{r cat_comp_3, message = FALSE, warning = FALSE}
+cat_1_stats <- cat_1_rfm %>% 
+    left_join(cat_1_att %>% collect()) %>% 
+    left_join(lines %>% collect()) %>% 
+    group_by(rfm) %>% 
+    summarise(spend = sum(line_dollars, na.rm = T)) %>% 
+    left_join(cat_1_rfm_stats, by = c("rfm" = "rfm")) %>% 
+    arrange(desc(spend)) %>% 
+    mutate(spend_rank = row_number()) %>% 
+    arrange(rfm) %>% collect()
+
+cat_2_stats <- cat_2_rfm %>% 
+    left_join(cat_2_att %>% collect()) %>% 
+    left_join(lines %>% collect()) %>% 
+    group_by(rfm) %>% 
+    summarise(spend = sum(line_dollars, na.rm = T)) %>% 
+    left_join(cat_2_rfm_stats, by = c("rfm" = "rfm")) %>% 
+    arrange(desc(spend)) %>% 
+    mutate(spend_rank = row_number()) %>% 
+    arrange(rfm) %>% collect()
+
+cat_compare <- cat_1_stats %>% 
+    left_join(cat_2_stats, by = c("rfm" = "rfm")) %>% 
+    select(rfm, response_rate.x, response_rate.y, spend_rank.x, spend_rank.y) %>% 
+    rename(pred_respon = response_rate.x,
+           act_respon = response_rate.y,
+           pred_spend_rank = spend_rank.x,
+           act_spend_rank = spend_rank.y) %>% 
+    left_join(cat_1_rfm_stats %>% 
+                filter(orders >= 400,
+                       response_rate >= 20) %>%
+                arrange(desc(response_rate))  %>% 
+                              select(rfm, orders)) %>% 
+    mutate(mailed = ifelse(is.na(orders), 0, 1)) %>% 
+    select(-orders)
+
+DT::datatable(cat_compare,
+              colnames = c("RFM", "Predicted Response", "Actual Response",
+                           "Predicted Spend Rank", "Actual Spend Rank", "Mailed"))
+```
 
 # Section C - RFM Extensions
+
+We also sought to extend our marketing strategy using another dimension in the RFM model. Having explored several possiblities in section A, we noted that only the level of gift giving (as measure by the out-degree centrality on the gift giving network
