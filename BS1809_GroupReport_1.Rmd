@@ -811,7 +811,7 @@ select * from cat_second_half
 
 This generated four data sets. One covering email contacts in the first half of the period for which data were available, one covering email contacts in the second half of the period; one covering catalogue contacts in the first of the period, and one covering catalogue contacts in the second half of the period.
 
-We then calculated the RFM segment for each customer in each of these four data sets. Recency was calculated using the order that was closest to the end of the period for each data set (2006-06-30 for the first half of the data, and 2008-01-01 for the second period). Frequency was estimated via a simple count of orders that were made in the period. Monetary was the total dollars spent by each customer in the period.
+We then calculated the RFM segment for each customer in each of these four data sets. Recency was calculated using the order that was closest to the end of the period for each data set (2006-06-30 for the first half of the data, and 2008-01-01 for the second period). Frequency was estimated via a simple count of orders that were made in the period. Monetary was the average order spend ($) for each customer in the period.
 
 ```{r rfm}
 # Define function to pull through specific customers from the db based on table
@@ -849,8 +849,10 @@ cust_rfm <- function(customers, start, stop) {
         filter(order_date >= start) %>% 
         filter(order_date <= stop) %>% 
         inner_join(customers, by = c("cust_id" = "cust_id")) %>% 
+        group_by(cust_id, ordernum) %>% 
+        summarise(spend = sum(line_dollars)) %>% 
         group_by(cust_id) %>% 
-        summarise(avg_spend = mean(line_dollars)) %>% 
+        summarise(avg_spend = mean(spend)) %>% 
         collect() %>% 
         mutate(m = ntile((avg_spend), 5))
     
@@ -1060,7 +1062,7 @@ email_comp <- email_1_rfm_stats %>%
     mutate(difference = actual - predicted) 
 
 email_comp %>% 
-    kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
+    kable(col.names = c("RFM", "Predicted Response", "Actual Response", "Difference"),
           digits = 3,
           caption = "Table 32: Difference in predicted and actual response rates for email contacts")
 ```
@@ -1077,7 +1079,7 @@ cat_comp <- cat_1_rfm_stats %>%
     mutate(difference = actual - predicted) 
 
 cat_comp %>% 
-    kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
+    kable(col.names = c("RFM", "Predicted Response", "Actual Response", "Difference"),
           digits = 3,
           caption = "Table 33: Difference in predicted and actual response rates for catalogue contacts")
 ```
@@ -1138,11 +1140,11 @@ cat_comp2 %>%
           caption = "Table 35: Comparison of catalogue strategies between first and second half of data")
 ```
 
-As can be seen in the tables, our strategies are shown to be valid based on applying the same strategies developed from the first period to the validation data from the second period. For emails, `r scales::percent(mean(email_comp2$did_mail))` of the segments that should have been chosen in the validation data were chosen in the first period. For catalogues, the same figure is `r scales::percent(mean(cat_comp2$did_mail))`.
+As can be seen in the tables, our strategies are shown to be valid based on applying the same strategies developed from the first period to the validation data from the second period. For emails, `r scales::percent(mean(email_comp2$did_mail))` of the segments that would have been chosen in the validation data were chosen in the first period. For catalogues, the same figure is `r scales::percent(mean(cat_comp2$did_mail))`, a weaker performance than for emails.
 
 ## Spend comparisons {.tabset}
 
-Finally, we can compare the spend of each segment in the data from the first and second periods. For emails, our strategy would have resulted in contacting all of the top 10 RFM segments when ranked by total spend of customers in each segment. For catalogues we mailed 80% of the top 5 RFM segments when ranked by total spend of customers in each segment. This helps to further demonstrate the validity of our approach.
+Finally, we can compare the spend of each segment in the data from the first and second periods. For both emails and catalogues, our strategy would have resulted in contacting only some of the top 10 RFM segments when ranked by total spend of customers in each segment. This is because the response rates were not prediced to be large enough for several high-spending segments to be included in our mailing strategy. There is perhaps, therefore, and opportunity to perform marketing based on the total spend in the category, in addition to the basic RFM model.
 
 ### Emails
 
@@ -1181,7 +1183,9 @@ email_compare <- email_1_stats %>%
     select(-resp_rank) %>% 
                   select(rfm, orders)) %>% 
     mutate(mailed = ifelse(is.na(orders), 0, 1)) %>% 
-    select(-orders)
+    select(-orders) %>% 
+    mutate(pred_respon = round(pred_respon, 2),
+           act_respon = round(act_respon, 2))
 
 DT::datatable(email_compare,
               colnames = c("RFM", "Predicted Response", "Actual Response",
@@ -1225,7 +1229,9 @@ cat_compare <- cat_1_stats %>%
                 arrange(desc(response_rate))  %>% 
                               select(rfm, orders)) %>% 
     mutate(mailed = ifelse(is.na(orders), 0, 1)) %>% 
-    select(-orders)
+    select(-orders) %>% 
+    mutate(pred_respon = round(pred_respon, 2),
+           act_respon = round(act_respon, 2))
 
 DT::datatable(cat_compare,
               colnames = c("RFM", "Predicted Response", "Actual Response",
