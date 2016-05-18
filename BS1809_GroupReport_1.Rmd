@@ -14,9 +14,9 @@ output:
 
 ## Project overview
 
-For this project sales and marketing data from a multi-channel company were provided. The data cover the company's retail stores, catalog and website and detail customer records, marketing contacts, orders, and line item records.
+For this project sales and marketing data from a multi-channel company were provided. The data cover the company's retail stores, catalogue and website and detail customer records, marketing contacts, orders, and line item records.
 
-This project used these data to investigate various marketing techniques used by this company in order to understand their effectiveness. A specific focus was placed upon email vs. catalog marketing. 
+This project used these data to investigate various marketing techniques used by this company in order to understand their effectiveness. A specific focus was placed upon email vs. catalogue marketing. 
 
 ## This document
 
@@ -24,7 +24,7 @@ This document is split in to three distinct sections, A, B and C. Section A cove
 
 The `SQL` and `R` code used to perform these analyses has been provided as supplementary files, and sections of the `R` code can be viewed in this report using the _Code_ buttons to toggle code viewing.
 
-This document has interactive elements and is best viewed using a modern web brower such as Mozilla Firefox or Google Chrome.
+This document has interactive elements and is best viewed using a modern web browser such as Mozilla Firefox or Google Chrome.
 
 ```{r prep, echo = TRUE, message=FALSE}
 # Load packages
@@ -196,7 +196,8 @@ rates %>%
     arrange(startDate) %>% 
     na.omit() %>% 
     kable(col.names = c("Season", "Start", "End", "Email Response Rate",
-                        "Catalogue Response Rate"))
+                        "Catalogue Response Rate"),
+          caption = "Table 1: Seasonal Response Rates")
 ```
 
 We visualised these results and present them in figures one and two below.
@@ -205,7 +206,7 @@ We visualised these results and present them in figures one and two below.
 include_graphics("./jon/Email Marketing Customer Response Rates By Season.jpg")
 ```
 
-Figure one shows the email marketing response rates for customers who were sent at least one marketing email in the season (lasting 6 months). They are counted as having responded if they have bought at least 1 item from the shop in that season through any channel (online order, in shop, or by phone).
+Figure one shows the email marketing response rates for customers who were sent at least one marketing email in the season (lasting 6 months). They are counted as having responded if they have bought at least 1 item from the shop in that season through any channel (on-line order, in shop, or by phone).
 
 The blue bars show that the company have increased the number of email addresses on their subscription list. The orange line peaking every Fall likely occurs due to the natural increase in sales that take place in December (as noted in the data description). However, this seasonal spike might also be due to customer’s increased responsiveness to marketing, as customers are already shopping heavily in that period and will respond to marketing more readily.
 
@@ -239,7 +240,8 @@ order_type_summary <- lines %>%
 order_type_summary %>% 
     kable(col.names = c("Order method", "Items purchased", "Total spend (£)"),
           format.args = list(big.mark = ','),
-          digits = 0)
+          digits = 0,
+          caption = "Table 2: Order method summary")
 ```
 
 Whilst store-based sales dominated in terms of items purchased, both phone and internet sales show strong figures for total spend, perhaps indicating an increased consumer preference to make larger orders via those media.
@@ -267,7 +269,8 @@ In order to understand the statistical effect that order method has on spend, we
 ```{r show_fit}
 kable(method_tidy, 
       col.names = tidy_names,
-      digits = 3)
+      digits = 3,
+      caption = "Table 3: Order method vs. sales regression coefficients")
 ```
 
 ```{r show_fit_stats}
@@ -275,7 +278,8 @@ method_glance %>% select(2, 3, 4, 5, 6, 8) %>%
 kable(col.names = c("Adjusted R-Squared", "Sigma",
                                    "F-Stat.", "p-Value", "Deg. Freedom",
                                    "AIC"),
-      digits = 3)
+      digits = 3,
+      caption = "Table 4: Order method vs. sales regression summary")
 ```
 
 As can be seen from the results of the regression, mail and phone orders are likely to increase the order spend relative to internet-based orders, whilst store orders are likely to be less valuable. These results are statistically significant. However, the overall model fit is exceptionally poor (R^2^ of just `r round(summary(method_fit)$r.squared, 3)`). This leads us to conclude that order type is not particularly useful in explaining order spend. Therefore a customer's order type preference should probably not inform our choice of how to market to customers.
@@ -317,7 +321,7 @@ data <- readr::read_csv("./Siang/resources/data.csv",
 attach(data)
 ```
 
-In this section we examined if a customers' store distance affected their spending and their order methods. Figure three shows the average distance from the customer’s address to the nearest company store and the results were broken down by the type of their order methods. Comparing to the channels of internet, mail and phone, customers who purchase products via retail channel (store) generally have an address that is nearest to the store. Customers who purchase through mail via catalog channel have the highest average store distance. Overall, customers who do not purchase directly at the retail store live relatively far away from their nearest company store.
+In this section we examined if a customers' store distance affected their spending and their order methods. Figure three shows the average distance from the customer’s address to the nearest company store and the results were broken down by the type of their order methods. Comparing to the channels of internet, mail and phone, customers who purchase products via retail channel (store) generally have an address that is nearest to the store. Customers who purchase through mail via catalogue channel have the highest average store distance. Overall, customers who do not purchase directly at the retail store live relatively far away from their nearest company store.
 
 ```{r show_siang_order_method_plot, echo=FALSE, out.width = 200, out.height= 200, fig.retina = NULL, fig.align='center', fig.cap="Figure 3: Average Store Distance (miles)"}
 knitr::include_graphics("./Siang/resources/ordermethod.png")
@@ -325,7 +329,7 @@ knitr::include_graphics("./Siang/resources/ordermethod.png")
 
 ## {.tabset .tabset-fade}
 
-The total spend of each customer was calculated to investigate the relationship between store distance and the total amount of money they spent on the products. Extending the work performed in section A2, the amount of money spent was split into different order channels: retail store, internet, mail and phone. Phone and mail are the two methods by which catalog channel orders are placed. Linear regression and scatter plots were employed to investigate the relationship and identify potential trends.
+The total spend of each customer was calculated to investigate the relationship between store distance and the total amount of money they spent on the products. Extending the work performed in section A2, the amount of money spent was split into different order channels: retail store, internet, mail and phone. Phone and mail are the two methods by which catalogue channel orders are placed. Linear regression and scatter plots were employed to investigate the relationship and identify potential trends.
 
 Results for all four scenarios are similar. Although the p-values of store distance in all four models are very significant, the R-squared and estimate are zero or near-zero. That implies the independent variable - store distance might be statistically significant but it is not economically significant at all, which was also supported by the scatter plots where no trend is observed.
 
@@ -340,8 +344,8 @@ include_graphics("./Siang/resources/s_internet.png")
 ```
 
 ```{r show_internet_model}
-kable(tidy(model211), col.names = tidy_names, caption = "Table 1: Coefficients", digits = 4)
-kable(glance(model211), col.names = toproper(glance(model211) %>% names()), caption = "Table 2: Regression Statistics", digits = 4)
+kable(tidy(model211), col.names = tidy_names, caption = "Table 5: Coefficients", digits = 4)
+kable(glance(model211), col.names = toproper(glance(model211) %>% names()), caption = "Table 6: Regression Statistics", digits = 4)
 ```
 
 ### Retail store
@@ -355,8 +359,8 @@ include_graphics("./Siang/resources/s_store.png")
 ```
 
 ```{r show_store_model}
-kable(tidy(model212), col.names = tidy_names,caption = "Table 3: Coefficients", digits = 4)
-kable(glance(model212), col.names = toproper(glance(model212) %>% names()), caption = "Table 4: Regression Statistics", digits = 4)
+kable(tidy(model212), col.names = tidy_names,caption = "Table 7: Coefficients", digits = 4)
+kable(glance(model212), col.names = toproper(glance(model212) %>% names()), caption = "Table 8: Regression Statistics", digits = 4)
 ```
 
 ### Mail
@@ -370,8 +374,8 @@ include_graphics("./Siang/resources/s_mail.png")
 ```
 
 ```{r show_mail_model}
-kable(tidy(model213), col.names = tidy_names, caption = "Table 5: Coefficients",digits = 4)
-kable(glance(model213), col.names = toproper(glance(model213) %>% names()),caption = "Table 6: Regression Statistics", digits = 4)
+kable(tidy(model213), col.names = tidy_names, caption = "Table 9: Coefficients",digits = 4)
+kable(glance(model213), col.names = toproper(glance(model213) %>% names()),caption = "Table 10: Regression Statistics", digits = 4)
 ```
 
 ### Phone
@@ -385,8 +389,8 @@ include_graphics("./Siang/resources/s_phone.png")
 ```
 
 ```{r show_phone_model}
-kable(tidy(model214), col.names = tidy_names,caption = "Table 7: Coefficients", digits = 4)
-kable(glance(model214), col.names = toproper(glance(model214) %>% names()),caption = "Table 8: Regression Statistics", digits = 4)
+kable(tidy(model214), col.names = tidy_names,caption = "Table 1: Coefficients", digits = 4)
+kable(glance(model214), col.names = toproper(glance(model214) %>% names()),caption = "Table 12: Regression Statistics", digits = 4)
 ```
 
 ## {.tabset .tabset-fade}
@@ -406,8 +410,8 @@ include_graphics("./Siang/resources/f_internet.png")
 ```
 
 ```{r, echo=FALSE}
-kable(tidy(model224), col.names = tidy_names, caption = "Table 9: Coefficients", digits = 4)
-kable(glance(model224), col.names = toproper(glance(model224) %>% names()),caption = "Table 10: Regression Statistics", digits = 4)
+kable(tidy(model224), col.names = tidy_names, caption = "Table 13: Coefficients", digits = 4)
+kable(glance(model224), col.names = toproper(glance(model224) %>% names()),caption = "Table 14: Regression Statistics", digits = 4)
 ```
 
 ### Retail store
@@ -421,8 +425,8 @@ include_graphics("./Siang/resources/f_store.png")
 ```
 
 ```{r}
-kable(tidy(model221), col.names = tidy_names,caption = "Table 11: Coefficients", digits = 4)
-kable(glance(model221), col.names = toproper(glance(model221) %>% names()), caption = "Table 12: Regression Statistics", digits = 4)
+kable(tidy(model221), col.names = tidy_names,caption = "Table 15: Coefficients", digits = 4)
+kable(glance(model221), col.names = toproper(glance(model221) %>% names()), caption = "Table 16: Regression Statistics", digits = 4)
 ```
 
 ### Mail
@@ -436,8 +440,8 @@ include_graphics("./Siang/resources/f_mail.png")
 ```
 
 ```{r}
-kable(tidy(model223), col.names = tidy_names, caption = "Table 13: Coefficients", digits = 4)
-kable(glance(model223), col.names = toproper(glance(model223) %>% names()), caption = "Table 14: Regression Statistics", digits = 4)
+kable(tidy(model223), col.names = tidy_names, caption = "Table 17: Coefficients", digits = 4)
+kable(glance(model223), col.names = toproper(glance(model223) %>% names()), caption = "Table 18: Regression Statistics", digits = 4)
 ```
 
 ### Phone
@@ -451,8 +455,8 @@ include_graphics("./Siang/resources/f_phone.png")
 ```
 
 ```{r}
-kable(tidy(model222), col.names = tidy_names, caption = "Table 15: Coefficients",digits = 4)
-kable(glance(model222), col.names = toproper(glance(model222) %>% names()), caption = "Table 16: Regression Statistics",digits = 4)
+kable(tidy(model222), col.names = tidy_names, caption = "Table 19: Coefficients",digits = 4)
+kable(glance(model222), col.names = toproper(glance(model222) %>% names()), caption = "Table 20: Regression Statistics",digits = 4)
 ```
 
 ##
@@ -498,10 +502,10 @@ outdeg <- sum_tabl %>%
     collect() %>% 
     left_join(outdeg, by = c("cust_id" = "cust_id")) %>% 
     mutate(out_deg = ifelse(is.na(out_deg), 0, out_deg),
-           od = ntile(out_deg, 5))
+           od = ntile((out_deg), 5))
 ```
 
-In the figure below, we present an example of the resulting graph structure. (Note that due to the size of the graph, not all nodes are shown). There is a clear structure to this graph. The majority of nodes are not connected, with most customers sending/receiving gifts to/from a very small number of other customers. Groups are small, with little connection between groups of customers, there are very few chains or cycles in the graph. There are, however, some users who have sent a huge number of gifts and therefore stand out in the network representation. (Note that the visualisatin is interactive - click and drag/mousewheel zoom to navigate the network).
+In the figure below, we present an example of the resulting graph structure. (Note that due to the size of the graph, not all nodes are shown). There is a clear structure to this graph. The majority of nodes are not connected, with most customers sending/receiving gifts to/from a very small number of other customers. Groups are small, with little connection between groups of customers, there are very few chains or cycles in the graph. There are, however, some users who have sent a huge number of gifts and therefore stand out in the network representation. (Note that the visualisation is interactive - click and drag/mousewheel zoom to navigate the network, and select/drag/highlight individual node with the mouse).
 
 ```{r show_graph, message = FALSE, fig.align='center'}
 # Subset the data slightly
@@ -536,7 +540,7 @@ net <- forceNetwork(Links = nw$links,
 net
 ```
 
-Having viewed the graph structure, we then examined the relationship between the outdegree centrality of a customer, and their total purchases and total spend. This relationship is shown in figure 12 where a clear positive relationship between gift recipients and total spend is observed. 
+Having viewed the graph structure, we then examined the relationship between the out-degree centrality of a customer, and their total purchases and total spend. This relationship is shown in figure 12 where a clear positive relationship between gift recipients and total spend is observed. 
 
 ```{r gift_spend_plot, fig.cap = "Figure 12: Relationship between gifts sent and total spend. Red line shows linear fit of the data.", out.width=600, out.height=600, fig.retina = NULL, fig.align='center', message = FALSE}
 purchase_stats <- orders %>% 
@@ -569,14 +573,16 @@ fit <- lm(spend ~ out_deg + orders, data = purchase_stats)
 tidy_fit <- tidy(fit)
 glance_fit <- glance(fit)
 
-kable(tidy_fit, col.names = tidy_names, digits = 3)
-glance_fit %>% select(2, 3, 4, 5, 6, 8) %>% kable(col.names = c("Adj. R-Squared", "Sigma",
-                                                                "F-stat.", "p-Value", 
-                                                                "Deg. Freedom", "AIC"),
-                                                  digits = 3)
+kable(tidy_fit, col.names = tidy_names, digits = 3, caption = "Table 21: Spend vs. gift giving regression coefficients.")
+glance_fit %>% 
+    select(2, 3, 4, 5, 6, 8) %>% 
+    kable(col.names = c("Adj. R-Squared", "Sigma", "F-stat.", "p-Value", 
+                        "Deg. Freedom", "AIC"),
+          digits = 3,
+          caption = "Table 22: Spend vs. gift giving regression summary.")
 ```
 
-From this model, it is clear that out-degree centality does have a statistically and economically significant effect on total spend, when controlling for number of orders. The estiamtes are large and statistically significant, and the overall model has a good fit, explaing around 60% of the variation in the data. Therefore we have considered out-degree centrality to be a plausible dimension to segment customers on for marketing purposes, as explored in section C. 
+From this model, it is clear that out-degree centrality does have a statistically and economically significant effect on total spend, when controlling for number of orders. The estimates are large and statistically significant, and the overall model has a good fit, explaining around 60% of the variation in the data. Therefore we have considered out-degree centrality to be a plausible dimension to segment customers on for marketing purposes, as explored in section C. 
 
 ## Section A5 - The effect of children
 
@@ -586,7 +592,7 @@ We also investigated the effect of children (of various ages) on customer spendi
 load("./Kane/First.RData")
 ```
 
-We have adressed the question of whether there is a correlation between the number of children in a household, and the children's age, with customer spending. To do this we used the `Y`/`N` variable on whether the customer has a child between certain ages, namely between the age of 0 to 2, 6 to 11, 12 to 16 and 17 to 18.
+We have addressed the question of whether there is a correlation between the number of children in a household, and the children's age, with customer spending. To do this we used the `Y`/`N` variable on whether the customer has a child between certain ages, namely between the age of 0 to 2, 6 to 11, 12 to 16 and 17 to 18.
 
 ```{r get_kane, eval = FALSE}
 drv <- dbDriver("PostgreSQL")
@@ -690,11 +696,11 @@ df$child17_18 <- ifelse(df$child17_18=="Y", 1, 0)
 
 model <- lm(df$line_dollars ~ df$child0_2 + df$child3_5 + df$child6_11 + df$child12_16 + df$child17_18 )
 
-kable(tidy(model), caption = "Table 1: Regression Coefficients", digits = 3, col.names = tidy_names)
-kable(glance(model), caption = "Table 2: Regression Statistics", digits = 3, col.names = toproper(glance(model) %>% names()))
+kable(tidy(model), caption = "Table 23: Regression Coefficients", digits = 3, col.names = tidy_names)
+kable(glance(model), caption = "Table 24: Regression Statistics", digits = 3, col.names = toproper(glance(model) %>% names()))
 ```
 
-Whilst the coefficients of the model are typically significant, the R^2^ value is low.  Even though the coefficents reveal the presence of a trend, such a low R^2^ indicates that having children is only a small factor in determining how much a customer will spend. 
+Whilst the coefficients of the model are typically significant, the R^2^ value is low.  Even though the coefficients reveal the presence of a trend, such a low R^2^ indicates that having children is only a small factor in determining how much a customer will spend. 
 
 We therefore created a second model, which examined the effect the _number_ of children had on spending.
 
@@ -705,8 +711,8 @@ df$childrenFactor <- factor(df$childrenNum)
 
 model2 <- lm(df$line_dollars ~ df$childrenFactor)
 
-kable(tidy(model2), caption = "Table 3: Coefficients", digits = 3, col_names = tidy_names)
-kable(glance(model2), caption = "Table 4: Regression Statistics", digits =3, col.names = toproper(glance(model2) %>% names()))
+kable(tidy(model2), caption = "Table 25: Coefficients", digits = 3, col_names = tidy_names)
+kable(glance(model2), caption = "Table 26: Regression Statistics", digits =3, col.names = toproper(glance(model2) %>% names()))
 ```
 
 Again the R^2^ is really low. However there is a trend that as a customer has more children they spend less. Again this might be because a family probably have less money to spend on gifts if they have to take care of their children. 
@@ -721,7 +727,7 @@ We therefore decided to investigate whether the number of emails/catalogues sent
 
 Figure 13 shows the distribution of number of emails and catalogues sent between 2004 and 2007. Each point represents a customer.
 
-```{r kin_email_dist, fig.cap = "Figure 13: Distribution of number of emails and catalogues sent to customers", fig.align="center"}
+```{r kin_email_dist, fig.cap = "Figure 15: Distribution of number of emails and catalogues sent to customers", fig.align="center"}
 include_graphics("./Kin/Email and Catalogue Contacts Distribution.png")
 ```
 
@@ -735,14 +741,16 @@ We performed a linear regression of sales (dollar spend) on the number of emails
 tidy(lm(purchase~mailcount+ctlgcount,data=CandL_R)) %>% 
     kable(col.names = c("Term", "Estimate", "Std. Error", 
                         "t-Stat.", "p-Value"),
-          digits = 3)
+          digits = 3,
+          caption = "Table 27: Sales vs. contact count regression coefficients.")
 
 glance(lm(purchase~mailcount+ctlgcount,data=CandL_R)) %>% 
     select(2, 3, 4, 5, 6, 8) %>% 
     kable(col.names = c("Adj. R-Squared", "Sigma", 
                         "F-stat.", "p-Value", "Deg. Freedom", 
                         "AIC"),
-          digits = 3)
+          digits = 3,
+          caption = "Table 28: sales vs. contact count regression summary.")
 ```
 
 We see that both number of emails sent and the number of catalogues sent have positive effect on the amount spent by customers. However, the number of emails sent is economically insignificant when compared with the effect of catalogues sent. 
@@ -753,7 +761,7 @@ Also, the adjusted R^2^ of the model is very small, indicating that it cannot ex
 
 ## Generating RFM segments
 
-In order to create and test a marketing approach for this data, we first separated email from catalgoue marketing communications. We then further split the data based on the date. The contacts data set contained data from 2005 up to 2007. As such we took the first half of data (i.e. up to 2006-06-30) as one sample, leaving a validation set covering dates 2006-07-01 to 2008-01-01.
+In order to create and test a marketing approach for this data, we first separated email from catalogue marketing communications. We then further split the data based on the date. The contacts data set contained data from 2005 up to 2007. As such we took the first half of data (i.e. up to 2006-06-30) as one sample, leaving a validation set covering dates 2006-07-01 to 2008-01-01.
 
 ```{r split_data, eval = FALSE}
 /* Clean up tables as needed *********/
@@ -803,7 +811,7 @@ select * from cat_second_half
 
 This generated four data sets. One covering email contacts in the first half of the period for which data were available, one covering email contacts in the second half of the period; one covering catalogue contacts in the first of the period, and one covering catalogue contacts in the second half of the period.
 
-We then calcuted the RFM segment for each customer in each of these four data sets. Recency was calculted using the order that was closest to the end of the period for each data set (2006-06-30 for the first half of the data, and 2008-01-01 for the second period). Frequency was estimated via a simple count of orders that were made in the period. Monetary was the total dollars spent by each customer in the period.
+We then calculated the RFM segment for each customer in each of these four data sets. Recency was calculated using the order that was closest to the end of the period for each data set (2006-06-30 for the first half of the data, and 2008-01-01 for the second period). Frequency was estimated via a simple count of orders that were made in the period. Monetary was the total dollars spent by each customer in the period.
 
 ```{r rfm}
 # Define function to pull through specific customers from the db based on table
@@ -824,7 +832,7 @@ cust_rfm <- function(customers, start, stop) {
         mutate(age = difftime(stop, most_recent, units = "days"),
                age = as.numeric(age),
                age = ifelse(age < 0, Inf, age),
-               r = ntile(age, 5))
+               r = ntile(desc(age), 5))
     
     # Compute f
     f <- lines %>% 
@@ -834,7 +842,7 @@ cust_rfm <- function(customers, start, stop) {
         group_by(cust_id) %>% 
         summarise(purchases = n()) %>% 
         collect() %>% 
-        mutate(f = ntile(desc(purchases), 5))
+        mutate(f = ntile((purchases), 5))
     
     # Compute m
     m <- lines %>% 
@@ -844,7 +852,7 @@ cust_rfm <- function(customers, start, stop) {
         group_by(cust_id) %>% 
         summarise(avg_spend = mean(line_dollars)) %>% 
         collect() %>% 
-        mutate(m = ntile(desc(avg_spend), 5))
+        mutate(m = ntile((avg_spend), 5))
     
     # Combine and return
     rfm <- r %>% 
@@ -914,7 +922,7 @@ cat_2_att <- attributable_sales("cat_second_half", 100)
 rm(attributable_sales)
 ```
 
-We calculated the total number of attributable orders placed by each customer in ther period, and joined this information, along with the number of contacts to the RFM segment data calculated earlier. Summarising this data to calculate _total_ contacts and _total_ sales per RFM segment enabled us to calculated the _response rate_ \eqref{eq:resp} for each segment.
+We calculated the total number of attributable orders placed by each customer in the period, and joined this information, along with the number of contacts to the RFM segment data calculated earlier. Summarising this data to calculate _total_ contacts and _total_ sales per RFM segment enabled us to calculated the _response rate_ \eqref{eq:resp} for each segment.
 
 \begin{equation} \label{eq:resp}
 \text{Response rate} = \dfrac{Orders}{Contacts} * 100
@@ -971,22 +979,24 @@ These statistics are presented below
 ### Emails
 
 ```{r email_1}
-DT::datatable(email_1_rfm_stats, colnames = c("RFM", "Contacts", "Orders", "Response Rate"))
+DT::datatable(email_1_rfm_stats, colnames = c("RFM", "Contacts", "Orders", "Response Rate"),
+              caption = "Table 29: Emailed customer RFM statistics")
 ```
 
 ### Catalogues
 
 ```{r cat_1}
-DT::datatable(cat_1_rfm_stats, colnames = c("RFM", "Contacts", "Orders", "Response Rate"))
+DT::datatable(cat_1_rfm_stats, colnames = c("RFM", "Contacts", "Orders", "Response Rate"),
+              caption = "Table 30: Catalogue customer RFM statistics")
 ```
 
 ## Marketing strategy
 
 Having found the response rates for customers in each RFM segment for both email and catalogue contacts, we then sought to implement a marketing strategy. 
 
-We first assessed the range of response rates for both emails and catalogues, presented in figures 14 and 15.
+We first assessed the range of response rates for both emails and catalogues, presented in figures 16 and 17.
 
-```{r email_resp, fig.cap = "Figure 14: The range of email response rates", fig.align="center"}
+```{r email_resp, fig.cap = "Figure 16: The range of email response rates", fig.align="center"}
 email_1_rfm_stats %>% 
     ggplot(aes(x = response_rate)) +
     geom_histogram(fill = "steelblue", colour = "white", binwidth = .25) +
@@ -996,7 +1006,7 @@ email_1_rfm_stats %>%
     theme_jim
 ```
 
-```{r cat_resp, fig.cap = "Figure 15: The range of catalogue response rates", fig.align="center"}
+```{r cat_resp, fig.cap = "Figure 17: The range of catalogue response rates", fig.align="center"}
 cat_1_rfm_stats %>% 
     ggplot(aes(x = response_rate)) +
     geom_histogram(fill = "steelblue", colour = "white", binwidth = 1) +
@@ -1017,7 +1027,8 @@ email_1_rfm_stats %>%
     filter(resp_rank <= 25) %>% 
     select(-resp_rank) %>% 
     kable(col.names = c("RFM", "Contacts", "Orders", "Response Rate"),
-          digits = 3)
+          digits = 3,
+          caption = "Table 31: Email customer RFM mailing segments")
 ```
 
 For catalogue contacts, we adopted a different strategy. Due to the high costs involved in mailing catalogues to customers, we decided that we would mail a smaller group of customers. We therefore chose to mail to those segments which had made at least 400 orders, and had a response rate greater than or equal to 20%. (We chose 400 orders as we noted the presence of some segments, such as RFM-345 that had artificially high response rates due to very small values of both orders and contacts). The segments which we mailed, and their associated response rates are presented below.
@@ -1028,7 +1039,8 @@ cat_1_rfm_stats %>%
            response_rate >= 20) %>%
     arrange(desc(response_rate)) %>% 
     kable(col.names = c("RFM", "Contacts", "Orders", "Response Rate"),
-          digits = 3)
+          digits = 3,
+          caption = "Table 31: Catalogue customer RFM mailing segments")
 ```
 
 ## Response comparisons
@@ -1050,7 +1062,7 @@ email_comp <- email_1_rfm_stats %>%
 email_comp %>% 
     kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
           digits = 3,
-          caption = "Table : Difference in predicted and actual response rates for email contacts")
+          caption = "Table 32: Difference in predicted and actual response rates for email contacts")
 ```
 
 ```{r cat_comp}
@@ -1067,7 +1079,7 @@ cat_comp <- cat_1_rfm_stats %>%
 cat_comp %>% 
     kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
           digits = 3,
-          caption = "Table : Difference in predicted and actual response rates for catalogue contacts")
+          caption = "Table 33: Difference in predicted and actual response rates for catalogue contacts")
 ```
 
 As can be seen in the tables, whilst our marketing strategy was slightly optimistic (as several "actual" response rates are lower than the predictions), the predictions were not so different as to be useless. The average difference for emails was `r round(mean(email_comp$difference), 2)`% and was `r round(mean(cat_comp$difference), 2)`% for catalogues. These small differences demonstrate the validity of our approach.
@@ -1099,7 +1111,7 @@ email_comp2 <- would_mail_email_2 %>%
 email_comp2 %>% 
     kable(col.names = c("RFM", "Predicted Response", "Actual Response", "In Strategy"),
           digits = 3,
-          caption = "Table : Comparison of email strategies between first and second half of data")
+          caption = "Table 34: Comparison of email strategies between first and second half of data")
 ```
 
 ```{r cat_comp2}
@@ -1123,10 +1135,10 @@ cat_comp2 <- would_mail_cat_2 %>%
 cat_comp2 %>% 
     kable(col.names = c("RFM", "Predicted Response", "Actual Response", "In Strategy"),
           digits = 3,
-          caption = "Table : Comparison of catalogue strategies between first and second half of data")
+          caption = "Table 35: Comparison of catalogue strategies between first and second half of data")
 ```
 
-As can be seen in the tables, our strategies are shown to be valid based on applying the same strategies devleoped from the first period to the validation data from the second period. For emails, `r scales::percent(mean(email_comp2$did_mail))` of the segments that should have been chosen in the validation data were chosen in the first period. For catalogues, the same figure is `r scales::percent(mean(cat_comp2$did_mail))`.
+As can be seen in the tables, our strategies are shown to be valid based on applying the same strategies developed from the first period to the validation data from the second period. For emails, `r scales::percent(mean(email_comp2$did_mail))` of the segments that should have been chosen in the validation data were chosen in the first period. For catalogues, the same figure is `r scales::percent(mean(cat_comp2$did_mail))`.
 
 ## Spend comparisons {.tabset}
 
@@ -1173,7 +1185,8 @@ email_compare <- email_1_stats %>%
 
 DT::datatable(email_compare,
               colnames = c("RFM", "Predicted Response", "Actual Response",
-                           "Predicted Spend Rank", "Actual Spend Rank", "Mailed"))
+                           "Predicted Spend Rank", "Actual Spend Rank", "Mailed"),
+              caption = "Table 36: RFM Segment level spending comparisons for emailed customers.")
 ```
 
 ### Catalogues
@@ -1216,9 +1229,75 @@ cat_compare <- cat_1_stats %>%
 
 DT::datatable(cat_compare,
               colnames = c("RFM", "Predicted Response", "Actual Response",
-                           "Predicted Spend Rank", "Actual Spend Rank", "Mailed"))
+                           "Predicted Spend Rank", "Actual Spend Rank", "Mailed"),
+              caption = "Table 37: RFM Segment level spending comparisons for catalogue customers.")
 ```
 
 # Section C - RFM Extensions
 
-We also sought to extend our marketing strategy using another dimension in the RFM model. Having explored several possiblities in section A, we noted that only the level of gift giving (as measure by the out-degree centrality on the gift giving network
+We also sought to extend our marketing strategy using another dimension in the RFM model. Having explored several possibilities in section A, we noted that only the level of gift giving (as measure by the out-degree centrality on the gift giving network) seemed significant in explaining customer spend. As such, we decided to use that as a fourth dimension in the RFM model. We term this the RFMOD model.
+
+```{r rfm_od}
+# Set up RFMOD stats
+rfm_od_1 <- cat_1_rfm %>% 
+    left_join(outdeg, by = c("cust_id" = "cust_id")) %>% 
+    mutate(rfm_od = paste0(rfm, od)) %>% 
+    select(cust_id, rfm_od) %>% 
+    rename(rfm = rfm_od)
+
+rfm_od_2 <- cat_2_rfm %>% 
+    left_join(outdeg, by = c("cust_id" = "cust_id")) %>% 
+    mutate(rfm_od = paste0(rfm, od)) %>% 
+    select(cust_id, rfm_od) %>% 
+    rename(rfm = rfm_od)
+
+# Generate RFMOD response rates for catalogues
+cat_1_rfm_od_stats <- rfm_to_stats(rfm_od_1, cat_1_contacts, cat_1_orders)
+cat_2_rfm_od_stats <- rfm_to_stats(rfm_od_2, cat_2_contacts, cat_2_orders)
+```
+
+For brevity, we have applied this methodology to catalogue contacts only, but the same process could easily be extended to email contacts, too. Applying a similar segment-selection process as for the basic RFM model in section B, we generated the segments which we would mail based on the RFMOD model. Whilst we still looked for segments with a response rate of at least 20%, we lowered the orders threshold to 300, reasoning that with more segments, order volumes per-segment would be lower. The segments which were therefore selected for mailing are presented below.
+
+```{r rfmod_mail}
+cat_1_rfm_od_stats %>% 
+    filter(orders >= 300,
+           response_rate >= 20) %>% 
+    kable(col.names = c("RFMOD", "Contacts", "Orders", "Response Rate"),
+          digits = 3,
+          caption = "Table 38: RFMOD selected segments")
+```
+
+We then compared these response rates with those obtained using the catalogue contact data from the second period and assessed the differences.
+
+```{r cat_comp_rfmod}
+cat_comp_rfmod <- cat_1_rfm_od_stats %>% 
+    filter(orders >= 300,
+           response_rate >= 20) %>%
+    arrange(desc(response_rate)) %>% 
+    inner_join(cat_2_rfm_od_stats, by = c("rfm" = "rfm")) %>% 
+    select(rfm, response_rate.x, response_rate.y) %>% 
+    rename(predicted = response_rate.x,
+           actual = response_rate.y) %>% 
+    mutate(difference = actual - predicted) 
+
+cat_comp_rfmod %>% 
+    arrange(-actual) %>% 
+    kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
+          digits = 3,
+          caption = "Table 39: Difference in predicted and actual response rates for RFMOD catalogue contacts")
+```
+
+As can be seen in the table, whilst our marketing strategy was again slightly optimistic (as several "actual" response rates are lower than the predictions), the predictions were not so different as to be useless. The average difference was `r round(mean(cat_comp_rfmod$difference), 2)`%. These small differences demonstrate the validity of extending the RFM model to RFMOD, using gift-giving as an extra dimension. 
+
+Whilst these differences are better than for the basic RFM model (where the average difference was `r round(mean(cat_comp$difference), 2)`%), the results are not statistically significant, as seen in the table below.
+
+```{r diff_stat}
+t.test(cat_comp$difference, cat_comp_rfmod$difference, var.equal = F) %>% 
+    tidy() %>% 
+    select(estimate1, estimate2, statistic, p.value) %>% 
+    kable(col.names = c("RFM Avg. Diff.", "RFMOD Avg. Diff.", "t-Stat.", "p-Value"),
+          digits = 3,
+          caption = "Table 40: Statistical difference in performance of RFM vs. RFMOD models")
+```
+
+The initial results from the validation set are promising, indicating that gift-giving may be a valuable dimension to help segment customers more effectively for marketing purposes. However we note that the segments where we most over-estimated the expected response rate where those in the top quintile for gift-giving. This suggests that further work may be necessary to understand if gift giving is a relevant dimension for customer segmentation for marketing purposes.
