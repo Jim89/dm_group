@@ -811,7 +811,7 @@ select * from cat_second_half
 
 This generated four data sets. One covering email contacts in the first half of the period for which data were available, one covering email contacts in the second half of the period; one covering catalogue contacts in the first of the period, and one covering catalogue contacts in the second half of the period.
 
-We then calculated the RFM segment for each customer in each of these four data sets. Recency was calculated using the order that was closest to the end of the period for each data set (2006-06-30 for the first half of the data, and 2008-01-01 for the second period). Frequency was estimated via a simple count of orders that were made in the period. Monetary was the total dollars spent by each customer in the period.
+We then calculated the RFM segment for each customer in each of these four data sets. Recency was calculated using the order that was closest to the end of the period for each data set (2006-06-30 for the first half of the data, and 2008-01-01 for the second period). Frequency was estimated via a simple count of orders that were made in the period. Monetary was the average order spend ($) for each customer in the period.
 
 ```{r rfm}
 # Define function to pull through specific customers from the db based on table
@@ -849,8 +849,10 @@ cust_rfm <- function(customers, start, stop) {
         filter(order_date >= start) %>% 
         filter(order_date <= stop) %>% 
         inner_join(customers, by = c("cust_id" = "cust_id")) %>% 
+        group_by(cust_id, ordernum) %>% 
+        summarise(spend = sum(line_dollars)) %>% 
         group_by(cust_id) %>% 
-        summarise(avg_spend = mean(line_dollars)) %>% 
+        summarise(avg_spend = mean(spend)) %>% 
         collect() %>% 
         mutate(m = ntile((avg_spend), 5))
     
@@ -1031,12 +1033,11 @@ email_1_rfm_stats %>%
           caption = "Table 31: Email customer RFM mailing segments")
 ```
 
-For catalogue contacts, we adopted a different strategy. Due to the high costs involved in mailing catalogues to customers, we decided that we would mail a smaller group of customers. We therefore chose to mail to those segments which had made at least 400 orders, and had a response rate greater than or equal to 20%. (We chose 400 orders as we noted the presence of some segments, such as RFM-345 that had artificially high response rates due to very small values of both orders and contacts). The segments which we mailed, and their associated response rates are presented below.
+For catalogue contacts, we adopted a different strategy. Due to the high costs involved in mailing catalogues to customers, we decided that we would mail a smaller group of customers. We therefore chose to mail to those segments which had a response rate greater than or equal to 20%. The segments which we mailed, and their associated response rates are presented below.
 
 ```{r cat_mailed}
 cat_1_rfm_stats %>% 
-    filter(orders >= 400,
-           response_rate >= 20) %>%
+    filter(response_rate >= 20) %>%
     arrange(desc(response_rate)) %>% 
     kable(col.names = c("RFM", "Contacts", "Orders", "Response Rate"),
           digits = 3,
@@ -1060,15 +1061,14 @@ email_comp <- email_1_rfm_stats %>%
     mutate(difference = actual - predicted) 
 
 email_comp %>% 
-    kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
+    kable(col.names = c("RFM", "Predicted Response", "Actual Response", "Difference"),
           digits = 3,
           caption = "Table 32: Difference in predicted and actual response rates for email contacts")
 ```
 
 ```{r cat_comp}
 cat_comp <- cat_1_rfm_stats %>% 
-    filter(orders >= 400,
-           response_rate >= 20) %>%
+    filter(response_rate >= 20) %>%
     arrange(desc(response_rate)) %>% 
     inner_join(cat_2_rfm_stats, by = c("rfm" = "rfm")) %>% 
     select(rfm, response_rate.x, response_rate.y) %>% 
@@ -1077,7 +1077,7 @@ cat_comp <- cat_1_rfm_stats %>%
     mutate(difference = actual - predicted) 
 
 cat_comp %>% 
-    kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
+    kable(col.names = c("RFM", "Predicted Response", "Actual Response", "Difference"),
           digits = 3,
           caption = "Table 33: Difference in predicted and actual response rates for catalogue contacts")
 ```
@@ -1116,14 +1116,12 @@ email_comp2 %>%
 
 ```{r cat_comp2}
 would_mail_cat_2 <- cat_2_rfm_stats %>% 
-    filter(orders >= 400,
-           response_rate >= 20) %>%
+    filter(response_rate >= 20) %>%
     arrange(desc(response_rate)) 
 
 cat_comp2 <- would_mail_cat_2 %>% 
     left_join(cat_1_rfm_stats %>% 
-    filter(orders >= 400,
-           response_rate >= 20) %>%
+    filter(response_rate >= 20) %>%
     arrange(desc(response_rate)), 
               by = c("rfm" = "rfm")) %>% 
     select(rfm, response_rate.x, response_rate.y) %>% 
@@ -1138,11 +1136,11 @@ cat_comp2 %>%
           caption = "Table 35: Comparison of catalogue strategies between first and second half of data")
 ```
 
-As can be seen in the tables, our strategies are shown to be valid based on applying the same strategies developed from the first period to the validation data from the second period. For emails, `r scales::percent(mean(email_comp2$did_mail))` of the segments that should have been chosen in the validation data were chosen in the first period. For catalogues, the same figure is `r scales::percent(mean(cat_comp2$did_mail))`.
+As can be seen in the tables, our strategies are shown to be valid based on applying the same strategies developed from the first period to the validation data from the second period. For emails, `r scales::percent(mean(email_comp2$did_mail))` of the segments that would have been chosen in the validation data were chosen in the first period. For catalogues, the same figure is `r scales::percent(mean(cat_comp2$did_mail))`, a marginally stronger performance than for emails.
 
 ## Spend comparisons {.tabset}
 
-Finally, we can compare the spend of each segment in the data from the first and second periods. For emails, our strategy would have resulted in contacting all of the top 10 RFM segments when ranked by total spend of customers in each segment. For catalogues we mailed 80% of the top 5 RFM segments when ranked by total spend of customers in each segment. This helps to further demonstrate the validity of our approach.
+Finally, we can compare the spend of each segment in the data from the first and second periods. For both emails and catalogues, our strategy would have resulted in contacting only some of the top 10 RFM segments when ranked by total spend of customers in each segment. This is because the response rates were not prediced to be large enough for several high-spending segments to be included in our mailing strategy. There is perhaps, therefore, and opportunity to perform marketing based on the total spend in the category, in addition to the basic RFM model.
 
 ### Emails
 
@@ -1181,7 +1179,9 @@ email_compare <- email_1_stats %>%
     select(-resp_rank) %>% 
                   select(rfm, orders)) %>% 
     mutate(mailed = ifelse(is.na(orders), 0, 1)) %>% 
-    select(-orders)
+    select(-orders) %>% 
+    mutate(pred_respon = round(pred_respon, 2),
+           act_respon = round(act_respon, 2))
 
 DT::datatable(email_compare,
               colnames = c("RFM", "Predicted Response", "Actual Response",
@@ -1220,12 +1220,13 @@ cat_compare <- cat_1_stats %>%
            pred_spend_rank = spend_rank.x,
            act_spend_rank = spend_rank.y) %>% 
     left_join(cat_1_rfm_stats %>% 
-                filter(orders >= 400,
-                       response_rate >= 20) %>%
+                filter(response_rate >= 20) %>%
                 arrange(desc(response_rate))  %>% 
                               select(rfm, orders)) %>% 
     mutate(mailed = ifelse(is.na(orders), 0, 1)) %>% 
-    select(-orders)
+    select(-orders) %>% 
+    mutate(pred_respon = round(pred_respon, 2),
+           act_respon = round(act_respon, 2))
 
 DT::datatable(cat_compare,
               colnames = c("RFM", "Predicted Response", "Actual Response",
@@ -1256,14 +1257,13 @@ cat_1_rfm_od_stats <- rfm_to_stats(rfm_od_1, cat_1_contacts, cat_1_orders)
 cat_2_rfm_od_stats <- rfm_to_stats(rfm_od_2, cat_2_contacts, cat_2_orders)
 ```
 
-For brevity, we have applied this methodology to catalogue contacts only, but the same process could easily be extended to email contacts, too. Applying a similar segment-selection process as for the basic RFM model in section B, we generated the segments which we would mail based on the RFMOD model. Whilst we still looked for segments with a response rate of at least 20%, we lowered the orders threshold to 300, reasoning that with more segments, order volumes per-segment would be lower. The segments which were therefore selected for mailing are presented below.
+For brevity, we have applied this methodology to catalogue contacts only, but the same process could easily be extended to email contacts, too. Applying a similar segment-selection process as for the basic RFM model in section B, we generated the segments which we would mail based on the RFMOD model. We still looked for segments with a response rate of at least 20%. As many more segments had a response rate greater than 20%, this resulted in many segments being selected for mailing. However the number of customers in each segment will be greatly reduced compared to the basic RFM model (as there are 5 times as many segments), and so we felt that this was still an appropriate method from a mailing-cost perspective. The segments which were therefore selected for mailing are presented below.
 
 ```{r rfmod_mail}
 cat_1_rfm_od_stats %>% 
-    filter(orders >= 300,
-           response_rate >= 20) %>% 
-    kable(col.names = c("RFMOD", "Contacts", "Orders", "Response Rate"),
-          digits = 3,
+    filter(response_rate >= 20) %>% 
+    mutate(response_rate = round(response_rate, 2)) %>% 
+    DT::datatable(colnames = c("RFMOD", "Contacts", "Orders", "Response Rate"),
           caption = "Table 38: RFMOD selected segments")
 ```
 
@@ -1271,25 +1271,26 @@ We then compared these response rates with those obtained using the catalogue co
 
 ```{r cat_comp_rfmod}
 cat_comp_rfmod <- cat_1_rfm_od_stats %>% 
-    filter(orders >= 300,
-           response_rate >= 20) %>%
+    filter(response_rate >= 20) %>%
     arrange(desc(response_rate)) %>% 
     inner_join(cat_2_rfm_od_stats, by = c("rfm" = "rfm")) %>% 
     select(rfm, response_rate.x, response_rate.y) %>% 
     rename(predicted = response_rate.x,
            actual = response_rate.y) %>% 
-    mutate(difference = actual - predicted) 
+    mutate(predicted = round(predicted, 2),
+           actual = round(actual, 2),
+           difference = round(actual - predicted, 2))
+           
 
 cat_comp_rfmod %>% 
     arrange(-actual) %>% 
-    kable(col.names = c("RFM", "Precited Response", "Actual Response", "Difference"),
-          digits = 3,
+    DT::datatable(colnames = c("RFM", "Precited Response", "Actual Response", "Difference"),
           caption = "Table 39: Difference in predicted and actual response rates for RFMOD catalogue contacts")
 ```
 
-As can be seen in the table, whilst our marketing strategy was again slightly optimistic (as several "actual" response rates are lower than the predictions), the predictions were not so different as to be useless. The average difference was `r round(mean(cat_comp_rfmod$difference), 2)`%. These small differences demonstrate the validity of extending the RFM model to RFMOD, using gift-giving as an extra dimension. 
+As can be seen in the table, whilst our marketing strategy was again slightly optimistic (as several "actual" response rates are lower than the predictions), the predictions were not so different as to be useless. The average difference was `r round(mean(cat_comp_rfmod$difference), 2)`%. 
 
-Whilst these differences are better than for the basic RFM model (where the average difference was `r round(mean(cat_comp$difference), 2)`%), the results are not statistically significant, as seen in the table below.
+Whilst these differences are slightly worse than for the basic RFM model (where the average difference was `r round(mean(cat_comp$difference), 2)`%), the results are not statistically significant, as seen in the table below.
 
 ```{r diff_stat}
 t.test(cat_comp$difference, cat_comp_rfmod$difference, var.equal = F) %>% 
@@ -1300,4 +1301,4 @@ t.test(cat_comp$difference, cat_comp_rfmod$difference, var.equal = F) %>%
           caption = "Table 40: Statistical difference in performance of RFM vs. RFMOD models")
 ```
 
-The initial results from the validation set are promising, indicating that gift-giving may be a valuable dimension to help segment customers more effectively for marketing purposes. However we note that the segments where we most over-estimated the expected response rate where those in the top quintile for gift-giving. This suggests that further work may be necessary to understand if gift giving is a relevant dimension for customer segmentation for marketing purposes.
+The initial results from the validation set are not particularly promising, indicating that gift-giving may not be a valuable dimension to help segment customers more effectively for marketing purposes. However we note that the segments where we most over-estimated the expected response rate where typically not those in the top quintile for gift-giving. This suggests that further work may be necessary to understand if gift giving is a relevant dimension for customer segmentation for marketing purposes.
