@@ -1,0 +1,96 @@
+---
+title: "BS1809 Digital Marketing Group Assignment Two"
+author: "Siang Lau, Jone Leung, C.K. Poon, Kane Wu, Jim Leach"
+date: "25 May 2016"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: spacelab 
+---
+
+# Introduction
+
+```{r setup, include = FALSE}
+# Set knitr options
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(dplyr)
+library(ggplot2)
+
+# Set up theme object for prettier plots
+theme_jim <-  theme(legend.position = "bottom",
+                    axis.text.y = element_text(size = 16, colour = "black"),
+                    axis.text.x = element_text(size = 16, colour = "black"),
+                    legend.text = element_text(size = 16),
+                    legend.title = element_text(size = 16),
+                    title = element_text(size = 16),
+                    strip.text = element_text(size = 16, colour = "black"),
+                    strip.background = element_rect(fill = "white"),
+                    panel.grid.minor.x = element_blank(),
+                    panel.grid.major.x = element_line(colour = "grey", linetype = "dotted"),
+                    panel.grid.minor.y = element_line(colour = "lightgrey", linetype = "dotted"),
+                    panel.grid.major.y = element_line(colour = "grey", linetype = "dotted"),
+                    panel.margin.y = unit(0.1, units = "in"),
+                    panel.background = element_rect(fill = "white", colour = "white"),
+                    panel.border = element_rect(colour = "black", fill = NA))
+```
+
+## Project overview
+
+TODO
+
+## This document
+
+This document is split in to two distinct sections, The first covers an overview of existing literature on the effectiveness of paid search (Blake, Nosko & Tadelis, 2015). The second analyses data from RestaurantGrades in order to compare the effectiveness of their advertising methods.
+
+The `R` code used for the analyses in the second section has been provided as a supplementary file, and can be viewed in this report using the _Code_ buttons to toggle code viewing.
+
+This document has interactive elements and is best viewed using a modern web browser such as Mozilla Firefox or Google Chrome.
+
+# Paid search effectiveness
+
+# Comparing advertising methods
+
+## The data
+
+Data from RestaurantGrades ("RG") were provided which detailed the results from a large test that RG had implemented in order to test the effectiveness of a new advertising campaign.
+
+These data covered 30,000 restaurants that were active on the RG platform forming a representative sample of the population of RG restaurants. Three groups of 10,000 restaurants (selected at random from the 30,000) were each assigned to one of three groups receiving the following treatments:
+
+* 10,000 received free advertising on RG using RG's existing advert-delivery algorithm;
+* 10,000 received free advertising on RG using a new ad-delivery algorithm that was significantly different from existing methods; and
+* 10,000 received _no_ advertising on the RG network for the duration of the study.
+
+Participating restaurants were not informed of their involvement. The data provided listed, for each restaurant: the group they were assignmed to coded as 0 (no ads.), 1 (existing ad-delivery algorithm), and 2 (new ad-delivery algorithm); the number of pageviews received, calls and reservations received during the study; and the type of restaurant (either chain or independent).
+
+```{r load_data}
+grades <- readxl::read_excel("./data/Advertising-Experiments-at-RestaurantGrades-Spreadsheet-Supplement.xlsx", sheet = 2) %>% tbl_df()
+```
+
+An evaluation metric needed to be determined in order to compare the effectiveness of the ad-delivery methods. The ratio of reservations to pageviews was used (termed _conversion rate_) as reservations were the desired outcome, and pageviews were representative of the effect of the advertising. 
+
+```{r create_metric}
+# Define metric - use reservations / views, i.e. conversion
+grades <- grades %>% 
+  mutate(treatment = as.factor(treatment),
+         convert_rate = reservations/pageviews,
+         restaurant_type = ifelse(restaurant_type == "chain", "Chain", "Independent"))
+```         
+
+For each ad-delivery method and restaurant type, the range of conversion rates was identified and is visualised in figure one.
+
+```{r vis_conv_rate, fig.cap = "Figure 1: Conversion rate per ad-delivery method and store type."}
+
+grades %>% 
+  ggplot(aes(x = treatment, y = convert_rate)) +
+  geom_violin(aes(fill = treatment), draw_quantiles = c(.5)) +
+  facet_grid(restaurant_type ~ .) +
+  scale_fill_brewer(type = "qual", palette = "Dark2") +
+  scale_y_continuous(labels = scales::percent) +
+  xlab("") +
+  ylab("Conversion Rate") +
+  guides(fill = guide_legend(title = "Ad-delivery method")) +
+  theme_jim
+```
