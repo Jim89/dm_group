@@ -293,7 +293,7 @@ div.tocify {
 Figure 1: Customer funnel from pageviews to calls to reservations for chain and independent restaurants
 </p>
 </div>
-<p>It is noted that advertising under the current approach (group 1) produced more <em>views</em> than no advertising (group 0). However this increase in views did not appear to translate in to an increased number of reservations. Therefore an evaluation metric needed to be determined that captured this fact. The ratio of pageviews to reservations was used (termed <em>conversion rate</em>) as reservations were the desired outcome, and pageviews were representative of the effect of the advertising.</p>
+<p>It is noted that advertising under the current approach (group 1) produced more <em>views</em> than no advertising (group 0). However this increase in views did not appear to translate in to an increased number of reservations. Therefore an evaluation metric needed to be determined that captured this fact. The ratio of reservations to pageviews was used (termed <em>conversion rate</em>) to model the effectiveness of each ad-delivery strategy.</p>
 <pre class="r"><code># Define metric - use reservations / views, i.e. conversion
 grades &lt;- grades %&gt;% 
   mutate(treatment = as.factor(treatment),

@@ -102,7 +102,7 @@ grades %>%
     theme(strip.text = element_text(size = 14, colour = "black"))
 ```
 
-It is noted that advertising under the current approach (group 1) produced more _views_ than no advertising (group 0). However this increase in views did not appear to translate in to an increased number of reservations. Therefore an evaluation metric needed to be determined that captured this fact. The ratio of pageviews to reservations was used (termed _conversion rate_) as reservations were the desired outcome, and pageviews were representative of the effect of the advertising. 
+It is noted that advertising under the current approach (group 1) produced more _views_ than no advertising (group 0). However this increase in views did not appear to translate in to an increased number of reservations. Therefore an evaluation metric needed to be determined that captured this fact. The ratio of reservations to pageviews was used (termed _conversion rate_) to model the effectiveness of each ad-delivery strategy. 
 
 ```{r create_metric}
 # Define metric - use reservations / views, i.e. conversion
