@@ -7,7 +7,8 @@ output:
     toc: true
     toc_float: true
     code_folding: hide
-    theme: spacelab 
+    theme: spacelab
+    number_sections: yes
 ---
 
 # Introduction
@@ -18,6 +19,9 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 library(dplyr)
 library(ggplot2)
+library(tidyr)
+library(purrr)
+library(knitr)
 
 # Set up theme object for prettier plots
 theme_jim <-  theme(legend.position = "bottom",
@@ -63,10 +67,29 @@ These data covered 30,000 restaurants that were active on the RG platform formin
 * 10,000 received free advertising on RG using a new ad-delivery algorithm that was significantly different from existing methods; and
 * 10,000 received _no_ advertising on the RG network for the duration of the study.
 
-Participating restaurants were not informed of their involvement. The data provided listed, for each restaurant: the group they were assignmed to coded as 0 (no ads.), 1 (existing ad-delivery algorithm), and 2 (new ad-delivery algorithm); the number of pageviews received, calls and reservations received during the study; and the type of restaurant (either chain or independent).
+Participating restaurants were not informed of their involvement. The data provided listed, for each restaurant: the group they were assigned to coded as 0 (no ads.), 1 (existing ad-delivery algorithm), and 2 (new ad-delivery algorithm); the number of pageviews received, calls and reservations received during the study; and the type of restaurant (either chain or independent).
 
 ```{r load_data}
 grades <- readxl::read_excel("./data/Advertising-Experiments-at-RestaurantGrades-Spreadsheet-Supplement.xlsx", sheet = 2) %>% tbl_df()
+```
+
+For each restaurant type, we visualised the funnel of customers from pageviews, to calls, and to reservations. This is displayed in figure one.
+
+```{r funnel, fig.cap = "Figure 1: Customer funnel for chain and independent restaurants", fig.align = "centre"}
+grades %>% 
+    gather(key, value, -treatment, -business_id, -restaurant_type) %>% 
+    filter(key != "convert_rate") %>% 
+    group_by(treatment, restaurant_type, key) %>% 
+    summarise(value = sum(value)) %>% 
+    mutate(key = ifelse(key == "pageviews", "1 - Pageviews",
+                        ifelse(key == "calls", "2 - Calls", "3 - Reservations"))) %>% 
+    ggplot(aes(x = treatment, y = value)) +
+    geom_bar(stat = "identity", aes(fill = restaurant_type)) +
+    facet_grid(key ~ restaurant_type, scales = "free") +
+    scale_y_continuous(labels = scales::comma) + 
+    scale_fill_manual(values = c("firebrick", "steelblue")) +
+    guides(fill = guide_legend(title = "Restaurant Type")) +
+    theme_jim
 ```
 
 An evaluation metric needed to be determined in order to compare the effectiveness of the ad-delivery methods. The ratio of reservations to pageviews was used (termed _conversion rate_) as reservations were the desired outcome, and pageviews were representative of the effect of the advertising. 
@@ -81,7 +104,7 @@ grades <- grades %>%
 
 For each ad-delivery method and restaurant type, the range of conversion rates was identified and is visualised in figure one.
 
-```{r vis_conv_rate, fig.cap = "Figure 1: Conversion rate per ad-delivery method and store type."}
+```{r vis_conv_rate, fig.cap = "Figure 1: Conversion rate per ad-delivery method and store type.", fig.align='center', out.width = 800, out.height=600}
 
 grades %>% 
   ggplot(aes(x = treatment, y = convert_rate)) +
@@ -94,3 +117,65 @@ grades %>%
   guides(fill = guide_legend(title = "Ad-delivery method")) +
   theme_jim
 ```
+
+From the visualisation in figure one, it appears that the conversion rates are not the same across the three groups in each restaurant type. Indeed it appears that displaying no ads (group 0) produces a better conversion rate than the current ad-delivery design. And that the new algorithm out-performs both the current method and the display of no ads when measured by conversion rate. 
+
+In order to understand if there were truly differences between the three groups for each restaurant type, the differences in the advertising effectiveness were compared using a one-way analysis of variance procedure. This one-way analysis of variance test compares the mean of a each group and assesses them against the null that they are all equal, i.e.:
+
+\begin{equation}
+H_0 : \mu_1 = \mu_2 = \mu_3
+\end{equation}
+
+The results of these procedures are displayed in tables one and two below.
+
+```{r nest_and_aov}
+# Creating fitting aov function
+fit_aov <- function(dat) {
+    fit <- aov(convert_rate ~ treatment, data = dat)
+    fit <- broom::tidy(fit)
+}
+    
+# Group and apply the function
+grades_aov <- grades %>% 
+    group_by(restaurant_type) %>% 
+    nest() %>% 
+    mutate(aov = data %>% map(fit_aov))
+
+# Set aov kable names
+aov_names <- c("Term", "Df", "Sum Squares", "Mean Square", "  F-Stat", "  p-Value")
+    
+kable(grades_aov$aov[[1]], col.names = aov_names, caption = "Table 1: Analysis of Variance for chain restaurants", digits = 2)
+
+kable(grades_aov$aov[[2]], col.names = aov_names, caption = "Table 2: Analysis of Variance for independent restaurants", digits = 2)
+```
+
+The large and statistically significant F-statistics for the treatment (advertising type) for both chain and independent restaurants mean it is possible to reject the null that there is an equal mean across the three groups.
+
+Having determined that, within each restaurant type, each advertising method was different from the others, it was necessary to determine _how_ they differed. For this, a pair-wise $t$-test was used to assess the differences between all combinations of the groups.
+
+```{r pairwise_t}
+# Function to implement pairwise t-test on the nested data
+fit_pair_t <- function(dat) {
+    data <- dat
+    fit <- pairwise.t.test(data$convert_rate, data$treatment, paired = FALSE,
+                        alternative = "greater", p.adjust = "bonferroni")
+    fit <- broom::tidy(fit)
+    return(fit)
+    
+}
+
+# Nest the data and fit the pairwise t-tests
+grades_pair <- 
+    grades %>% 
+    group_by(restaurant_type) %>% 
+    nest() %>% 
+    mutate(pair_t = data %>% map(fit_pair_t))
+
+pair_t_names <- c("Group A", "Group B", "p-Value")
+
+# Present results
+kable(grades_pair$pair_t[[1]], col.names = pair_t_names, digits = 3, caption = "Table 3: Pairwise t-tests against the alternative that group A is larger than group B for chain restaurants.")
+
+kable(grades_pair$pair_t[[2]], col.names = pair_t_names, digits = 3, caption = "Table 4: Pairwise t-tests against the alternative that group A is larger than group B for independent restaurants.")
+```
+
