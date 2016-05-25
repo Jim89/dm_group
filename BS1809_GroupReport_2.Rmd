@@ -49,7 +49,7 @@ TODO
 
 This document is split in to two distinct sections, The first covers an overview of existing literature on the effectiveness of paid search (Blake, Nosko & Tadelis, 2015). The second analyses data from RestaurantGrades in order to compare the effectiveness of their advertising methods.
 
-The `R` code used for the analyses in the second section has been provided as a supplementary file, and can be viewed in this report using the _Code_ buttons to toggle code viewing.
+The `R` code used for the analyses in the second section can be viewed in this report using the _Code_ buttons to toggle code viewing, on alternatively on the online [repository](https://github.com/jim89/dm_group).
 
 This document has interactive elements and is best viewed using a modern web browser such as Mozilla Firefox or Google Chrome.
 
