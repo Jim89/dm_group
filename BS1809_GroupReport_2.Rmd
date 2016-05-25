@@ -78,7 +78,7 @@ grades <- readxl::read_excel("./data/Advertising-Experiments-at-RestaurantGrades
                                             labels = c("Chain", "Independent")))
 ```
 
-## Defining evaluation metric
+## Evaluation metrics
 
 For each restaurant type, the funnel of customers from pageviews, to calls, and to reservations was visualised. This is displayed in figure one.
 
@@ -128,9 +128,9 @@ grades %>%
 
 From the visualisation in figure two, it appears that the conversion rates are not the same across the three groups in each restaurant type. Indeed it appears that displaying _no_ ads (group 0) produces a better conversion rate than the current ad-delivery design. And that the new algorithm out-performs both the current method _and_ the display of no ads when measured by conversion rate. 
 
-## Statistical differences between groups
+## Statistical differences
 
-In order to understand if there were truly differences between the three groups for each restaurant type, the differences in the advertising effectiveness were compared using a one-way analysis of variance procedure. This one-way analysis of variance test compares the mean of a each group and assesses them against the null that they are all equal, i.e.:
+Statistical differences between the three groups for each restaurant type were examined. The differences in advertising effectiveness were compared using a one-way analysis of variance procedure of conversion rate as predicted by ad-delivery method. This test compares the means of a each group and assesses the differences against the null hypothesis that they are all equal, i.e.:
 
 \begin{equation}
 H_0 : \mu_1 = \mu_2 = \mu_3
@@ -159,7 +159,7 @@ kable(grades_aov$aov[[1]], col.names = aov_names, caption = "Table 1: Analysis o
 kable(grades_aov$aov[[2]], col.names = aov_names, caption = "Table 2: Analysis of Variance for independent restaurants", digits = 2)
 ```
 
-The large and statistically significant F-statistics for the treatment (advertising type) for both chain and independent restaurants mean it is possible to reject the null that there is an equal mean across the three groups.
+The large and statistically significant F-statistics for the advert-delivery method coefficient for both chain and independent restaurants mean it is possible to reject the null that there is an equal mean across the three groups, i.e. the three groups are _statistically_ different.
 
 Having determined that, within each restaurant type, each advertising method was different from the others, it was necessary to determine _how_ they differed. For this, Tukey Honest Significant Differences were used to generate the 95% confidence intervals for the differences in the average values between each of the three goups. 
 
@@ -186,11 +186,15 @@ kable(grades_tukey$tukey[[2]], col.names = tukey_names,
       caption = "Table 4: Tukey Honest Significant Differences for ad-delivery methods in independent restaurants")
 ```
 
-From tables three and four it is seen that, for both chain and independent restaurants, the current avertising method resulsts in a _lower_ conversion rate than no advertising at all (and this difference is statistically significant). Similarly, the new ad-delivery algorithm results in a _higer_ conversion rate than either the current method or displaying no adverts at all (again, this difference is statistically significant).
+From tables three and four it is seen that, for both types of restaurant, the current avertising method resulsts in a _lower_ conversion rate than no advertising at all (comparison 1-0). Similarly, the new ad-delivery algorithm results in a _higer_ conversion rate than either the current method or displaying no adverts at all (comparisons 2-0 and 2-1). All these differences are statistically significant.
 
 ## Conclusion
 
-It is therefore possible to recommend the new advertising demand. Simple statistical analysis shows the three methods to be different when measured by conversion rate (the ratio of pageviews to reservations). When determining the direction of these differences, it has been shown that the current method is statistically _less_ effective than displaying _no_ advertisements at all! The new method out-performs both the current method _and_ displaying no advertisements at a statistically significant rate. Therefore the new ad-delivery algorithm is highly recommended. 
+It is therefore possible to recommend the new advertising method. 
+
+Simple statistical analysis shows the three methods to be different when measured by conversion rate (the ratio of pageviews to reservations). When determining the direction of these differences, it has been shown that the current method is statistically _less_ effective than displaying _no_ advertisements at all! The new method out-performs both the current method _and_ displaying no advertisements at a statistically significant rate. 
+
+Therefore the new ad-delivery algorithm is highly recommended. 
 
 # References
 
