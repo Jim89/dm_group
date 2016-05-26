@@ -196,6 +196,10 @@ Simple statistical analysis shows the three methods to be different when measure
 
 Therefore the new ad-delivery algorithm is highly recommended. 
 
+One potential explanation of the differences in conversion rates could be how the advertisments are set up. In the current advertisement scheme, the current advertisement will send the customer to a restaurant close to the restaurant that the customer is currently looking at. In the alternative advertisement scheme, the alternative advertisement will send the customer to a restaurant with similar ratings and hours but not in the same area. 
+
+As shown in the graphs above, the percentage of customers clicking on the current advertisment of the restaurant is high but the conversion rate of turning those page views into reservation is low. We propose two reasons for that. The first reason is that the current advertisement sends the customer to a restaurant with a different ranking and price point. Hence the customer lost interest after the page and did not call the restaurant which explains the drop between page views and the customer calling the restaurant. The second reason is that the advertisments are showing restaurants that are full and therefore a table could not be reserved. Usually, for a customer to click on ad, it means the restaurant the customer is looking at is full and is looking for an alternative. If the restaurants from the ad are restaurants from the same area there is a high possibility that those restaurants are full as well. Most customers will generally try restaurants near the area they are looking at first. For the alternative advertisement scheme, the customer will be booking restaurants from another area which might have more free space. Therefore even though the current advertisment is more effective in creating more interest, it is less effective as it does not create more reservations as those restaurants are already full. We would need to perform additional data collection and investigation to test these two hypothesis.
+
 # References
 
 * _Simultaneous Statistical Inference_, 1981, R. G. Miller, Springer;
