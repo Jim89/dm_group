@@ -41,11 +41,8 @@ theme_jim <-  theme(legend.position = "bottom",
                     panel.border = element_rect(colour = "black", fill = NA))
 ```
 
-## Project overview
 
-TODO
-
-## This document
+## Overview
 
 This document is split in to two distinct sections, The first covers an overview of existing literature on the effectiveness of paid search (Blake, Nosko & Tadelis, 2015). The second analyses data from RestaurantGrades in order to compare the effectiveness of their advertising methods.
 
@@ -55,7 +52,7 @@ This document has interactive elements and is best viewed using a modern web bro
 
 # Paid search effectiveness
 
-## a) Summary of the paper's main contribution.
+## Summary of the paper's main contribution.
 
 Blake, Nosko, Tadelis's paper "Consumer heterogeneity and paid search effectiveness: A large scale field experiment (2015)" found paid search term advertising on the brand name of a well-known brand e.g. "ebay" to be ineffective in increasing short term revenues. Big brand's names usually appear through natural search after the paid search which is displayed at the top, hence customers who were going to go on the website anyway are being intercepted by those paid links. 
 
@@ -63,7 +60,7 @@ Additionally, it was shown that non-brand search terms, e.g. "shoes", were effec
 
 Given the findings, ROI for both brand and non-brand keyword ads were estimated to be negative in the short term. However, it causes new users to visit the site and could potentially deter competitors, so the effects for the longer term are unknown.
 
-## b) The methodology used. 
+## The methodology used. 
 
 Typical consumers who click on the brand and non-brand adlinks had purchase intentions so would have found a way to the ebay website regardless of adverts. The CPC model means that ad spend increases as these consumers go to purchase on ebay, hence ad spend rises along with sales, leading to the endogeneity of the independent variable, spend. Strictly speaking this is known as backwards causation, and causes E(_x_|_u_) !=0 for all _i_,_t_. Naively regressing sales on ad spending with OLS will result in biased estimates of the true effect of ad spend. This endogeneity of log(spend) problem is alleviated by estimating it using the IV _AdsOn_ a dummy variable for weather ads were being paid for or not in a region (made from the interaction of _Post_ a dummy for whether the test was running at t and _Group_ a dummy whether that region i keeping search spending on during the test). Differences in Differences regression can also be used to directly estimate the treatment effect of turning adverts on for m=11 different sections of consumers (by purchase frequency).
 
@@ -74,7 +71,7 @@ include_graphics("./jon/digital_groupwork2_equations.jpg")
 
 Where _R1_ is estimated US 2012 revenues given ad spend =$2880.64m, and _S1_ is estimated spend on US 2010 search ads =$51m. _beta1_ is the estimate of change in ln(Revenue) from turning on Ads, (i.e. the variable of interest in the DnD regression). To obtain a comparable measure for OLS and IV, their _alpha1_ coefficients are multiplied by the _alphahat1_ coefficient in the first stage IV equation. 
 
-## c) Based on this, how would you approach ad spending?
+## Based on this, how would you approach ad spending?
 
 We provide two strategies for a company to approach ad spending to deliver both rapid returns and sustained growth:
 
