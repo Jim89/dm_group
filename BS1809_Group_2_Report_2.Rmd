@@ -50,7 +50,7 @@ The `R` code used for the analyses in the second section can be viewed in this r
 
 This document has interactive elements and is best viewed using a modern web browser such as Mozilla Firefox or Google Chrome.
 
-# Paid search effectiveness
+# Assignment Part 1 - Paid Search Effectiveness
 
 ## Summary of the paper's main contribution.
 
@@ -81,7 +81,7 @@ We provide two strategies for a company to approach ad spending to deliver both 
 
 Overall, companies should stop paying for the majority of the poor-performing keywords, only keeping important ones for strategic reasons.
 
-# Comparing advertising methods
+# Assignment Part 2 - Comparing advertising methods
 
 ## The data
 
