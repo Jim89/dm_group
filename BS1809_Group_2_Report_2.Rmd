@@ -55,6 +55,35 @@ This document has interactive elements and is best viewed using a modern web bro
 
 # Paid search effectiveness
 
+## a) Summary of the paper's main contribution.
+
+Blake, Nosko, Tadelis's paper "Consumer heterogeneity and paid search effectiveness: A large scale field experiment (2015)" found paid search term advertising on the brand name of a well-known brand e.g. "ebay" to be ineffective in increasing short term revenues. Big brand's names usually appear through natural search after the paid search which is displayed at the top, hence customers who were going to go on the website anyway are being intercepted by those paid links. 
+
+Additionally, it was shown that non-brand search terms, e.g. "shoes", were effective in gaining new users to the site. However, those new user's purchase rates are low. Frequent users - who would have come on to the website anyway - also clicked on these links (and accounted for most of the advertising costs) with no effect on their spending. This heterogeneity of customers this is consistent with the informative view of advertising, that adverts only provide information on products, adding very weak persuasive power.
+
+Given the findings, ROI for both brand and non-brand keyword ads were estimated to be negative in the short term. However, it causes new users to visit the site and could potentially deter competitors, so the effects for the longer term are unknown.
+
+## b) The methodology used. 
+
+Typical consumers who click on the brand and non-brand adlinks had purchase intentions so would have found a way to the ebay website regardless of adverts. The CPC model means that ad spend increases as these consumers go to purchase on ebay, hence ad spend rises along with sales, leading to the endogeneity of the independent variable, spend. Strictly speaking this is known as backwards causation, and causes E(_x_|_u_) !=0 for all _i_,_t_. Naively regressing sales on ad spending with OLS will result in biased estimates of the true effect of ad spend. This endogeneity of log(spend) problem is alleviated by estimating it using the IV _AdsOn_ a dummy variable for weather ads were being paid for or not in a region (made from the interaction of _Post_ a dummy for whether the test was running at t and _Group_ a dummy whether that region i keeping search spending on during the test). Differences in Differences regression can also be used to directly estimate the treatment effect of turning adverts on for m=11 different sections of consumers (by purchase frequency).
+
+
+```{r show_equations, out.width = 600, out.height= 600, fig.retina = NULL, fig.align='center'}
+include_graphics("./jon/digital_groupwork2_equations.jpg")
+```
+
+Where _R1_ is estimated US 2012 revenues given ad spend =$2880.64m, and _S1_ is estimated spend on US 2010 search ads =$51m. _beta1_ is the estimate of change in ln(Revenue) from turning on Ads, (i.e. the variable of interest in the DnD regression). To obtain a comparable measure for OLS and IV, their _alpha1_ coefficients are multiplied by the _alphahat1_ coefficient in the first stage IV equation. 
+
+## c) Based on this, how would you approach ad spending?
+
+We provide two strategies for a company to approach ad spending to deliver both rapid returns and sustained growth:
+
+.	Shift spending from paid media to owned and earned media. Users substituted paid search clicks for natural search clicks when querying brands. Companies could reallocate spending from low-performing paid search and invest in maximizing the value from owned media (such as a company website) and earned media (such as a blogger writing about your product) to boost organic Search-Engine Optimisation, then conduct a thorough technical site audit which aims to drive higher value for the corporate brand. Note, paid search for brand queries could be still effective for small/new entities that have no brand recognition.
+
+.	Measure impact of paid media for non-brand keywords on granular level. The majority of paid non-brand clicks may not directly result in incremental sales; new/infrequent users were positively influenced by ads, but frequent users whose buying behavior was not influenced by ads accounted for most of the expenses. A company's digital buy can have many keywords and display ads by size, type, and placement, each with their own individual performance information. In such a data-rich environment, granular level analysis will identify significantly more value than reliance on misleading averages. 
+
+Overall, companies should stop paying for the majority of the poor-performing keywords, only keeping important ones for strategic reasons.
+
 # Comparing advertising methods
 
 ## The data
