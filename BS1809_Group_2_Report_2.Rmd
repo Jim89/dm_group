@@ -52,7 +52,7 @@ This document has interactive elements and is best viewed using a modern web bro
 
 # Assignment Part 1 - Paid Search Effectiveness
 
-## Summary of the paper's main contribution.
+## Summary of the paper's main contribution
 
 Blake, Nosko, Tadelis's paper "Consumer heterogeneity and paid search effectiveness: A large scale field experiment (2015)" found paid search term advertising on the brand name of a well-known brand e.g. "ebay" to be ineffective in increasing short term revenues. Big brand's names usually appear through natural search after the paid search which is displayed at the top, hence customers who were going to go on the website anyway are being intercepted by those paid links. 
 
@@ -60,16 +60,17 @@ Additionally, it was shown that non-brand search terms, e.g. "shoes", were effec
 
 Given the findings, ROI for both brand and non-brand keyword ads were estimated to be negative in the short term. However, it causes new users to visit the site and could potentially deter competitors, so the effects for the longer term are unknown.
 
-## The methodology used. 
+## The methodology used
+To test the hypothesis for brand search terms, ebay turned off paid advertising that contain the word 'ebay' on MSN/Bing in March 2012. After using clicks from google to control for seasonal factors 99.5% of the foregone traffic was found to come though natural search.
 
-Typical consumers who click on the brand and non-brand adlinks had purchase intentions so would have found a way to the ebay website regardless of adverts. The CPC model means that ad spend increases as these consumers go to purchase on ebay, hence ad spend rises along with sales, leading to the endogeneity of the independent variable, spend. Strictly speaking this is known as backwards causation, and causes E(_x_|_u_) !=0 for all _i_,_t_. Naively regressing sales on ad spending with OLS will result in biased estimates of the true effect of ad spend. This endogeneity of log(spend) problem is alleviated by estimating it using the IV _AdsOn_ a dummy variable for weather ads were being paid for or not in a region (made from the interaction of _Post_ a dummy for whether the test was running at t and _Group_ a dummy whether that region i keeping search spending on during the test). Differences in Differences regression can also be used to directly estimate the treatment effect of turning adverts on for m=11 different sections of consumers (by purchase frequency).
+For the non-brand experiment, U.S buyers were separated into 210 geographic Design Market Areas DMAs. In May 2012 Ads were turned off in 30% of DMAs, other DMAs were used as a control group. Users were separated into 11 segments by purchase frequency, where m=0 indexes a new buyer and m=1 indexes the user having purchased once, etc. Differences in Differences regression was then used to estimate eleven treatment effects of turning adverts on. Note that sales were attributed by each segment, and _AdsOn_, _delta_,_gamma_, and _theta_ are dummies for Ads being on, time, DMA and segment.
 
 
 ```{r show_equations, out.width = 600, out.height= 600, fig.retina = NULL, fig.align='center'}
-include_graphics("./jon/digital_groupwork2_equations.jpg")
+include_graphics("./jon/DnD regression.jpg")
 ```
 
-Where _R1_ is estimated US 2012 revenues given ad spend =$2880.64m, and _S1_ is estimated spend on US 2010 search ads =$51m. _beta1_ is the estimate of change in ln(Revenue) from turning on Ads, (i.e. the variable of interest in the DnD regression). To obtain a comparable measure for OLS and IV, their _alpha1_ coefficients are multiplied by the _alphahat1_ coefficient in the first stage IV equation. 
+Where _R1_ is estimated US 2012 sales given ad spend =$2880.64m, and _S1_ is estimated spend on US 2010 search ads =$51m. _beta1_ is the estimate of change in ln(Revenue) from turning on Ads, (i.e. a weighted average of variables of interest in the DnD regression).
 
 ## Based on this, how would you approach ad spending?
 
