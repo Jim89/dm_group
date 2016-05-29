@@ -52,16 +52,16 @@ This document has interactive elements and is best viewed using a modern web bro
 
 # Assignment Part 1 - Paid Search Effectiveness
 
-## Summary of the paper's main contribution
+## Paper's main contribution
 
 Blake, Nosko, Tadelis's paper "Consumer heterogeneity and paid search effectiveness: A large scale field experiment (2015)" found paid search term advertising on the brand name of a well-known brand e.g. "ebay" to be ineffective in increasing short term revenues. Big brand's names usually appear through natural search after the paid search which is displayed at the top, hence customers who were going to go on the website anyway are being intercepted by those paid links. 
 
-Additionally, it was shown that non-brand search terms, e.g. "shoes", were effective in gaining new users to the site. However, those new user's purchase rates are low. Frequent users - who would have come on to the website anyway - also clicked on these links (and accounted for most of the advertising costs) with no effect on their spending. This heterogeneity of customers this is consistent with the informative view of advertising, that adverts only provide information on products, adding very weak persuasive power.
+Additionally, it was shown that non-brand search terms, e.g. "shoes", were effective in gaining new users to the site. However, those new user's purchase rates are low. Frequent users - who would have come on to the website anyway - also clicked on these links (and accounted for most of the advertising costs) with no effect on their spending. This heterogeneity of customers is consistent with the informative view of advertising, that adverts only provide information on products, adding very weak persuasive power.
 
 Given the findings, ROI for both brand and non-brand keyword ads were estimated to be negative in the short term. However, it causes new users to visit the site and could potentially deter competitors, so the effects for the longer term are unknown.
 
 ## The methodology used
-To test the hypothesis for brand search terms, ebay turned off paid advertising that contain the word 'ebay' on MSN/Bing in March 2012. After using clicks from google to control for seasonal factors 99.5% of the foregone traffic was found to come though natural search.
+To test the hypothesis for brand search terms, ebay turned off paid advertising that contain the word 'ebay' on MSN/Bing in March 2012. After using clicks from google to control for seasonal factors 99.5% of the foregone traffic was found to come through natural search.
 
 For the non-brand experiment, U.S buyers were separated into 210 geographic Design Market Areas DMAs. In May 2012 Ads were turned off in 30% of DMAs, other DMAs were used as a control group. Users were separated into 11 segments by purchase frequency, where m=0 indexes a new buyer and m=1 indexes the user having purchased once, etc. Differences in Differences regression was then used to estimate eleven treatment effects of turning adverts on. Note that sales were attributed by each segment, and _AdsOn_, _delta_,_gamma_, and _theta_ are dummies for Ads being on, time, DMA and segment.
 
@@ -72,13 +72,13 @@ include_graphics("./jon/DnD regression.jpg")
 
 Where _R1_ is estimated US 2012 sales given ad spend =$2880.64m, and _S1_ is estimated spend on US 2010 search ads =$51m. _beta1_ is the estimate of change in ln(Revenue) from turning on Ads, (i.e. a weighted average of variables of interest in the DnD regression).
 
-## Based on this, how would you approach ad spending?
+## How would you approach ad spending?
 
 We provide two strategies for a company to approach ad spending to deliver both rapid returns and sustained growth:
 
-.	Shift focus from paid media to owned and earned media for brand keywords. Users substituted paid search clicks for natural search clicks when querying brands. Companies could reallocate spending from low-performing paid search and invest in maximizing the value from owned media (such as a company website) and earned media (such as a blogger writing about your product) to boost organic Search-Engine Optimisation (SEO), then conduct a thorough technical site audit which aims to drive higher value for the corporate brand. Note, paid search for brand queries could be still effective for small/new entities that have no brand recognition.
+***Shift focus from paid media to owned and earned media for brand keywords***. Users easily substituted paid search clicks for natural search clicks when querying brands. Companies could reallocate spending from low-performing paid search and invest in maximizing the value from owned media (such as a company website) and earned media (such as a blogger writing about your product) to boost organic Search-Engine Optimisation (SEO), then conduct a thorough technical site audit which aims to drive higher value for the corporate brand. Note, paid search for brand queries could be still effective for small/new entities that have no brand recognition.
 
-.	Measure impact of paid media for non-brand keywords on granular level. The majority of paid non-brand clicks may not directly result in incremental sales; new/infrequent users were positively influenced by ads, but frequent users whose buying behavior was not influenced by ads accounted for most of the expenses. A company's digital buy can have many keywords and display ads by size, type, and placement, each with their own individual performance information. In such a data-rich environment, granular level analysis will identify significantly more value than reliance on misleading averages. 
+***Measure impact of paid media for non-brand keywords on granular level***. The majority of paid non-brand clicks may not directly result in incremental sales; new/infrequent users were positively influenced by ads, but frequent users whose buying behavior was not influenced by ads accounted for most of the expenses. A company's digital buy can have many keywords and display ads by size, type, and placement, each with their own individual performance information. In such a data-rich environment, granular level analysis will identify significantly more value than reliance on misleading averages. 
 
 Overall, companies should stop paying for the majority of the poor-performing keywords, only keeping important ones for strategic reasons.
 
