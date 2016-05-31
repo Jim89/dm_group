@@ -3,3 +3,8 @@
 .RData
 .Ruserdata
 *.pdf
+data/expedia/destinations.csv.gz
+data/expedia/sample_submission.csv.gz
+data/expedia/test.csv.gz
+data/expedia/train.csv
+data/expedia/train.csv.gz
