@@ -8,3 +8,4 @@ data/expedia/sample_submission.csv.gz
 data/expedia/test.csv.gz
 data/expedia/train.csv
 data/expedia/train.csv.gz
+data/expedia/*
