@@ -9,3 +9,5 @@ data/expedia/test.csv.gz
 data/expedia/train.csv
 data/expedia/train.csv.gz
 data/expedia/*
+BS1809_Group_2_Report_3_cache/*
+BS1809_Group_2_Report_3_files/*
