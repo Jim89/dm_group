@@ -1,0 +1,161 @@
+---
+title: "BS1809 Digital Marketing Group Assignment Three"
+author: "Siang Lau, Jone Leung, C.K. Poon, Kane Wu, Jim Leach"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: spacelab
+    number_sections: yes
+---
+
+# Introduction
+
+```{r setup, include = FALSE}
+# Set knitr options
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = "center",
+                      fig.retina = NULL)
+
+# Load packages
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(purrr)
+library(knitr)
+
+# Set up theme object for prettier plots
+theme_jim <-  theme(legend.position = "bottom",
+                    axis.text.y = element_text(size = 16, colour = "black"),
+                    axis.text.x = element_text(size = 16, colour = "black"),
+                    legend.text = element_text(size = 16),
+                    legend.title = element_text(size = 16),
+                    title = element_text(size = 16),
+                    strip.text = element_text(size = 16, colour = "black"),
+                    strip.background = element_rect(fill = "white"),
+                    panel.grid.minor.x = element_blank(),
+                    panel.grid.major.x = element_line(colour = "grey", linetype = "dotted"),
+                    panel.grid.minor.y = element_line(colour = "lightgrey", linetype = "dotted"),
+                    panel.grid.major.y = element_line(colour = "grey", linetype = "dotted"),
+                    panel.margin.y = unit(0.1, units = "in"),
+                    panel.background = element_rect(fill = "white", colour = "white"),
+                    panel.border = element_rect(colour = "black", fill = NA))
+
+# Function that takes a string and converts it in to "proper case" (i.e.
+# the first letter is capitalised, all remaining letters are lower case)
+# N.b. for multi-word strings, only the first word will be affected
+toproper <- function(x) { 
+  first <- substring(x, 1, 1) %>% toupper()
+  rest <- substring(x, 2) %>% tolower()
+  whole <- paste0(first, rest)
+  return(whole)
+}
+
+# Function to perform pretty cuts of numeric vector
+# Source: http://www.r-bloggers.com/r-function-of-the-day-cut/
+cut_custom <- function(x, lower = 0, upper, by = 10,
+                   sep = "-", above.char = "+") {
+
+ labs <- c(paste(seq(lower, upper - by, by = by),
+                 seq(lower + by - 1, upper - 1, by = by),
+                 sep = sep),
+           paste(upper, above.char, sep = ""))
+
+ cut(floor(x), breaks = c(seq(lower, upper, by = by), Inf),
+     right = FALSE, labels = labs)
+}
+```
+
+
+## Overview
+
+TODO
+
+The `R` code used for the analyses in the second section can be viewed in this report using the _Code_ buttons to toggle code viewing, on alternatively on the online [repository](https://github.com/jim89/dm_group).
+
+This document has interactive elements and is best viewed using a modern web browser such as Mozilla Firefox or Google Chrome.
+
+# Data exploration
+
+```{r get_data, cache = TRUE}
+# Connect to the DB
+db <- src_postgres("expedia", user = "postgres", password = pg_password)
+
+# Get the data
+train_sample <- tbl(db, "train_new")
+
+# Take a smaller subset of fields and do some tidying up
+data <- train_sample %>% 
+    select(srch_id, prop_id, 
+           position, 
+           price_usd, 
+           click_bool, 
+           booking_bool, 
+           prop_starrating,
+           promotion_flag,
+           srch_length_of_stay) %>% 
+    collect() %>% 
+    mutate(price_usd = round(price_usd, 0),
+           price_bin = cut_custom(price_usd, lower = 0, upper = 1000, by = 100),
+           click_bool = ifelse(click_bool == T, 1, 0),
+           booking_bool = ifelse(booking_bool == T, 1, 0),
+           action = ifelse(booking_bool == 1, "Book", 
+                           ifelse(click_bool == 1 & booking_bool == 0, "Click",
+                                  "No action")),
+           action = factor(action, levels = c("No action", "Click", "Book")))
+```
+
+After loading the data some simple exploratory charts were produced to look at differences in click and booking rates across different search positions and prices. 
+
+```{r plotting_fn}
+# Function for plotting data
+gather_and_plot <- function(data, field) {
+    data %>% 
+        group_by_(field) %>% 
+        summarise(Click = mean(click_bool),
+                  Book = mean(booking_bool)) %>% 
+        gather_("key", "value", c("Click", "Book")) %>% 
+        ggplot(aes_string(x = field, y = "value", group = "key")) +
+        geom_line(aes(colour = key), size = 1.5) +
+        geom_point(aes(colour = key), size = 1.5) +
+        facet_grid(key ~ .) +
+        scale_y_continuous(labels = scales::percent) +
+        scale_colour_brewer(palette = "Dark2") +
+        guides(colour = guide_legend(title = "")) +
+        xlab(field %>% toproper) +
+        ylab("Rate") +
+        theme_jim
+}
+```
+
+```{r pos_plot, out.width = 600, fig.cap = "Figure 1: The relationship between search position and clicking and booking rates."}
+gather_and_plot(data, "position")
+```
+
+```{r price_plot, out.width = 600, fig.cap = "Figure 2: The relationship between price and clicking and booking rates."}
+gather_and_plot(data, "price_bin") + xlab("Price ($)") + 
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+```
+
+Figures 1 and 2 show that there is a general decreasing trend when considering booking _and_ clicking rates in relation to both search position _and_ price. Higher prices lead to lower click and booking rates, and higher positions (lower in the search rankings) have a similar effect, lowering overall booking and clicking rates.
+
+In terms of position there is an interesting, cyclical pattern displayed of extra dips in both click and booking rates at set intervals of position. This is likely due to the number of results that are displayed on a page
+
+# Correlations
+
+In order to quantify these differences further, we assessed the correlations between position, price, and clicking/booking rates. These correlations are displayed in table one.
+
+```{r cors}
+# Simple correlations between fields
+cors <- cor(data %>% select(position, price_usd, click_bool, booking_bool))
+
+# Make the names prettier
+rownames(cors) <- gsub("_usd|_bool|", "", rownames(cors)) %>% toproper()
+colnames(cors) <- gsub("_usd|_bool|", "", colnames(cors)) %>% toproper()
+
+kable(cors, digits = 3, caption = "Table 1: Correlations between position, price, and booking/click rates")
+```
+
+It is the case that both price and position are both negatively correlated with clicking and booking rates. However it appears that position has a much stronger effect than price, with correlations between position and click/booking rates being approximately an order of magnitude greater than those for price.
+
