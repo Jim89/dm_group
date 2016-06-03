@@ -70,7 +70,7 @@ cut_custom <- function(x, lower = 0, upper, by = 10,
 
 ## Overview
 
-TODO
+This assignment covered an analysis of data made available by Expedia covering hotel searches and bookings. The task was to assess the effect of the position of a hotel in the search results on the consumer response rates (e.g. clicking on the hotel, or making a booking). Work was also performed to assess the effect of price on customer response, and to understand if search position or price played a larger role in determining response rates.
 
 The `R` code used for the analyses in the second section can be viewed in this report using the _Code_ buttons to toggle code viewing, on alternatively on the online [repository](https://github.com/jim89/dm_group).
 
@@ -169,7 +169,7 @@ It is the case that position is negatively correlated with clicking and booking 
 
 # Response model
 
-We also considered a simple logistic regression model in which _any_ type of customer response was modelled as a function of position and price in order to understand their effect on either clicking _or_ booking. In doing so we also included control variables, including star rating, an indication of whether the hotel was on promotion or not, length of stay, an indication of the hotel was a major brand, the average review score, and a score indicating how desirable the hotel location was. This helped us to isolate the true effects of price and position. The results from this model are displayed in table two.
+We also considered a simple logistic regression model in which _any_ type of customer response was modeled as a function of position and price in order to understand their effect on either clicking _or_ booking. In doing so we also included control variables, including star rating, an indication of whether the hotel was on promotion or not, length of stay, an indication of the hotel was a major brand, the average review score, and a score indicating how desirable the hotel location was. This helped us to isolate the true effects of price and position. The results from this model are displayed in table two.
 
 ```{r simple_model, cache = T}
 data <- data %>% 
