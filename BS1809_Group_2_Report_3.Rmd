@@ -74,7 +74,7 @@ TODO
 
 The `R` code used for the analyses in the second section can be viewed in this report using the _Code_ buttons to toggle code viewing, on alternatively on the online [repository](https://github.com/jim89/dm_group).
 
-This document has interactive elements and is best viewed using a modern web browser such as Mozilla Firefox or Google Chrome.
+This document is best viewed using a modern web browser such as Mozilla Firefox or Google Chrome.
 
 # Data exploration
 
@@ -94,26 +94,25 @@ data <- train_sample %>%
            booking_bool, 
            prop_starrating,
            promotion_flag,
-           srch_length_of_stay) %>% 
-    collect()
-
-```
-
-```{r manage_train, cache = T}
-data <- data %>% 
+           srch_length_of_stay,
+           prop_brand_bool,
+           prop_review_score,
+           prop_location_score1) %>% 
+    collect() %>% 
     mutate(price_usd = round(price_usd, 0),
-           price_bin = cut_custom(price_usd, lower = 0, upper = 15000, by = 1000),
-           click_bool = ifelse(click_bool == T, 1, 0),
-           booking_bool = ifelse(booking_bool == T, 1, 0),
-           action = ifelse(booking_bool == 1, "Book", 
-                           ifelse(click_bool == 1 & booking_bool == 0, "Click",
-                                  "No action")),
-           action = factor(action, levels = c("No action", "Click", "Book")))
+       price_bin = cut_custom(price_usd, lower = 0, upper = 15000, by = 1000),
+       click_bool = ifelse(click_bool == T, 1, 0),
+       booking_bool = ifelse(booking_bool == T, 1, 0),
+       action = ifelse(booking_bool == 1, "Book", 
+                       ifelse(click_bool == 1 & booking_bool == 0, "Click",
+                              "No action")),
+       action = factor(action, levels = c("No action", "Click", "Book")))
+
 ```
 
 After loading the data some simple exploratory charts were produced to look at differences in click and booking rates across different search positions and prices. 
 
-```{r plotting_fn}
+```{r pos_plot, out.width = 600, fig.cap = "Figure 1: The relationship between search position and clicking and booking rates."}
 # Function for plotting data
 gather_and_plot <- function(data, field) {
     data %>% 
@@ -134,13 +133,12 @@ gather_and_plot <- function(data, field) {
         ylab("Rate") +
         theme_jim
 }
-```
-
-```{r pos_plot, out.width = 600, fig.cap = "Figure 1: The relationship between search position and clicking and booking rates."}
+# Make the plot for position
 gather_and_plot(data, "position")
 ```
 
 ```{r price_plot, out.width = 600, fig.cap = "Figure 2: The relationship between price and clicking and booking rates."}
+# Make the plot for price
 gather_and_plot(data, "price_bin") + xlab("Price ($)") + 
     theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
@@ -167,17 +165,17 @@ colnames(cors) <- gsub("_usd|_bool|", "", colnames(cors)) %>% toproper()
 kable(cors, digits = 3, caption = "Table 1: Correlations between position, price, and booking/click rates")
 ```
 
-It is the case that both price and position are both negatively correlated with clicking and booking rates. However it appears that position has a much stronger effect than price, with correlations between position and click/booking rates being approximately an order of magnitude greater than those for price.
+It is the case that position is negatively correlated with clicking and booking rates (as expected from the exploratory visualisations) whereas there appears to be no correlation between price and either booking or clicking rates. 
 
-# Simple response models
+# Response model
 
-We also considered a simple logistic regression model in which _any_ type of customer response was modelled as a function of position and price in order to understand their effect on either clicking _or_ booking. In doing so we also included the star rating for each hotel, and indication of whether the hotel was on promotion or not, and the length of stay searched for. This helped us to isolate the true effects of price and position. The results from this model are displayed in table two.
+We also considered a simple logistic regression model in which _any_ type of customer response was modelled as a function of position and price in order to understand their effect on either clicking _or_ booking. In doing so we also included control variables, including star rating, an indication of whether the hotel was on promotion or not, length of stay, an indication of the hotel was a major brand, the average review score, and a score indicating how desirable the hotel location was. This helped us to isolate the true effects of price and position. The results from this model are displayed in table two.
 
 ```{r simple_model, cache = T}
 data <- data %>% 
         mutate(response = ifelse(click_bool == 1 | booking_bool == 1, 1, 0))
 
-simple_fit <- glm(response ~ position + price_usd + prop_starrating + srch_length_of_stay, 
+simple_fit <- glm(response ~ position + price_usd + prop_starrating + srch_length_of_stay + prop_brand_bool + prop_review_score + prop_location_score1, 
                  data = data, family = "binomial")
 
 simple_fit %>% 
@@ -188,6 +186,12 @@ simple_fit %>%
           caption = "Table 2: Model coefficients for the effect of position and price on consumer response")
 ```
 
-It is seen that both position and price have a statistically significant effect on the log-odds (and therefore the likelihood) of a consumer responding. However, the effect of position is much larger than for price, again approximately an order of magnitude larger.
+It is seen that position has a statistically significant effect on the log-odds (and therefore the likelihood) of a consumer responding. The effect of price is an order of magnitude smaller than for position, although it is statistically significant when predicting the likelihood of a response. 
+
+The effect of position is to change the log-odds of a response by `r round(simple_fit %>% tidy() %>% filter(term == "position") %>% select(estimate), 4)` for each increase in position (i.e. for each place _lower_ in the results that the hotel was). Price has a much smaller effect, changing the log-odds of response by only `r round(simple_fit %>% tidy() %>% filter(term == "price_usd") %>% select(estimate), 4)`
+
+# Conclusion
+
+The results of these analyses show that the search position _does_ have an effect on customer response - a lower search position significantly reduces the likelihood that a customer will respond. Price has a statistically significant effect, but one that is an order of magnitude smaller than for position, indicating that it has a much smaller influence than position when other factors (e.g. hotel location, quality etc) are controlled for.
 
 
