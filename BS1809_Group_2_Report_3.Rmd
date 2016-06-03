@@ -22,8 +22,8 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align =
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-library(purrr)
 library(knitr)
+library(broom)
 
 # Set up theme object for prettier plots
 theme_jim <-  theme(legend.position = "bottom",
@@ -95,9 +95,14 @@ data <- train_sample %>%
            prop_starrating,
            promotion_flag,
            srch_length_of_stay) %>% 
-    collect() %>% 
+    collect()
+
+```
+
+```{r manage_train, cache = T}
+data <- data %>% 
     mutate(price_usd = round(price_usd, 0),
-           price_bin = cut_custom(price_usd, lower = 0, upper = 1000, by = 100),
+           price_bin = cut_custom(price_usd, lower = 0, upper = 15000, by = 1000),
            click_bool = ifelse(click_bool == T, 1, 0),
            booking_bool = ifelse(booking_bool == T, 1, 0),
            action = ifelse(booking_bool == 1, "Book", 
@@ -114,15 +119,17 @@ gather_and_plot <- function(data, field) {
     data %>% 
         group_by_(field) %>% 
         summarise(Click = mean(click_bool),
-                  Book = mean(booking_bool)) %>% 
+                  Book = mean(booking_bool),
+                  results = n()) %>%
         gather_("key", "value", c("Click", "Book")) %>% 
         ggplot(aes_string(x = field, y = "value", group = "key")) +
+        geom_point(aes(colour = key, size = results)) +
         geom_line(aes(colour = key), size = 1.5) +
-        geom_point(aes(colour = key), size = 1.5) +
         facet_grid(key ~ .) +
         scale_y_continuous(labels = scales::percent) +
         scale_colour_brewer(palette = "Dark2") +
-        guides(colour = guide_legend(title = "")) +
+        guides(colour = guide_legend(title = ""),
+               size = guide_legend(title = "Search Results")) +
         xlab(field %>% toproper) +
         ylab("Rate") +
         theme_jim
@@ -138,9 +145,12 @@ gather_and_plot(data, "price_bin") + xlab("Price ($)") +
     theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
-Figures 1 and 2 show that there is a general decreasing trend when considering booking _and_ clicking rates in relation to both search position _and_ price. Higher prices lead to lower click and booking rates, and higher positions (lower in the search rankings) have a similar effect, lowering overall booking and clicking rates.
+Figures 1 and 2 show that there is a general decreasing trend when considering booking and clicking rates in relation to search position, and very little trend when considering the effect of price.
 
-In terms of position there is an interesting, cyclical pattern displayed of extra dips in both click and booking rates at set intervals of position. This is likely due to the number of results that are displayed on a page
+Price does not have a large effect, with fluctuations in booking and clicking rates across all prices. However the vast number of search results are for lower-priced options, which may be disguising the overall trend. 
+
+Higher positions (lower in the search rankings) have an effect of lowering overall booking and clicking rates. There is also an interesting, cyclical pattern displayed of extra dips in both click and booking rates at recurring intervals of position (every four or five positions). This is likely due to the number of results that are displayed on a page and how users browse results on the page.
+
 
 # Correlations
 
@@ -158,4 +168,26 @@ kable(cors, digits = 3, caption = "Table 1: Correlations between position, price
 ```
 
 It is the case that both price and position are both negatively correlated with clicking and booking rates. However it appears that position has a much stronger effect than price, with correlations between position and click/booking rates being approximately an order of magnitude greater than those for price.
+
+# Simple response models
+
+We also considered a simple logistic regression model in which _any_ type of customer response was modelled as a function of position and price in order to understand their effect on either clicking _or_ booking. In doing so we also included the star rating for each hotel, and indication of whether the hotel was on promotion or not, and the length of stay searched for. This helped us to isolate the true effects of price and position. The results from this model are displayed in table two.
+
+```{r simple_model, cache = T}
+data <- data %>% 
+        mutate(response = ifelse(click_bool == 1 | booking_bool == 1, 1, 0))
+
+simple_fit <- glm(response ~ position + price_usd + prop_starrating + srch_length_of_stay, 
+                 data = data, family = "binomial")
+
+simple_fit %>% 
+    tidy() %>% 
+    select(-statistic) %>% 
+    kable(col.names = c("Term", "Estimate", "Std. Error", "p-Value"),
+          digits = 4,
+          caption = "Table 2: Model coefficients for the effect of position and price on consumer response")
+```
+
+It is seen that both position and price have a statistically significant effect on the log-odds (and therefore the likelihood) of a consumer responding. However, the effect of position is much larger than for price, again approximately an order of magnitude larger.
+
 
