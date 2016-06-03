@@ -21,47 +21,76 @@ theme_jim <-  theme(legend.position = "bottom",
 db <- src_postgres("expedia", user = "postgres", password = pg_password)
 
 
-data <- tbl(db, "train_new")
+train_sample <- tbl(db, "train_new_sample")
 
-
-clean <- data %>% 
-    select(srch_id, prop_id, position, price_usd, click_bool, booking_bool) %>% 
+# Grab the data
+data <- train_sample %>% 
+    select(srch_id, prop_id, 
+           position, 
+           price_usd, 
+           click_bool, 
+           booking_bool, 
+           prop_starrating,
+           promotion_flag,
+           srch_length_of_stay) %>% 
+    collect() %>% 
     mutate(price_usd = round(price_usd, 0),
-           price_bin = cut(price_usd, 25))
+           price_bin = cut(price_usd, 25),
+           click_bool = ifelse(click_bool == T, 1, 0),
+           booking_bool = ifelse(booking_bool == T, 1, 0),
+           action = ifelse(booking_bool == 1, "Book", 
+                           ifelse(click_bool == 1 & booking_bool == 0, "Click",
+                                  "No action")),
+           action = factor(action, levels = c("No action", "Click", "Book")))
 
+# Simple correlations between fields
+cors <- cor(data %>% select(position, price_usd, click_bool, booking_bool, promotion_flag))
 
-clean %>% 
+# Summary of click/book rate per position
+rates <- data %>% 
     group_by(position) %>% 
-    summarise(click  = mean(click_bool),
-              book = mean(booking_bool)) %>% 
-    gather(type, avg, -position) %>% 
-    mutate(type = ifelse(type == "book", "Book", "Click")) %>% 
-    ggplot(aes(x = position, y = avg, group = type)) +
-    geom_point(aes(colour = type)) +
-    geom_line(aes(colour = type), size = 1.5) +
-    facet_grid(type ~ .) +
-    scale_y_continuous(labels = scales::percent) +
-    scale_colour_brewer(palette = "Dark2") +
-    guides(colour = "none") +
-    ylab("Likelihood") +
+    summarise(click = mean(click_bool),
+              book = mean(booking_bool))
+
+# Look at effects of position and price on click and book
+click_fit <- glm(click_bool ~ position + price_usd + prop_starrating + srch_length_of_stay, 
+                 data = data, family = "binomial")
+book_fit <- glm(booking_bool ~ position + price_usd + prop_starrating  + srch_length_of_stay, 
+                data = data, family = "binomial")
+
+# Fit multinomial logit for all 3 levels (no action, click, book)
+fit <- multinom(action ~ position + price_usd + prop_starrating  + srch_length_of_stay
+                , data = data)
+
+
+# Function for plotting data
+gather_and_plot <- function(data, field) {
+    data %>% 
+        group_by_(field) %>% 
+        summarise(click = mean(click_bool),
+                  book = mean(booking_bool)) %>% 
+        gather_("key", "value", c("click", "book")) %>% 
+        ggplot(aes_string(x = field, y = "value", group = "key")) +
+        geom_line(aes(colour = key), size = 1.5) +
+        facet_grid(key ~ .) +
+        scale_y_continuous(labels = scales::percent) +
+        xlab(field) +
+        ylab("Rate") +
+        scale_colour_brewer(palette = "Dark2") +
+        theme_jim
+}
+
+gather_and_plot(data, "price_bin")
+
+data %>% 
+    ggplot(aes(x = price_usd, y = click_bool)) +
+    geom_point(colour = "steelblue", size = 2, alpha = 0.75) +
+    geom_smooth() +
     theme_jim
 
-
-
-clean %>% 
-    group_by(price_bin) %>% 
-    summarise(click  = mean(click_bool),
-              book = mean(booking_bool)) %>% 
-    gather(type, avg, -price_bin) %>% 
-    mutate(type = ifelse(type == "book", "Book", "Click")) %>% 
-    ggplot(aes(x = price_bin, y = avg, group = type)) +
-    geom_point(aes(colour = type)) +
-    geom_line(aes(colour = type), size = 1.5) +
-    facet_grid(type ~ .) +
-    scale_y_continuous(labels = scales::percent) +
-    scale_colour_brewer(palette = "Dark2") +
-    guides(colour = "none") +
-    ylab("Likelihood") +
+data %>% 
+    ggplot(aes(x = price_usd, y = booking_bool)) +
+    geom_point(colour = "steelblue", size = 2, alpha = 0.75) +
+    geom_smooth() +
     theme_jim
-
 
