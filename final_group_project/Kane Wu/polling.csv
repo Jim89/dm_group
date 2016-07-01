@@ -1,0 +1,157 @@
+OBJECTID,NEW2007,NEWWARD,WESTMINSTE,SCOTTISH,PLACE_LINK,POLLING_PL,ADDRESS,POSTCODE,FULL_AD,X,Y,Shapearea,Shapelen
+1,WW01G,Almond,West,Western,WW01G,Hillwood Primary School,"66 Station Road, Ratho",EH28 8PT,"66 Station Road, Ratho, EH28 8PT",313184.4109,672292.3421,19868286.21,25436.33667
+2,WW01C,Almond,West,Western,WW01C,Dalmeny Parish Church Hall,"22 Main Street, Dalmeny",EH30 9TU,"22 Main Street, Dalmeny, EH30 9TU",314422.6747,677451.6198,20665934.3,27713.77945
+3,WW01D,Almond,West,Western,WW01D,Kirkliston Community Centre,"16-18 Queensferry Road, Kirkliston",EH29 9AQ,"16-18 Queensferry Road, Kirkliston, EH29 9AQ",312471.4571,674756.143,10777554.27,19939.50497
+4,WW01E,Almond,West,Western,WW01E,Cramond Primary School,4 Cramond Crescent,EH4 6PG,"4 Cramond Crescent, EH4 6PG",318706.9361,676161.1786,4276490.403,13948.76533
+5,SWW01Z,Almond,South West,Western,SWW01Z, , , , ,0,0,371716.5171,3907.349778
+6,WW01B,Almond,West,Western,WW01B,Queensferry Primary School,"Burgess Road, South Queensferry",EH30 9NX,"Burgess Road, South Queensferry, EH30 9NX",312993.3961,678038.0202,1888591.739,6779.059171
+7,WW01A,Almond,West,Western,WW01A,Echline Primary School,"Bo'ness Road, South Queensferry",EH30 9XJ,"Bo'ness Road, South Queensferry, EH30 9XJ",312043.7781,678140.3071,1441636.678,7477.379947
+8,WW01F,Almond,West,Western,WW01F,Holy Cross Episcopal Church Hall,East Barnton Gardens,EH4 6AR,"East Barnton Gardens, EH4 6AR",320514.2898,675398.2393,3478824.517,9396.147317
+9,NC11E,City Centre,North and Leith,Central,NC11E,Walpole Hall,26 Chester St,EH3 7EN,"26 Chester St, EH3 7EN",324092.8804,673579.5317,233883.736,2071.972536
+10,EC11J,City Centre,East,Central,EC11J,Waverley Court,4 East Market Street,EH8 8BG,"4 East Market Street, EH8 8BG",326173.2349,673822.1488,356887.4081,3299.300649
+11,EE11K,City Centre,East,Eastern,EE11K,Abbeyhill Primary School,5b Abbey Street,EH7 5SJ,"5b Abbey Street, EH7 5SJ",327075.2371,674337.152,405011.8435,3167.509717
+12,EC11H,City Centre,East,Central,EC11H,Lothian Chambers,59-63 George IV Bridge,EH1 1RN,"59-63 George IV Bridge, EH1 1RN",325644.7781,673559.0866,854097.3637,4583.884449
+13,SWC11F,City Centre,South West,Central,SWC11F,Tollcross Community Centre,117 Fountainbridge,EH3 9QG,"117 Fountainbridge, EH3 9QG",324723.9117,672942.9767,278817.0333,3156.396154
+14,NC11C,City Centre,North and Leith,Central,NC11B/NC11C,"Cafe Camino, St. Mary's Parish Centre",1 Little King Street,EH1 3JD,"1 Little King Street, EH1 3JD",325944.2888,674296.6261,360635.339,2699.04737
+15,NC11B,City Centre,North and Leith,Central,NC11B/NC11C,"Cafe Camino, St. Mary's Parish Centre",1 Little King Street,EH1 3JD,"1 Little King Street, EH1 3JD",325944.2888,674296.6261,627631.0516,4054.163437
+16,NC11A,City Centre,North and Leith,Central,NC11A,The Roxburghe,33-34 Charlotte Square,EH2 4HQ,"33-34 Charlotte Square, EH2 4HQ",324780.7638,673835.8899,693783.5637,4345.198461
+17,WC11D,City Centre,West,Central,WC05K/WC11D,Apex Haymarket Hotel,90 Haymarket Terrace (enter via Magdala Crescent),EH12 5LQ,"90 Haymarket Terrace (enter via Magdala Crescent), EH12 5LQ",323727.3906,673245.6922,255247.9247,2432.055202
+18,EC11G,City Centre,East,Central,EC11G,Lauriston Halls,28 Lauriston Street,EH3 9DJ,"28 Lauriston Street, EH3 9DJ",325073.9119,673108.3819,205949.9766,2116.524275
+19,SP08G,Colinton/Fairmilehead,South,Pentlands,SP08G,Fairmilehead Parish Church Hall,1a Frogston Road West,EH10 7AA,"1a Frogston Road West, EH10 7AA",324863.2185,668263.9149,2751255.302,9614.27359
+20,SP08D,Colinton/Fairmilehead,South,Pentlands,SP08D,St Fillan's Church Hall,4 Buckstone Drive,EH10 6PD,"4 Buckstone Drive, EH10 6PD",324582.537,669143.3671,1574785.318,6996.095504
+21,SWP08C,Colinton/Fairmilehead,South West,Pentlands,SWP08C,Pentland Primary School,4 Oxgangs Green,EH13 0BD,"4 Oxgangs Green, EH13 0BD",323854.7568,668886.0374,194448.9626,2077.7029
+22,SWP08B,Colinton/Fairmilehead,South West,Pentlands,SWP08B,St John's Colinton Mains Church,223 Oxgangs Road North,EH13 9ED,"223 Oxgangs Road North, EH13 9ED",323330.5246,669134.4476,698602.7658,4092.469184
+23,SWP08E,Colinton/Fairmilehead,South West,Pentlands,SWP08E,Dreghorn Loan Church Hall,22 Dreghorn Loan,EH13 0DE,"22 Dreghorn Loan, EH13 0DE",321668.2284,668769.8332,4681579.612,12725.52466
+24,SWP08F,Colinton/Fairmilehead,South West,Pentlands,SWP08F,Pentland Community Centre,21 Oxgangs Brae,EH13 9LS,"21 Oxgangs Brae, EH13 9LS",323754.7938,668698.9415,5297073.984,12056.72274
+25,SWP08A,Colinton/Fairmilehead,South West,Pentlands,SWP08A,St Cuthbert's Episcopal Church Hall,6 Westgarth Avenue,EH14 0BD,"6 Westgarth Avenue, EH14 0BD",321733.3468,668982.166,4938919.298,12969.12713
+26,WC06G,Corstorphine/Murrayfield,West,Central,WC06G,Saughton Crescent Scout Hall,54 Saughton Crescent,EH12 5SP,"54 Saughton Crescent, EH12 5SP",321705.5855,672995.0844,1008874.399,4984.54116
+27,WW06I,Corstorphine/Murrayfield,West,Western,WW06I,Carrick Knowe Parish Church Hall,118 Saughton Road North,EH12 7DR,"118 Saughton Road North, EH12 7DR",320236.7112,672072.7963,604631.767,4538.618925
+28,WW06E,Corstorphine/Murrayfield,West,Western,WW06E,10th Craigalmond Scout Hall,31 Corstorphine High Street,EH12 7AZ,"31 Corstorphine High Street, EH12 7AZ",319824.2057,672646.5665,617167.6665,5229.290854
+29,WW06F,Corstorphine/Murrayfield,West,Western,WW06F,Carrick Knowe Primary School,15a Lampacre Road,EH12 7HU,"15a Lampacre Road, EH12 7HU",320506.6961,672449.3222,337338.8921,3239.365267
+30,WC06H,Corstorphine/Murrayfield,West,Central,WC06H,Roseburn Primary School,64 Roseburn Street,EH12 5PL,"64 Roseburn Street, EH12 5PL",322868.4742,672966.0851,883489.8886,4893.992657
+31,WC06D,Corstorphine/Murrayfield,West,Central,WC06D,Murrayfield Parish Church Centre,2B Ormidale Terrace,EH12 6EQ,"2B Ormidale Terrace, EH12 6EQ",322626.1246,673254.8516,1187045.128,5537.988245
+32,WC06C,Corstorphine/Murrayfield,West,Central,WC06C,Holiday Inn Edinburgh City West,107 Queensferry Road,EH4 3HL,"107 Queensferry Road, EH4 3HL",322491.1972,674338.2506,653818.1672,5015.331834
+33,WW06A,Corstorphine/Murrayfield,West,Western,WW06A,Corstorphine St Ninian's Church Hall,St Ninian's Road,EH12 8AL,"St Ninian's Road, EH12 8AL",319825.2823,673008.7507,525825.0004,3147.47421
+34,WW06B,Corstorphine/Murrayfield,West,Western,WW06B,St Anne's Parish Church Hall,1 Kaimes Rd,EH12 6JR,"1 Kaimes Rd, EH12 6JR",320554.5722,672855.9599,680190.5079,4301.660558
+35,SWW06J,Corstorphine/Murrayfield,South West,Western,SWW06J,Mobile Polling Station,Roadway adjacent to 16 and 18 Forrester Park Gardens,EH12 6AN,"Roadway adjacent to 16 and 18 Forrester Park Gardens, EH12 6AN",320035.0537,671812.5487,130129.28,2162.755928
+36,EE14J,Craigentinny/Duddingston,East,Eastern,EE14J,Duddingston Primary School,70a Duddingston Road,EH15 1SW,"70a Duddingston Road, EH15 1SW",329450.1185,673334.3222,1291431.548,7225.959673
+37,EE14C,Craigentinny/Duddingston,East,Eastern,EE14C,Craigentinny St Christopher's Church Hall,77-79 Craigentinny Road,EH7 6QL,"77-79 Craigentinny Road, EH7 6QL",329221.6499,674759.5377,1673786.207,7627.133532
+38,EE14B,Craigentinny/Duddingston,East,Eastern,EE14B,Craigentinny Community Centre,9 Loaning Road,EH7 6JE,"9 Loaning Road, EH7 6JE",328511.3696,674700.1031,686220.8524,4893.76398
+39,EE14A,Craigentinny/Duddingston,East,Eastern,EE14A,St Ninian's RC Church Hall,232 Marionville Road,EH7 6BE,"232 Marionville Road, EH7 6BE",328012.206,674582.5983,610265.8206,4542.354281
+40,EE14G,Craigentinny/Duddingston,East,Eastern,EE14G,Northfield/Willowbrae Community Centre,10 Northfield Road,EH8 7PP,"10 Northfield Road, EH8 7PP",328984.6964,673880.2772,820541.1962,4316.440132
+41,EE14H,Craigentinny/Duddingston,East,Eastern,EE14H,Parson's Green Nursery School,60 Meadowfield Drive,EH8 7LU,"60 Meadowfield Drive, EH8 7LU",328693.8815,673333.4407,469465.9505,3117.674402
+42,EE14F,Craigentinny/Duddingston,East,Eastern,EE14F,New Restalrig Parish Church Hall,1a Willowbrae Road,EH8 7DB,"1a Willowbrae Road, EH8 7DB",328376.2081,674135.7938,473953.8093,3588.73822
+43,EE14D,Craigentinny/Duddingston,East,Eastern,EE14D,Holyrood Abbey Church Hall,83 London Road,EH7 5TT,"83 London Road, EH7 5TT",327416.9062,674388.1769,2763625.271,10464.47798
+44,WW03B,Drum Brae/Gyle,West,Western,WW03B,Munro Community Centre,6 Parkgrove Street,EH4 7NT,"6 Parkgrove Street, EH4 7NT",319567.2888,674892.9666,697884.923,5263.042882
+45,SWW03G,Drum Brae/Gyle,South West,Western,SWW03G,Lothian Valuation Joint Board Office,17A South Gyle Crescent,EH12 9FL,"17A South Gyle Crescent, EH12 9FL",318900.1129,671516.1238,711835.2692,4622.990708
+46,WW03F,Drum Brae/Gyle,West,Western,WW03F,Gylemuir Primary School,10 Wester Broom Place,EH12 7RT,"10 Wester Broom Place, EH12 7RT",319191.1854,672425.2188,2106966.61,8208.262649
+47,WW03E,Drum Brae/Gyle,West,Western,WW03E,Craigsbank Church Hall,19a Craigs Bank,EH12 8HD,"19a Craigs Bank, EH12 8HD",319104.5942,673036.4549,1375279.283,6597.988056
+48,WW03D,Drum Brae/Gyle,West,Western,WW03D,Fox Covert Primary School,12a Clerwood Crescent,EH12 8PG,"12a Clerwood Crescent, EH12 8PG",320158.303,673982.3063,1185480.55,5818.119786
+49,WW03C,Drum Brae/Gyle,West,Western,WW03C,The Rannoch Centre,6 Rannoch Terrace,EH4 7ES,"6 Rannoch Terrace, EH4 7ES",319721.8824,674301.0168,504296.25,4569.685356
+50,WW03A,Drum Brae/Gyle,West,Western,WW03A,East Craigs Church Centre,8 Bughtlin Market,EH12 8XP,"8 Bughtlin Market, EH12 8XP",318644.1015,673838.0446,907957.3988,4702.887425
+51,WW04B,Forth,West,Western,WW04B,North Edinburgh Arts Centre,15a Pennywell Court,EH4 4TZ,"15a Pennywell Court, EH4 4TZ",321838.169,676052.1909,710724.7569,5007.031518
+52,WW04A,Forth,West,Western,WW04A,Muirhouse Millenium Centre,7 Muirhouse Medway,EH4 4RW,"7 Muirhouse Medway, EH4 4RW",321409.9813,675947.9588,701992.4368,4319.117347
+53,NN04D,Forth,North and Leith,Northern & Leith,NN04D,Prentice Centre,1 Granton Mains Avenue,EH4 4GA,"1 Granton Mains Avenue, EH4 4GA",322358.8774,676619.8747,946780.1753,4610.357881
+54,NN04C,Forth,North and Leith,Northern & Leith,NN04C,West Pilton Neighbourhood Centre,19 West Pilton Grove,EH4 4BY,"19 West Pilton Grove, EH4 4BY",322390.0951,676100.3156,642055.6683,3475.662497
+55,NN04J,Forth,North and Leith,Northern & Leith,NN04J,Trinity Primary School,181 Newhaven Road,EH6 4QA,"181 Newhaven Road, EH6 4QA",325632.6173,676582.3493,376659.3837,2905.499316
+56,NN04H,Forth,North and Leith,Northern & Leith,NN04H,Inverleith St Serf's Church,280 Ferry Road,EH5 3NP,"280 Ferry Road, EH5 3NP",324876.2997,676067.7677,826314.1742,4041.150005
+57,NN04I,Forth,North and Leith,Northern & Leith,NN04I,Newhaven Church Hall,7 Craighall Road,EH6 4ND,"7 Craighall Road, EH6 4ND",325392.9599,676959.3211,347600.9889,2818.401165
+58,NN04E,Forth,North and Leith,Northern & Leith,NN04E,Royston Wardieburn Community Centre,11 Pilton Drive North,EH5 1NF,"11 Pilton Drive North, EH5 1NF",323344.2128,676620.1613,1100275.202,6981.007629
+59,NN04F,Forth,North and Leith,Northern & Leith,NN04F,"Granton Primary School, New Annex",59 Boswall Parkway (Enter via Wardieburn Street West),EH5 2DA,"59 Boswall Parkway (Enter via Wardieburn Street West), EH5 2DA",323518.3221,676607.7497,526875.007,3569.99295
+60,NN04G,Forth,North and Leith,Northern & Leith,NN04G,Wardie Residents Club,125 Granton Road,EH5 3NJ,"125 Granton Road, EH5 3NJ",324253.1192,676577.935,674303.2504,6947.208693
+61,SWS09C,Fountainbridge/Craiglockhart,South West,Southern,SWS09C,Fountainbridge Library,137 Dundee Street,EH11 1BG,"137 Dundee Street, EH11 1BG",323997.4611,672570.3788,197782.1317,2234.42552
+62,SWS09B,Fountainbridge/Craiglockhart,South West,Southern,SWS09B,Craiglockhart Primary School,90 Ashley Terrace,EH11 1RG,"90 Ashley Terrace, EH11 1RG",323399.665,671645.076,401044.4524,2743.63989
+63,SWS09A,Fountainbridge/Craiglockhart,South West,Southern,SWS07K/SWS09A,St Cuthbert's Church Hall,Hutchison Crossway,EH14 1PT,"Hutchison Crossway, EH14 1PT",322669.2705,671535.3251,982183.8199,4737.357108
+64,SWS09E,Fountainbridge/Craiglockhart,South West,Southern,SWS09E,Boroughmuir Rugby & Community Sports Club,2 Meggetland Wynd,EH14 1XN,"2 Meggetland Wynd, EH14 1XN",323010.5684,671196.2866,1019576.563,4968.697233
+65,SS09F,Fountainbridge/Craiglockhart,South,Southern,SS09F/SS10B,Polwarth Parish Church,36 Polwarth Terrace,EH11 1LU,"36 Polwarth Terrace, EH11 1LU",323658.6775,671906.0851,140839.3772,2353.829308
+66,SS09H,Fountainbridge/Craiglockhart,South,Southern,SS09H/SS10J,Greenbank Church Hall,2b Braidburn Terrace,EH10 6ES,"2b Braidburn Terrace, EH10 6ES",324334.2051,670235.9477,3231.252372,243.028348
+67,SWC09D,Fountainbridge/Craiglockhart,South West,Central,SWC09D,Tollcross Primary School,117 Fountainbridge,EH3 9QG,"117 Fountainbridge, EH3 9QG",324743.6538,672913.2711,282659.5086,2275.40282
+68,SWS09G,Fountainbridge/Craiglockhart,South West,Southern,SWS09G,Craiglockhart Parish Church Hall,Craiglockhart Drive North,EH14 1HS,"Craiglockhart Drive North, EH14 1HS",322445.7749,670539.9699,1829056.696,8691.301264
+69,WW05C,Inverleith,West,Western,WW05C,Drylaw Neighbourhood Centre,67 Groathill Road North,EH4 2SA,"67 Groathill Road North, EH4 2SA",322265.5792,675024.0213,641699.9909,3611.095396
+70,NC05D,Inverleith,North and Leith,Central,NC05D,Scottish Health Service Centre,Crewe Road South,EH4 2LF,"Crewe Road South, EH4 2LF",323268.996,674940.1396,1164914.151,5112.015778
+71,NW05E,Inverleith,North and Leith,Western,NW05E,Blackhall St Columba's Church Hall,6 Muirdale Terrace,EH4 3QW,"6 Muirdale Terrace, EH4 3QW",321913.8572,674624.9349,863152.5623,4857.385019
+72,NC05G,Inverleith,North and Leith,Central,NC05G,St Stephen's Comely Bank Church,10 Comely Bank Road,EH4 1DW,"10 Comely Bank Road, EH4 1DW",324030.4903,674769.0988,798984.9102,4924.347563
+73,NC05J,Inverleith,North and Leith,Central,NC05J,Bristo Baptist Church Hall,41 Buckingham Terrace,EH4 3AP,"41 Buckingham Terrace, EH4 3AP",323842.2371,674200.4992,807889.6078,4953.938389
+74,WW05A,Inverleith,West,Western,WW05A,Blackhall Library,56 Hillhouse Road,EH4 5EG,"56 Hillhouse Road, EH4 5EG",321379.492,675010.6844,258211.6225,2758.283667
+75,NC05I,Inverleith,North and Leith,Central,NC05I,Bellevue Chapel,Rodney Street,EH7 4EL,"Rodney Street, EH7 4EL",325507.5345,674911.5059,115136.4037,1396.790295
+76,NC05H,Inverleith,North and Leith,Central,NC05H,Stockbridge Parish Church,7B Saxe Coburg St,EH3 5BN,"7B Saxe Coburg St, EH3 5BN",324749.8815,674795.3807,558634.6678,3844.51206
+77,NN05F,Inverleith,North and Leith,Northern & Leith,NN05F,St James' Episcopal Church Hall,57b Inverleith Row,EH3 5PX,"57b Inverleith Row, EH3 5PX",324654.293,675945.9615,1683599.36,5561.796375
+78,WC05K,Inverleith,West,Central,WC05K/WC11D,Apex Haymarket Hotel,90 Haymarket Terrace (enter via Magdala Crescent),EH12 5LQ,"90 Haymarket Terrace (enter via Magdala Crescent), EH12 5LQ",323727.3906,673245.6922,30774.13072,1172.751506
+79,WW05B,Inverleith,West,Western,WW05B,Blackhall Primary School,83 Craigcrook Rd,EH4 3PH,"83 Craigcrook Rd, EH4 3PH",321322.01,674328.1496,1204004.004,5272.552618
+80,NN13B,Leith,North and Leith,Northern & Leith,NN13B,North Leith Parish Church Hall,55 Madiera Street,EH6 4AU,"55 Madiera Street, EH6 4AU",326265.8047,676544.5645,929410.7457,4604.210123
+81,NN13A,Leith,North and Leith,Northern & Leith,NN13A,Victoria Primary School,4-6 Newhaven Main Street,EH6 4HY,"4-6 Newhaven Main Street, EH6 4HY",325684.6562,677017.1918,956197.6896,4324.7063
+82,NN13C,Leith,North and Leith,Northern & Leith,NN13C,St Mary's (Leith) RC Primary School,30 Links Gardens,EH6 7JG,"30 Links Gardens, EH6 7JG",327708.8815,676017.3222,2609155.463,11374.46576
+83,NN13D,Leith,North and Leith,Northern & Leith,NN13D,South Leith Parish Church Halls,6 Henderson Street,EH6 7GS,"6 Henderson Street, EH6 7GS",326900.1381,676060.6718,481741.2936,3583.74398
+84,EN13E,Leith,East,Northern & Leith,EN13E,Hermitage Park Primary School,9 Hermitage Park,EH6 8HD,"9 Hermitage Park, EH6 8HD",327564.2371,675339.3222,816253.4714,5999.742047
+85,EE13F,Leith,East,Eastern,EE13F,Restalrig Lochend Community Hub,198 Restalrig Road South,EH7 6DZ,"198 Restalrig Road South, EH7 6DZ",328067.4365,675130.1747,168078.2045,1788.425545
+86,NN12A,Leith Walk,North and Leith,Northern & Leith,NN12A,Holy Cross RC Primary School,82 Craighall Road,EH6 4RE,"82 Craighall Road, EH6 4RE",325478.2119,676228.3438,269082.1957,2716.61942
+87,NN12B,Leith Walk,North and Leith,Northern & Leith,NN12B,Ebeneezer United Free Church Hall,31 Bangor Road,EH6 5JX,"31 Bangor Road, EH6 5JX",326583.6296,676164.5619,186623.5133,2044.265418
+88,NN12C,Leith Walk,North and Leith,Northern & Leith,NN12C,Royal Navy & Royal Marine Assoc. & Club,"Heriothill House,1 Broughton Road",EH7 4EW,"Heriothill House,1 Broughton Road, EH7 4EW",325353.0442,675058.3652,302601.1814,3397.958985
+89,NN12D,Leith Walk,North and Leith,Northern & Leith,NN12D,Broughton Nursery,McDonald Road,EH7 4NW,"McDonald Road, EH7 4NW",325940.0383,675337.0749,561860.9249,3811.99377
+90,NN12E,Leith Walk,North and Leith,Northern & Leith,NN12E,Pilrig St Paul's Church Hall,1b Pilrig Street,EH5 5AH,"1b Pilrig Street, EH5 5AH",326535.449,675200.6001,211062.8854,2000.69035
+91,NN12F,Leith Walk,North and Leith,Northern & Leith,NN12F,Lorne Primary School,7 Lorne Street,EH6 8QS,"7 Lorne Street, EH6 8QS",326783.6444,675421.7963,176637.421,1926.970164
+92,NN12I,Leith Walk,North and Leith,Northern & Leith,NN12I,McDonald Road Library,2 McDonald Road,EH7 4LU,"2 McDonald Road, EH7 4LU",326344.5282,674887.0814,241547.6427,2706.79424
+93,NN12J,Leith Walk,North and Leith,Northern & Leith,NN12J,Leith Walk Primary School,9 Brunswick Road,EH7 5NG,"9 Brunswick Road, EH7 5NG",326475.5259,674776.6261,413426.244,2643.99716
+94,EN12K,Leith Walk,East,Northern & Leith,EN12K,London Rd Church Hall,1c London Road (enter via Easter Road),EH7 5AP,"1c London Road (enter via Easter Road), EH7 5AP",326905.9607,674496.2973,115540.6769,1547.528248
+95,EN12G,Leith Walk,East,Northern & Leith,EN12G,Pilmeny Youth Centre,44 Buchanan Street,EH6 8RF,"44 Buchanan Street, EH6 8RF",326764.0416,675254.2934,22178.59205,702.717155
+96,EN12H,Leith Walk,East,Northern & Leith,EN12H,Norton Park Conference Centre,57 Albion Road,EH7 5QY,"57 Albion Road, EH7 5QY",327234.3246,674883.8315,275644.1973,2856.969843
+97,SE16K,Liberton/Gilmerton,South,Eastern,SE16K,Gilmerton Community Centre,4 Drum Street,EH17 8QG,"4 Drum Street, EH17 8QG",329192.5678,668681.1431,4443673.713,9929.496797
+98,SE16I,Liberton/Gilmerton,South,Eastern,SE16I,Liberton Northfield Church Hall,280a Gilmerton Road,EH16 5UR,"280a Gilmerton Road, EH16 5UR",328019.7292,669953.9817,431211.8868,3864.770002
+100,EE16L,Liberton/Gilmerton,East,Eastern,EE16L/SE16D/SE17L,Moredun Library,92 Moredun Park Road,EH17 7HL,"92 Moredun Park Road, EH17 7HL",329155,669514,435279.196,4615.146962
+101,SE16D,Liberton/Gilmerton,South,Eastern,EE16L/SE16D/SE17L,Moredun Library,92 Moredun Park Road,EH17 7HL,"92 Moredun Park Road, EH17 7HL",329155,669514,970114.9748,5566.004233
+102,SE16H,Liberton/Gilmerton,South,Eastern,SE16H/SS16E,Liberton Kirk Halls,28-30 Kirkgate,EH16 6RY,"28-30 Kirkgate, EH16 6RY",327549.6279,669477.1967,110132.3147,1630.01923
+99,SS16B,Liberton/Gilmerton,South,Southern,SS16B,St Gregory's RC Church Hall,Walter Scott Avenue (enter via Bellenden Gardens),EH16 5RJ,"Walter Scott Avenue (enter via Bellenden Gardens), EH16 5RJ",328092.1491,670514.0586,1184889.959,5173.333742
+103,SS16E,Liberton/Gilmerton,South,Southern,SE16H/SS16E,Liberton Kirk Halls,28-30 Kirkgate,EH16 6RY,"28-30 Kirkgate, EH16 6RY",327549.6279,669477.1967,1861825.799,8118.95276
+104,SE16G,Liberton/Gilmerton,South,Eastern,SE16G,South Neighbourhood Office,40 Captain's Road,EH17 8QF,"40 Captain's Road, EH17 8QF",327991.785,668354.6824,1910163.479,9432.113738
+105,SE16F,Liberton/Gilmerton,South,Eastern,SE16F,TA Centre,126a Alnwickhill Road,EH16 6NQ,"126a Alnwickhill Road, EH16 6NQ",327017.0462,668980.3367,458111.3466,2833.777077
+106,SE16J,Liberton/Gilmerton,South,Eastern,SE16J,Valley Park Community Centre,37 Southhouse Road,EH17 8EU,"37 Southhouse Road, EH17 8EU",327798.5008,667855.6266,3066782.837,7645.278924
+107,SS16A,Liberton/Gilmerton,South,Southern,SS16A,St John Vianney RC Primary School,17 Ivanhoe Crescent (enter from Woodstock Place),EH16 6AU,"17 Ivanhoe Crescent (enter from Woodstock Place), EH16 6AU",327793.2008,670084.2124,439071.0774,3168.265715
+108,ES16C,Liberton/Gilmerton,East,Southern,ES15H/ES16C,Cameron House Community Education Centre,34 Prestonfield Avenue,EH16 5EU,"34 Prestonfield Avenue, EH16 5EU",327716.3619,671698.8751,444166.6929,3397.441918
+109,SS10H,Meadows/Morningside,South,Southern,SS10H,South Morningside Primary School,118 Comiston Road,EH10 5QN,"118 Comiston Road, EH10 5QN",324342.3785,670475.1309,527988.6518,2993.715367
+110,SS10F,Meadows/Morningside,South,Southern,SS10F,Church Hill Theatre - Studio,33 Morningside Road,EH10 4DR,"33 Morningside Road, EH10 4DR",324537.6126,671727.8931,774956.6647,4709.397635
+111,SWS10A,Meadows/Morningside,South West,Southern,SWS10A,Church of Jesus Christ of LDS,30a Colinton Road (enter via Spylaw Road),EH10 5DG,"30a Colinton Road (enter via Spylaw Road), EH10 5DG",323761.0799,671524.4299,369502.2122,2908.024216
+112,SS10J,Meadows/Morningside,South,Southern,SS09H/SS10J,Greenbank Church Hall,2b Braidburn Terrace,EH10 6ES,"2b Braidburn Terrace, EH10 6ES",324334.2051,670235.9477,2112495.019,7635.786611
+113,SS10I,Meadows/Morningside,South,Southern,SS10I,Morningside Parish Church Halls,5 Braid Road,EH10 6AD,"5 Braid Road, EH10 6AD",324559.434,670805.0963,881246.2736,5681.055351
+114,SS10B,Meadows/Morningside,South,Southern,SS09F/SS10B,Polwarth Parish Church,36 Polwarth Terrace,EH11 1LU,"36 Polwarth Terrace, EH11 1LU",323658.6775,671906.0851,315976.7679,2262.78089
+115,SS10C,Meadows/Morningside,South,Southern,SS10C,Morningside United Main Church Hall,15 Chamberlain Road,EH10 4DJ,"15 Chamberlain Road, EH10 4DJ",324531.287,671931.917,233745.7999,2109.304361
+116,EC10E,Meadows/Morningside,East,Central,EC10E,Novotel Edinburgh Centre,80 Lauriston Place,EH3 9DE,"80 Lauriston Place, EH3 9DE",325178.4205,673094.4282,522728.1801,3681.632264
+117,SWC10D,Meadows/Morningside,South West,Central,SWC10D,Barclay Viewforth Church,1 Wright's Houses,EH10 4HR,"1 Wright's Houses, EH10 4HR",324925.9412,672594.1565,201048.095,2176.237727
+118,WP02A,Pentland Hills,West,Pentlands,WP02A,Ratho Community Centre,"1 School Wynd, Ratho",EH28 8TT,"1 School Wynd, Ratho, EH28 8TT",313589.2371,670776.6778,18200958.02,20952.68179
+119,SWP02H,Pentland Hills,South West,Pentlands,SWP02H,"The Mill Café @ St Joseph's, Balerno Parish Church","2 Main Street, Balerno",EH14 7EH,"2 Main Street, Balerno, EH14 7EH",316236.467,666510.8753,43607916.88,31709.29996
+120,SWP02F,Pentland Hills,South West,Pentlands,SWP02F,Gibson Craig Halls,156 Lanark Road West,EH14 5NY,"156 Lanark Road West, EH14 5NY",318423.2753,667877.7684,8968529.204,17055.30872
+121,SWP02G,Pentland Hills,South West,Pentlands,SWP02G,Currie Library,210 Lanark Road West,EH14 5NX,"210 Lanark Road West, EH14 5NX",318111.82,667775.76,2118809.15,7780.536926
+122,SWP02B,Pentland Hills,South West,Pentlands,SWP02B,Heriot-Watt University,"Student Union Building, Riccarton",EH14 5DH,"Student Union Building, Riccarton , EH14 5DH",317702.3349,669456.4676,3661364.925,8653.624872
+148,ES15H,Southside/Newington,East,Southern,ES15H/ES16C,Cameron House Community Education Centre,34 Prestonfield Avenue,EH16 5EU,"34 Prestonfield Avenue, EH16 5EU",327716.3619,671698.8751,1160057.367,4634.476763
+149,EC15A,Southside/Newington,East,Central,EC15A,Braidwood Community Centre,69 Dumbiedykes Road,EH8 9UT,"69 Dumbiedykes Road, EH8 9UT",326542.4727,673457.2915,204930.4783,3379.444466
+150,EC15B,Southside/Newington,East,Central,EC15B,Southside Community Centre,117 Nicolson Street,EH8 9ER,"117 Nicolson Street, EH8 9ER",326144.4596,672995.0881,518927.4515,3301.856825
+123,SWP02C,Pentland Hills,South West,Pentlands,SWP02C,Juniper Green Parish Church Hall,"498 Lanark Road, Juniper Green (enter via Woodhall Avenue)",EH14 5DH,"498 Lanark Road, Juniper Green (enter via Woodhall Avenue), EH14 5DH",319964.4507,668764.9829,1363598.494,7430.714748
+124,SWP02D,Pentland Hills,South West,Pentlands,SWP02D,Clovenstone Community Centre,54 Clovenstone Park (Clovenstone PS),EH14 3EY,"54 Clovenstone Park (Clovenstone PS), EH14 3EY",320491.797,669417.6466,436621.9214,3034.317286
+125,SWP02E,Pentland Hills,South West,Pentlands,SWP02E,Kingsknowe Golf Club *NEW*,326 Lanark Road,EH14 2JD,"326 Lanark Road, EH14 2JD",321181.59,669708.9027,965779.5738,5837.628083
+126,EE17A,Portobello/Craigmillar,East,Eastern,EE17A,Portobello Town Hall,147 Portobello High Street,EH15 1AF,"147 Portobello High Street, EH15 1AF",330458.8168,673898.9037,936473.7168,4680.022934
+127,EE17B,Portobello/Craigmillar,East,Eastern,EE17B,St Johns RC Primary School,1 Hamilton Terrace,EH15 1NB,"1 Hamilton Terrace, EH15 1NB",330034.6444,673465.7446,537205.0641,3074.833463
+128,EE17C,Portobello/Craigmillar,East,Eastern,EE17C,St Philip's Church Hall,1a Brunstane Rd North,EH15 2DL,"1a Brunstane Rd North, EH15 2DL",331254.4134,673597.2037,1218696.1,6194.704551
+129,EE17E,Portobello/Craigmillar,East,Eastern,EE17E,Brunstane Primary School,106 Magdalene Drive,EH15 3BE,"106 Magdalene Drive, EH15 3BE",331149.7629,672661.3222,1887973.838,7384.865348
+130,EE17G,Portobello/Craigmillar,East,Eastern,EE17G/ES17M,East Neighbourhood Centre,101 Niddrie Mains Road,EH16 4DS,"101 Niddrie Mains Road, EH16 4DS",329134.8452,671700.0071,1916146.241,7724.232985
+131,EE17D,Portobello/Craigmillar,East,Eastern,EE17D,Bingham Community Centre,31 Bingham Avenue,EH15 3HZ,"31 Bingham Avenue, EH15 3HZ",329854.0727,672481.9936,970227.3634,6593.97695
+132,EE17J,Portobello/Craigmillar,East,Eastern,EE17J,Hays Community Business Centre,4 Hay Avenue,EH16 4AQ,"4 Hay Avenue, EH16 4AQ",329976.8852,671835.8115,2728988.953,10816.65847
+133,SE17L,Portobello/Craigmillar,South,Eastern,EE16L/SE16D/SE17L,Moredun Library,92 Moredun Park Road,EH17 7HL,"92 Moredun Park Road, EH17 7HL",329155,669514,2288.388736,188.223976
+134,ES17M,Portobello/Craigmillar,East,Southern,EE17G/ES17M,East Neighbourhood Centre,101 Niddrie Mains Road,EH16 4DS,"101 Niddrie Mains Road, EH16 4DS",329134.8452,671700.0071,256368.0129,2804.860048
+135,EE17K,Portobello/Craigmillar,East,Eastern,EE17K,Newcraighall Primary School,67 Whitehill Street,EH21 8QZ,"67 Whitehill Street, EH21 8QZ",332120,671875.5593,326887.2988,2918.830534
+136,SWP07A,Sighthill/Gorgie,South West,Pentlands,SWP07A,St David's Church Hall,70a Broomhouse Crescent,EH11 3RH,"70a Broomhouse Crescent, EH11 3RH",320295.8654,671329.7883,2067579.882,7318.452589
+137,SWP07G,Sighthill/Gorgie,South West,Pentlands,SWP07G,Sighthill Primary School,1 Calder Park,EH11 4NF,"1 Calder Park, EH11 4NF",319279.2371,670401.9149,598840.8418,3113.970115
+138,SWP07H,Sighthill/Gorgie,South West,Pentlands,SWP07H,Gate 55,55 Sighthill Road,EH11 4PB,"55 Sighthill Road, EH11 4PB",319601.1165,670423.4705,504093.7945,3926.256624
+139,SWP07I,Sighthill/Gorgie,South West,Pentlands,SWP07I,Murrayburn Primary School,1 Sighthill Loan,EH11 4NP,"1 Sighthill Loan, EH11 4NP",320062.0825,670693.9042,287495.7115,2599.89344
+140,SWP07J,Sighthill/Gorgie,South West,Pentlands,SWP07J,Stenhouse Primary School,4 Saughton Mains Street,EH11 3HH,"4 Saughton Mains Street, EH11 3HH",321178.0695,671552.2174,632500.7294,4334.155143
+141,SWP07M,Sighthill/Gorgie,South West,Pentlands,SWP07M,"The Bridge Community Cafe, Holy Trinity Church",2 Hailesland Place,EH14 2SL,"2 Hailesland Place, EH14 2SL",320124.2198,670034.0629,476536.4389,3535.412778
+142,SWP07N,Sighthill/Gorgie,South West,Pentlands,SWP07N,Longstone Primary School,3a Redhall Grove,EH14 2DU,"3a Redhall Grove, EH14 2DU",321269.9634,670486.5593,778727.3844,4024.485965
+143,WP07B,Sighthill/Gorgie,West,Pentlands,WP07B,Carrickvale Community Education Centre,2 Saughton Mains Street,EH11 3HH,"2 Saughton Mains Street, EH11 3HH",321135.5926,671601.9391,741111.0775,4398.349027
+144,SWS07K,Sighthill/Gorgie,South West,Southern,SWS07K/SWS09A,St Cuthbert's Church Hall,Hutchison Crossway,EH14 1PT,"Hutchison Crossway, EH14 1PT",322669.2705,671535.3251,42973.14169,1526.827047
+145,SWC07D,Sighthill/Gorgie,South West,Central,SWC07D,Gorgie War Memorial Hall,338 Gorgie Road,EH11 2QU,"338 Gorgie Road, EH11 2QU",322710.4452,672242.5016,369865.5659,3030.615787
+146,SWC07E,Sighthill/Gorgie,South West,Central,SWC07E,Gorgie Dalry Parish Church Hall,190-192 Gorgie Road,EH11 2NX,"190-192 Gorgie Road, EH11 2NX",323078.0578,672333.9692,508667.2467,3727.557396
+147,SWC07F,Sighthill/Gorgie,South West,Central,SWC07F,Dalry Primary School,4 Cathcart Place,EH11 2JB,"4 Cathcart Place, EH11 2JB",323712.2371,672792.9149,362745.3892,2965.749774
+151,EC15C,Southside/Newington,East,Central,EC15C,Nelson Hall Community Centre,5 Spittalfield Crescent,EH8 9QZ,"5 Spittalfield Crescent, EH8 9QZ",326465.1722,672687.6078,537040.9687,3572.158577
+152,SS15D,Southside/Newington,South,Southern,SS15D,St Catherine's Argyle Church,61-63 Grange Road,EH9 1TY,"61-63 Grange Road, EH9 1TY",325742.4354,672039.6121,489170.5257,3314.067927
+153,SS15F,Southside/Newington,South,Southern,SS15F,Marchmont St Giles' Parish Church,5 Kilgraston Road,EH9 2DW,"5 Kilgraston Road, EH9 2DW",325544.5785,671878.1155,990568.3711,4039.695374
+154,SS15I,Southside/Newington,South,Southern,SS15I,Reid Memorial Church Hall,184/186 West Saville Terrace,EH3 9HY,"184/186 West Saville Terrace, EH3 9HY",326062.492,671016.3141,1719461.358,5728.903967
+155,SS15G,Southside/Newington,South,Southern,SS15G,Mayfield Salisbury Church Hall,18 West Mayfield,EH9 1TQ,"18 West Mayfield, EH9 1TQ",326562.4897,671736.3452,836618.2149,4585.932543
+156,SS10G,Meadows/Morningside,South,Southern,SS10G,James Gillespie's Primary School,Whitehouse Loan (Enter via Warrender Park Road),EH9 1BD,"Whitehouse Loan (Enter via Warrender Park Road), EH9 1BD",325007.255,672172.389,440338.713,3085.987176

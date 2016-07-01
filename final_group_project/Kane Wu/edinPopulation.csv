@@ -1,0 +1,361 @@
+,indicator,type,value,Zip
+1,All,Almond,25016,EH4
+2,Population: male,Almond,12117,EH4
+3,Population: female,Almond,12899,EH4
+4,Age: 0-4,Almond,1499,EH4
+5,Age: 5-11,Almond,2166,EH4
+6,Age: 12-15,Almond,1288,EH4
+7,Age: 16-24,Almond,2194,EH4
+8,Age: 25-44,Almond,5887,EH4
+9,Age: 45-64,Almond,7338,EH4
+10,Age: 65-84,Almond,4108,EH4
+11,Age: 85+,Almond,536,EH4
+12,Age: 0-15,Almond,4953,EH4
+13,Age: 16-24,Almond,2194,EH4
+14,Age: 25-44,Almond,5887,EH4
+15,Age: 45-64,Almond,7338,EH4
+16,Age: 65+,Almond,4644,EH4
+17,Average annual household income,Almond,47899,EH4
+18,Average property value,Almond,214212,EH4
+20,All,Drum Brae Gyle,22221,EH12
+21,Population: male,Drum Brae Gyle,10694,EH12
+22,Population: female,Drum Brae Gyle,11527,EH12
+23,Age: 0-4,Drum Brae Gyle,1273,EH12
+24,Age: 5-11,Drum Brae Gyle,1485,EH12
+25,Age: 12-15,Drum Brae Gyle,954,EH12
+26,Age: 16-24,Drum Brae Gyle,2276,EH12
+27,Age: 25-44,Drum Brae Gyle,5727,EH12
+28,Age: 45-64,Drum Brae Gyle,6418,EH12
+29,Age: 65-84,Drum Brae Gyle,3500,EH12
+30,Age: 85+,Drum Brae Gyle,588,EH12
+31,Age: 0-15,Drum Brae Gyle,3712,EH12
+32,Age: 16-24,Drum Brae Gyle,2276,EH12
+33,Age: 25-44,Drum Brae Gyle,5727,EH12
+34,Age: 45-64,Drum Brae Gyle,6418,EH12
+35,Age: 65+,Drum Brae Gyle,4088,EH12
+36,Average annual household income,Drum Brae Gyle,41102,EH12
+37,Average property value,Drum Brae Gyle,169228,EH12
+39,All,Pentland Hills,23715,EH14
+40,Population: male,Pentland Hills,11778,EH14
+41,Population: female,Pentland Hills,11937,EH14
+42,Age: 0-4,Pentland Hills,1261,EH14
+43,Age: 5-11,Pentland Hills,1819,EH14
+44,Age: 12-15,Pentland Hills,1172,EH14
+45,Age: 16-24,Pentland Hills,3430,EH14
+46,Age: 25-44,Pentland Hills,5366,EH14
+47,Age: 45-64,Pentland Hills,6716,EH14
+48,Age: 65-84,Pentland Hills,3558,EH14
+49,Age: 85+,Pentland Hills,393,EH14
+50,Age: 0-15,Pentland Hills,4252,EH14
+51,Age: 16-24,Pentland Hills,3430,EH14
+52,Age: 25-44,Pentland Hills,5366,EH14
+53,Age: 45-64,Pentland Hills,6716,EH14
+54,Age: 65+,Pentland Hills,3951,EH14
+55,Average annual household income,Pentland Hills,42861,EH14
+56,Average property value,Pentland Hills,187173,EH14
+58,All,Forth,16605.5,EH4
+59,Population: male,Forth,8017.5,EH4
+60,Population: female,Forth,8588.0,EH4
+61,Age: 0-4,Forth,1300.5,EH4
+62,Age: 5-11,Forth,1329.5,EH4
+63,Age: 12-15,Forth,740.5,EH4
+64,Age: 16-24,Forth,1884.5,EH4
+65,Age: 25-44,Forth,5319.0,EH4
+66,Age: 45-64,Forth,3933.0,EH4
+67,Age: 65-84,Forth,1830.0,EH4
+68,Age: 85+,Forth,268.5,EH4
+69,Age: 0-15,Forth,3370.5,EH4
+70,Age: 16-24,Forth,1884.5,EH4
+71,Age: 25-44,Forth,5319.0,EH4
+72,Age: 45-64,Forth,3933.0,EH4
+73,Age: 65+,Forth,2098.5,EH4
+74,Average annual household income,Forth,32492,EH4
+75,Average property value,Forth,135941,EH4
+77,All,Forth.1,16605.5,EH5
+78,Population: male,Forth.1,8017.5,EH5
+79,Population: female,Forth.1,8588.0,EH5
+80,Age: 0-4,Forth.1,1300.5,EH5
+81,Age: 5-11,Forth.1,1329.5,EH5
+82,Age: 12-15,Forth.1,740.5,EH5
+83,Age: 16-24,Forth.1,1884.5,EH5
+84,Age: 25-44,Forth.1,5319.0,EH5
+85,Age: 45-64,Forth.1,3933.0,EH5
+86,Age: 65-84,Forth.1,1830.0,EH5
+87,Age: 85+,Forth.1,268.5,EH5
+88,Age: 0-15,Forth.1,3370.5,EH5
+89,Age: 16-24,Forth.1,1884.5,EH5
+90,Age: 25-44,Forth.1,5319.0,EH5
+91,Age: 45-64,Forth.1,3933.0,EH5
+92,Age: 65+,Forth.1,2098.5,EH5
+93,Average annual household income,Forth.1,32492,EH5
+94,Average property value,Forth.1,135941,EH5
+96,All,Inverleith,31112,EH4
+97,Population: male,Inverleith,14873,EH4
+98,Population: female,Inverleith,16239,EH4
+99,Age: 0-4,Inverleith,1572,EH4
+100,Age: 5-11,Inverleith,1845,EH4
+101,Age: 12-15,Inverleith,1245,EH4
+102,Age: 16-24,Inverleith,3016,EH4
+103,Age: 25-44,Inverleith,10029,EH4
+104,Age: 45-64,Inverleith,7976,EH4
+105,Age: 65-84,Inverleith,4520,EH4
+106,Age: 85+,Inverleith,909,EH4
+107,Age: 0-15,Inverleith,4662,EH4
+108,Age: 16-24,Inverleith,3016,EH4
+109,Age: 25-44,Inverleith,10029,EH4
+110,Age: 45-64,Inverleith,7976,EH4
+111,Age: 65+,Inverleith,5429,EH4
+112,Average annual household income,Inverleith,49797,EH4
+113,Average property value,Inverleith,242755,EH4
+115,All,Corstorphine Murrayfield,22967,EH12
+116,Population: male,Corstorphine Murrayfield,10820,EH12
+117,Population: female,Corstorphine Murrayfield,12147,EH12
+118,Age: 0-4,Corstorphine Murrayfield,1333,EH12
+119,Age: 5-11,Corstorphine Murrayfield,1516,EH12
+120,Age: 12-15,Corstorphine Murrayfield,974,EH12
+121,Age: 16-24,Corstorphine Murrayfield,2061,EH12
+122,Age: 25-44,Corstorphine Murrayfield,5998,EH12
+123,Age: 45-64,Corstorphine Murrayfield,6366,EH12
+124,Age: 65-84,Corstorphine Murrayfield,3889,EH12
+125,Age: 85+,Corstorphine Murrayfield,830,EH12
+126,Age: 0-15,Corstorphine Murrayfield,3823,EH12
+127,Age: 16-24,Corstorphine Murrayfield,2061,EH12
+128,Age: 25-44,Corstorphine Murrayfield,5998,EH12
+129,Age: 45-64,Corstorphine Murrayfield,6366,EH12
+130,Age: 65+,Corstorphine Murrayfield,4719,EH12
+131,Average annual household income,Corstorphine Murrayfield,47242,EH12
+132,Average property value,Corstorphine Murrayfield,221893,EH12
+134,All,Sighthill Gorgie,37298,EH11
+135,Population: male,Sighthill Gorgie,19174,EH11
+136,Population: female,Sighthill Gorgie,18124,EH11
+137,Age: 0-4,Sighthill Gorgie,2261,EH11
+138,Age: 5-11,Sighthill Gorgie,2090,EH11
+139,Age: 12-15,Sighthill Gorgie,1193,EH11
+140,Age: 16-24,Sighthill Gorgie,5751,EH11
+141,Age: 25-44,Sighthill Gorgie,14205,EH11
+142,Age: 45-64,Sighthill Gorgie,7649,EH11
+143,Age: 65-84,Sighthill Gorgie,3671,EH11
+144,Age: 85+,Sighthill Gorgie,478,EH11
+145,Age: 0-15,Sighthill Gorgie,5544,EH11
+146,Age: 16-24,Sighthill Gorgie,5751,EH11
+147,Age: 25-44,Sighthill Gorgie,14205,EH11
+148,Age: 45-64,Sighthill Gorgie,7649,EH11
+149,Age: 65+,Sighthill Gorgie,4149,EH11
+150,Average annual household income,Sighthill Gorgie,26389,EH11
+151,Average property value,Sighthill Gorgie,104156,EH11
+153,All,Colinton Fairmilehead,24238,EH13
+154,Population: male,Colinton Fairmilehead,11738,EH13
+155,Population: female,Colinton Fairmilehead,12500,EH13
+156,Age: 0-4,Colinton Fairmilehead,1519,EH13
+157,Age: 5-11,Colinton Fairmilehead,2005,EH13
+158,Age: 12-15,Colinton Fairmilehead,1331,EH13
+159,Age: 16-24,Colinton Fairmilehead,2433,EH13
+160,Age: 25-44,Colinton Fairmilehead,5514,EH13
+161,Age: 45-64,Colinton Fairmilehead,7150,EH13
+162,Age: 65-84,Colinton Fairmilehead,3744,EH13
+163,Age: 85+,Colinton Fairmilehead,542,EH13
+164,Age: 0-15,Colinton Fairmilehead,4855,EH13
+165,Age: 16-24,Colinton Fairmilehead,2433,EH13
+166,Age: 25-44,Colinton Fairmilehead,5514,EH13
+167,Age: 45-64,Colinton Fairmilehead,7150,EH13
+168,Age: 65+,Colinton Fairmilehead,4286,EH13
+169,Average annual household income,Colinton Fairmilehead,49795,EH13
+170,Average property value,Colinton Fairmilehead,235898,EH13
+172,All,Fountainbridge Craiglockhart,23994,EH3
+173,Population: male,Fountainbridge Craiglockhart,11833,EH3
+174,Population: female,Fountainbridge Craiglockhart,12161,EH3
+175,Age: 0-4,Fountainbridge Craiglockhart,1057,EH3
+176,Age: 5-11,Fountainbridge Craiglockhart,1032,EH3
+177,Age: 12-15,Fountainbridge Craiglockhart,641,EH3
+178,Age: 16-24,Fountainbridge Craiglockhart,4330,EH3
+179,Age: 25-44,Fountainbridge Craiglockhart,8778,EH3
+180,Age: 45-64,Fountainbridge Craiglockhart,5232,EH3
+181,Age: 65-84,Fountainbridge Craiglockhart,2492,EH3
+182,Age: 85+,Fountainbridge Craiglockhart,432,EH3
+183,Age: 0-15,Fountainbridge Craiglockhart,2730,EH3
+184,Age: 16-24,Fountainbridge Craiglockhart,4330,EH3
+185,Age: 25-44,Fountainbridge Craiglockhart,8778,EH3
+186,Age: 45-64,Fountainbridge Craiglockhart,5232,EH3
+187,Age: 65+,Fountainbridge Craiglockhart,2924,EH3
+188,Average annual household income,Fountainbridge Craiglockhart,37940,EH3
+189,Average property value,Fountainbridge Craiglockhart,176929,EH3
+191,All,Meadows Morningside,34165,EH10
+192,Population: male,Meadows Morningside,16236,EH10
+193,Population: female,Meadows Morningside,17929,EH10
+194,Age: 0-4,Meadows Morningside,1373,EH10
+195,Age: 5-11,Meadows Morningside,1633,EH10
+196,Age: 12-15,Meadows Morningside,1013,EH10
+197,Age: 16-24,Meadows Morningside,8932,EH10
+198,Age: 25-44,Meadows Morningside,10334,EH10
+199,Age: 45-64,Meadows Morningside,6748,EH10
+200,Age: 65-84,Meadows Morningside,3308,EH10
+201,Age: 85+,Meadows Morningside,824,EH10
+202,Age: 0-15,Meadows Morningside,4019,EH10
+203,Age: 16-24,Meadows Morningside,8932,EH10
+204,Age: 25-44,Meadows Morningside,10334,EH10
+205,Age: 45-64,Meadows Morningside,6748,EH10
+206,Age: 65+,Meadows Morningside,4132,EH10
+207,Average annual household income,Meadows Morningside,47080,EH10
+208,Average property value,Meadows Morningside,242499,EH10
+210,All,City Centre,12075.0,EH1
+211,Population: male,City Centre,6173.0,EH1
+212,Population: female,City Centre,5902.0,EH1
+213,Age: 0-4,City Centre,327.5,EH1
+214,Age: 5-11,City Centre,301.0,EH1
+215,Age: 12-15,City Centre,187.5,EH1
+216,Age: 16-24,City Centre,3535.0,EH1
+217,Age: 25-44,City Centre,4558.0,EH1
+218,Age: 45-64,City Centre,2159.5,EH1
+219,Age: 65-84,City Centre,876.5,EH1
+220,Age: 85+,City Centre,130.0,EH1
+221,Age: 0-15,City Centre,816.0,EH1
+222,Age: 16-24,City Centre,3535.0,EH1
+223,Age: 25-44,City Centre,4558.0,EH1
+224,Age: 45-64,City Centre,2159.5,EH1
+225,Age: 65+,City Centre,1006.5,EH1
+226,Average annual household income,City Centre,41753,EH1
+227,Average property value,City Centre,204027,EH1
+229,All,City Centre.1,12075.0,EH2
+230,Population: male,City Centre.1,6173.0,EH2
+231,Population: female,City Centre.1,5902.0,EH2
+232,Age: 0-4,City Centre.1,327.5,EH2
+233,Age: 5-11,City Centre.1,301.0,EH2
+234,Age: 12-15,City Centre.1,187.5,EH2
+235,Age: 16-24,City Centre.1,3535.0,EH2
+236,Age: 25-44,City Centre.1,4558.0,EH2
+237,Age: 45-64,City Centre.1,2159.5,EH2
+238,Age: 65-84,City Centre.1,876.5,EH2
+239,Age: 85+,City Centre.1,130.0,EH2
+240,Age: 0-15,City Centre.1,816.0,EH2
+241,Age: 16-24,City Centre.1,3535.0,EH2
+242,Age: 25-44,City Centre.1,4558.0,EH2
+243,Age: 45-64,City Centre.1,2159.5,EH2
+244,Age: 65+,City Centre.1,1006.5,EH2
+245,Average annual household income,City Centre.1,41753,EH2
+246,Average property value,City Centre.1,204027,EH2
+248,All,Leith Walk,31867,EH7
+249,Population: male,Leith Walk,15939,EH7
+250,Population: female,Leith Walk,15928,EH7
+251,Age: 0-4,Leith Walk,1511,EH7
+252,Age: 5-11,Leith Walk,1102,EH7
+253,Age: 12-15,Leith Walk,588,EH7
+254,Age: 16-24,Leith Walk,4504,EH7
+255,Age: 25-44,Leith Walk,15805,EH7
+256,Age: 45-64,Leith Walk,5679,EH7
+257,Age: 65-84,Leith Walk,2258,EH7
+258,Age: 85+,Leith Walk,420,EH7
+259,Age: 0-15,Leith Walk,3201,EH7
+260,Age: 16-24,Leith Walk,4504,EH7
+261,Age: 25-44,Leith Walk,15805,EH7
+262,Age: 45-64,Leith Walk,5679,EH7
+263,Age: 65+,Leith Walk,2678,EH7
+264,Average annual household income,Leith Walk,33528,EH7
+265,Average property value,Leith Walk,146484,EH7
+267,All,Leith ,24931,EH6
+268,Population: male,Leith ,12573,EH6
+269,Population: female,Leith ,12358,EH6
+270,Age: 0-4,Leith ,1560,EH6
+271,Age: 5-11,Leith ,1104,EH6
+272,Age: 12-15,Leith ,633,EH6
+273,Age: 16-24,Leith ,2780,EH6
+274,Age: 25-44,Leith ,10922,EH6
+275,Age: 45-64,Leith ,5224,EH6
+276,Age: 65-84,Leith ,2342,EH6
+277,Age: 85+,Leith ,366,EH6
+278,Age: 0-15,Leith ,3297,EH6
+279,Age: 16-24,Leith ,2780,EH6
+280,Age: 25-44,Leith ,10922,EH6
+281,Age: 45-64,Leith ,5224,EH6
+282,Age: 65+,Leith ,2708,EH6
+283,Average annual household income,Leith ,33950,EH6
+284,Average property value,Leith ,140732,EH6
+286,All,Craigentinny Duddingston,25746,EH7
+287,Population: male,Craigentinny Duddingston,12413,EH7
+288,Population: female,Craigentinny Duddingston,13333,EH7
+289,Age: 0-4,Craigentinny Duddingston,1330,EH7
+290,Age: 5-11,Craigentinny Duddingston,1451,EH7
+291,Age: 12-15,Craigentinny Duddingston,861,EH7
+292,Age: 16-24,Craigentinny Duddingston,2672,EH7
+293,Age: 25-44,Craigentinny Duddingston,7921,EH7
+294,Age: 45-64,Craigentinny Duddingston,6666,EH7
+295,Age: 65-84,Craigentinny Duddingston,4247,EH7
+296,Age: 85+,Craigentinny Duddingston,598,EH7
+297,Age: 0-15,Craigentinny Duddingston,3642,EH7
+298,Age: 16-24,Craigentinny Duddingston,2672,EH7
+299,Age: 25-44,Craigentinny Duddingston,7921,EH7
+300,Age: 45-64,Craigentinny Duddingston,6666,EH7
+301,Age: 65+,Craigentinny Duddingston,4845,EH7
+302,Average annual household income,Craigentinny Duddingston,34235,EH7
+303,Average property value,Craigentinny Duddingston,142877,EH7
+305,All,Southside Newington,33223,EH8
+306,Population: male,Southside Newington,15845,EH8
+307,Population: female,Southside Newington,17378,EH8
+308,Age: 0-4,Southside Newington,1281,EH8
+309,Age: 5-11,Southside Newington,1543,EH8
+310,Age: 12-15,Southside Newington,830,EH8
+311,Age: 16-24,Southside Newington,10450,EH8
+312,Age: 25-44,Southside Newington,8698,EH8
+313,Age: 45-64,Southside Newington,6062,EH8
+314,Age: 65-84,Southside Newington,3543,EH8
+315,Age: 85+,Southside Newington,816,EH8
+316,Age: 0-15,Southside Newington,3654,EH8
+317,Age: 16-24,Southside Newington,10450,EH8
+318,Age: 25-44,Southside Newington,8698,EH8
+319,Age: 45-64,Southside Newington,6062,EH8
+320,Age: 65+,Southside Newington,4359,EH8
+321,Average annual household income,Southside Newington,41471,EH8
+322,Average property value,Southside Newington,210800,EH8
+324,All,Southside Newington.1,16611.5,EH9
+325,Population: male,Southside Newington.1,7922.5,EH9
+326,Population: female,Southside Newington.1,8689.0,EH9
+327,Age: 0-4,Southside Newington.1,640.5,EH9
+328,Age: 5-11,Southside Newington.1,771.5,EH9
+329,Age: 12-15,Southside Newington.1,415.0,EH9
+330,Age: 16-24,Southside Newington.1,5225.0,EH9
+331,Age: 25-44,Southside Newington.1,4349.0,EH9
+332,Age: 45-64,Southside Newington.1,3031.0,EH9
+333,Age: 65-84,Southside Newington.1,1771.5,EH9
+334,Age: 85+,Southside Newington.1,408.0,EH9
+335,Age: 0-15,Southside Newington.1,1827.0,EH9
+336,Age: 16-24,Southside Newington.1,5225.0,EH9
+337,Age: 25-44,Southside Newington.1,4349.0,EH9
+338,Age: 45-64,Southside Newington.1,3031.0,EH9
+339,Age: 65+,Southside Newington.1,2179.5,EH9
+340,Average annual household income,Southside Newington.1,41471,EH9
+341,Average property value,Southside Newington.1,210800,EH9
+343,All,Liberton Gilmerton,33392,EH16
+344,Population: male,Liberton Gilmerton,15875,EH16
+345,Population: female,Liberton Gilmerton,17517,EH16
+346,Age: 0-4,Liberton Gilmerton,2251,EH16
+347,Age: 5-11,Liberton Gilmerton,2537,EH16
+348,Age: 12-15,Liberton Gilmerton,1652,EH16
+349,Age: 16-24,Liberton Gilmerton,3542,EH16
+350,Age: 25-44,Liberton Gilmerton,8783,EH16
+351,Age: 45-64,Liberton Gilmerton,9107,EH16
+352,Age: 65-84,Liberton Gilmerton,4657,EH16
+353,Age: 85+,Liberton Gilmerton,863,EH16
+354,Age: 0-15,Liberton Gilmerton,6440,EH16
+355,Age: 16-24,Liberton Gilmerton,3542,EH16
+356,Age: 25-44,Liberton Gilmerton,8783,EH16
+357,Age: 45-64,Liberton Gilmerton,9107,EH16
+358,Age: 65+,Liberton Gilmerton,5520,EH16
+359,Average annual household income,Liberton Gilmerton,33348,EH16
+360,Average property value,Liberton Gilmerton,131122,EH16
+362,All,Portobello Craigmillar,25380,EH15
+363,Population: male,Portobello Craigmillar,12075,EH15
+364,Population: female,Portobello Craigmillar,13305,EH15
+365,Age: 0-4,Portobello Craigmillar,1826,EH15
+366,Age: 5-11,Portobello Craigmillar,2050,EH15
+367,Age: 12-15,Portobello Craigmillar,1169,EH15
+368,Age: 16-24,Portobello Craigmillar,2658,EH15
+369,Age: 25-44,Portobello Craigmillar,7012,EH15
+370,Age: 45-64,Portobello Craigmillar,6820,EH15
+371,Age: 65-84,Portobello Craigmillar,3359,EH15
+372,Age: 85+,Portobello Craigmillar,486,EH15
+373,Age: 0-15,Portobello Craigmillar,5045,EH15
+374,Age: 16-24,Portobello Craigmillar,2658,EH15
+375,Age: 25-44,Portobello Craigmillar,7012,EH15
+376,Age: 45-64,Portobello Craigmillar,6820,EH15
+377,Age: 65+,Portobello Craigmillar,3845,EH15
+378,Average annual household income,Portobello Craigmillar,32975,EH15
+379,Average property value,Portobello Craigmillar,135996,EH15
