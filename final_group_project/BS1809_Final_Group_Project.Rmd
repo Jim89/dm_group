@@ -81,14 +81,22 @@ review=review.replace(np.nan,' ', regex=True)
 
 # Summary of dataset
 review.info()
+
 ```
 
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/1.png")
+```
 
 The text of reviews is full of punctuations, numbers and capital letters, further cleansing of data is required for text analysis.
 
 ```{r}
-review.head(3)
 review.text.head(10)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/2.png")
 ```
 
 ## Data Cleansing
@@ -137,6 +145,13 @@ review.text=review.text.apply(cleanup)
 review.text[28]
 ```
 
+Text after cleansing:
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/3.png")
+```
+
+
 ## Inspection of review contents
 
 ### Reviews VS Stars
@@ -155,11 +170,19 @@ ax.set_xlabel('Count of reviews')
 ax.set_ylabel('Count of words in review')
 ```
 
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/4.png")
+```
+
 It can be seen that almost 95% of reviews have length of more than 500 words, therefore, it is not necessary to remove any short reviews. The distribution of ratings was also examined to avoid inbalanced datasets.
 
 ```{r}
 review.stars.value_counts(sort=False).plot(kind='bar',color="black")
 plt.title('Reviews By Star');
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/5.png")
 ```
 
 Inituitively, we thought there would be more 1-star and 5-star reviews, however, the data shows otherwise, and the majority of reviews were 4-star and 5-star. It is also important to check the quality of reviews by examining their numbers of votes.
@@ -173,16 +196,28 @@ The majority of reviews have only one vote regardless of the type of vote (cool,
 pd.crosstab(review.stars,review.votes_cool[review.votes_cool!=0],margins=True)
 ```
 
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/6.png")
+```
+
 #### Vote for funny
 
 ```{r}
 pd.crosstab(review.stars,review.votes_funny[review.votes_funny!=0],margins=True)
 ```
 
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/7.png")
+```
+
 #### Vote for useful
 
 ```{r}
 pd.crosstab(review.stars,review.votes_useful[review.votes_useful!=0],margins=True)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/8.png")
 ```
 
 
@@ -192,6 +227,7 @@ pd.crosstab(review.stars,review.votes_useful[review.votes_useful!=0],margins=Tru
 
 To simplify the classification of topics - Good or Bad reviews. Reviews were split into two groups and 3-star reviews were excluded in this analysis due to the mixed expression of customers (three stars could be a good or a bad review). First group contains 1-star and 2-star reviews, which were later interpreted as bad reviews and second group contains 4-star and 5-star reviews, which were later interpreted as good reviews.
 
+
 ```{r}
 # Split the dataset into 2 categories: 1,2 stars and 4,5 stars
 
@@ -199,6 +235,12 @@ review_bad = review[(review.stars == 1) | (review.stars == 2)]
 review_good = review[(review.stars == 4) | (review.stars == 5)]
 
 review_good.text.head(10)
+```
+
+Example of good reviews:
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/9.png")
 ```
 
 ### Text feature extraction
@@ -243,6 +285,10 @@ H_good = nmfmodel_good.components_
 # W (number of reviews,number of topics) and H (number of topics, number of features)
 print "Generated factor W of size %s and factor H of size %s for good reviews" \
 % ( str(W_good.shape), str(H_good.shape) )
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/10.png")
 ```
 
 ## Results
@@ -307,10 +353,20 @@ This section shows the most significant topics discovered by NML model, also, th
 TopTermsByTopic(nmfmodel_bad, features_bad, 100)
 ```
 
+Example of Topic 1 for bad reviews: 
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/11.png")
+```
+
 #### Good Reviews: 4-star and 5-star reviews
 
 ```{r}
 TopTermsByTopic(nmfmodel_good, features_good, 100)
+```
+
+Example of Topic 1 for good reviews: 
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/12.png")
 ```
 
 
@@ -343,6 +399,12 @@ topic_table_bad = pd.DataFrame(data_bad)
 display(topic_table_bad)
 ```
 
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/13.png")
+```
+
+
+
 #### Good Reviews: 4-star and 5-star reviews
 
 ```{r}
@@ -365,6 +427,10 @@ data_good = {'Index of Topics':['Topic 1','Topic 2','Topic 3','Topic 4','Topic 5
 
 topic_table_good = pd.DataFrame(data_good)
 display(topic_table_good)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/14.png")
 ```
 
 ## Recommendation
@@ -394,6 +460,9 @@ The topics extracted by NMF model from both good and bad reviews were used to ma
 * Good Review Topic 15 appeared in 13.32% of reviews, that means current coffee shops are providing very good coffees and services.
 * BBQ shops are doing very well in Edinburgh. (Good Review Topic 20)
 * Potato shops are doing very well in Edinburgh. (Good Review Topic 25)
+
+In conclusion, insights above that were extracted by topic modelling are very useful for a company that plans to open a new restaurant in Edinburgh, for example, it was clear that customers are not satisfied with the current fish and chips and chicken dishes in Edinburgh, a new restaurant could potentially target these specific sectors to fullfill the customer demand. Also, company should be careful with certain issues that were discovered from bad reviews, for example, topics such as unfriendly staffs, long wait and uncomfortable room temperature that frequently appeared in bad reviews could negatively affect customer experience. Finally, sectors that are doing very well in Edinburgh such as bars, pubs, BBQ and Potato shops are the areas that a new restraunt may not want to consider in order to avoid fierce competition.
+
 
 # Analysis - Location and Competition
 
