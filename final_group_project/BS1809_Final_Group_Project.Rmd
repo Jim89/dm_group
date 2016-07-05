@@ -400,6 +400,401 @@ The topics extracted by NMF model from both good and bad reviews were used to ma
 
 # Analysis - Type and Characteristics
 
+In this part, we will classify different kind of restaurants with hierachical clustering technique to find out different category of restaurants and analyse their performance in different zips. From the result, we can then analyse the best location of our restaurants by recognising out-performing and under-performing areas for each type of restaurants.
+
+```{r include=FALSE}
+
+df2=pd.read_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/final_group_project/Kane Wu/edinburgh.csv",header=0)
+df2=df2.set_index(df2.ix[:,0])
+df2.drop(df2.columns[0], axis=1,inplace=True)
+df3=pd.DataFrame()
+df3["business_id"]=df2["business_id"]
+attributes_cols=[col for col in df2.columns if 'attributes' in col]
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Ambience"),axis=1)], axis=1)
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Dietary Restrictions"),axis=1)], axis=1)
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Good For"),axis=1)], axis=1)
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Music"),axis=1)], axis=1)
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Parking"),axis=1)], axis=1)
+df3=pd.concat([df3,pd.get_dummies(df2.attributes_Alcohol)], axis=1)
+df3=pd.concat([df3,pd.get_dummies(df2["attributes_Ages Allowed"])], axis=1)
+df3=pd.concat([df3,pd.get_dummies(df2.attributes_Attire)], axis=1)
+df3=pd.concat([df3,pd.get_dummies(df2["attributes_Price Range"])], axis=1)
+df3['attributes_BYOB/Corkage_TF']=df2["attributes_BYOB/Corkage"]=="yes_free"
+df3=pd.concat([df3,pd.get_dummies(df2["attributes_Noise Level"])], axis=1)
+df3 = df3.drop(0, 1)
+#df3['attributes_Noise Level_scaled']=df2['attributes_Noise Level'].replace(to_replace="quiet",value=1)
+#df3['attributes_Noise Level_scaled']=df3['attributes_Noise Level_scaled'].replace(to_replace="average",value=2)
+#df3['attributes_Noise Level_scaled']=df3['attributes_Noise Level_scaled'].replace(to_replace="loud",value=3)
+#df3['attributes_Noise Level_scaled']=df3['attributes_Noise Level_scaled'].replace(to_replace="very_loud",value=4)
+df3['attributes_Smoking_NO']=df2['attributes_Smoking']=="NO"
+df3['attributes_Smoking_OUTDOOR']=df2['attributes_Smoking']=="outdoor"
+df3['attributes_By Appointment Only']=df2['attributes_By Appointment Only']
+df3['attributes_Caters']=df2['attributes_Caters']
+df3['attributes_Coat Check']=df2['attributes_Coat Check']
+df3['attributes_Caters']=df2['attributes_Caters']
+df3['attributes_Drive-Thru']=df2['attributes_Drive-Thru']
+df3['attributes_Good For Dancing']=df2['attributes_Good For Dancing']
+df3['attributes_Good For Groups']=df2['attributes_Good For Groups']
+df3['attributes_Good for Kids']=df2['attributes_Good for Kids']
+df3['attributes_Good for Kids']=df2['attributes_Good for Kids']
+df3['attributes_Happy Hour']=df2['attributes_Happy Hour']
+df3['attributes_Has TV']=df2['attributes_Has TV']
+df3['attributes_Outdoor Seating']=df2['attributes_Outdoor Seating']
+df3['attributes_Has TV']=df2['attributes_Has TV']
+df3['attributes_Take-out']=df2['attributes_Take-out']
+df3['attributes_Takes Reservations']=df2['attributes_Takes Reservations']
+df3['attributes_Waiter Service']=df2['attributes_Waiter Service']
+df3['attributes_Wheelchair Accessible']=df2['attributes_Wheelchair Accessible']
+
+df3=df3.fillna(0)
+df3=df3.replace(to_replace=False,value=0)
+df3=df3.replace(to_replace=True,value=1)
+
+df3["Non-empty"]=(df3!=0).any(1)
+
+df4=pd.read_csv("C:/Users/cheukkin.Warwick/Documents/dm_grp/dm_group/edinburgh.csv")
+df4=df4.set_index(df4.ix[:,0])
+df4.drop(df4.columns[0], axis=1,inplace=True)
+df5=pd.concat([df3,pd.get_dummies(df4.cusine)],axis=1)
+df5["Non-empty"]=(df5!=0).any(1)
+
+#To build the functions for clustering
+def fancy_dendrogram(*args, **kwargs):
+    max_d = kwargs.pop('max_d', None)
+    if max_d and 'color_threshold' not in kwargs:
+        kwargs['color_threshold'] = max_d
+    annotate_above = kwargs.pop('annotate_above', 0)
+
+    ddata = dendrogram(*args, **kwargs)
+
+    if not kwargs.get('no_plot', False):
+        plt.title('Hierarchical Clustering Dendrogram (truncated)')
+        plt.xlabel('sample index or (cluster size)')
+        plt.ylabel('distance')
+        for i, d, c in zip(ddata['icoord'], ddata['dcoord'], ddata['color_list']):
+            x = 0.5 * sum(i[1:3])
+            y = d[1]
+            if y > annotate_above:
+                plt.plot(x, y, 'o', c=c)
+                plt.annotate("%.3g" % y, (x, y), xytext=(0, -5),
+                             textcoords='offset points',
+                             va='top', ha='center')
+        if max_d:
+            plt.axhline(y=max_d, c='k')
+    return ddata
+    
+def hclst(data,method,distance):
+    from scipy.cluster.hierarchy import cophenet
+    from scipy.spatial.distance import pdist
+    Z=linkage(data,method=method,metric=distance)
+    c, coph_dists = cophenet(Z , pdist(data,metric=distance))
+    # calculate full dendrogram'
+    plt.figure(figsize=(25, 10))
+    fancy_dendrogram(
+        Z,
+        truncate_mode='lastp',
+        p=12,
+        leaf_rotation=90.,
+        leaf_font_size=12.,
+        show_contracted=True,
+        annotate_above=10,  # useful in small plots so annotations don't overlap
+    )
+    plt.show()
+    
+    plt.figure(figsize=(25, 10))
+    plt.title('Hierarchical Clustering Dendrogram')
+    plt.xlabel('sample index')
+    plt.ylabel('distance')
+    dendrogram(
+        Z,
+        leaf_rotation=90.,  # rotates the x axis labels
+        leaf_font_size=8.,  # font size for the x axis labels
+    )
+    plt.show()
+    return(Z,c,coph_dists)
+    
+```
+
+##Restaurants Types Analysis
+
+We have total 1215 restaurants in our dataset with 55 of them having no attributes at all. Amount these 1215 restaurants, we clustered them in to 5 different categories to analyse the location and density of different type restaurants in different regions within the city.
+
+After considering different distance metrics and linkage, Euclidean distance metric and ward linkage are chosen for their simplicity and better structured dendrogram. 
+
+```{r}
+#Consider a few different linkage 
+df3_filtered=df3.loc[(df3!=0).any(1)]
+df3_filtered=df3_filtered.iloc[:,0:58]
+R1=hclst(df3_filtered.iloc[:,1:58],"ward","euclidean")
+df3_filtered
+```
+
+```{r}
+#To determine cuts by different measures
+from scipy.cluster.hierarchy import inconsistent
+depth = 20
+incons1 = inconsistent(R1[0], depth)
+incons1[-20:]
+plt.figure(figsize=(25, 10))
+plt.title('Inconsistency Measure of last 20 Merges with deth ' + str(depth))
+plt.xlabel('Merges')
+plt.ylabel('Inconsistency')
+plt.plot(incons1[-20:,3])
+plt.show()
+#Determine cuts By Elbow
+plt.figure(figsize=(25, 10))
+plt.title('Height of the last 20 Merges')
+plt.xlabel('Merges from the last merge')
+plt.ylabel('Height')
+last = R1[0][-20:, 2]
+last_rev = last[::-1]
+idxs = np.arange(1, len(last) + 1)
+plt.plot(idxs, last_rev)
+plt.show()
+
+plt.figure(figsize=(25, 10))
+plt.title('Rate of increase in Height between Merges')
+plt.xlabel('Merges from the last merge')
+plt.ylabel('Rate')
+acceleration = np.diff(last, 2)  # 2nd derivative of the distances
+acceleration_rev = acceleration[::-1]
+plt.plot(idxs[:-2] + 1, acceleration_rev)
+plt.show()
+
+
+from scipy.cluster.hierarchy import fcluster
+max_d = 15
+clusters = fcluster(R1[0], max_d, criterion='distance')
+df3_filtered['cluster']=clusters
+```
+
+Now to determine cuts by different measures.
+
+```{r}
+#To determine cuts by different measures
+from scipy.cluster.hierarchy import inconsistent
+depth = 20
+incons1 = inconsistent(R1[0], depth)
+incons1[-20:]
+plt.figure(figsize=(25, 10))
+plt.title('Inconsistency Measure of last 20 Merges with deth ' + str(depth))
+plt.xlabel('Merges')
+plt.ylabel('Inconsistency')
+plt.plot(incons1[-20:,3])
+plt.show()
+#Determine cuts By Elbow
+plt.figure(figsize=(25, 10))
+plt.title('Height of the last 20 Merges')
+plt.xlabel('Merges from the last merge')
+plt.ylabel('Height')
+last = R1[0][-20:, 2]
+last_rev = last[::-1]
+idxs = np.arange(1, len(last) + 1)
+plt.plot(idxs, last_rev)
+plt.show()
+
+plt.figure(figsize=(25, 10))
+plt.title('Rate of increase in Height between Merges')
+plt.xlabel('Merges from the last merge')
+plt.ylabel('Rate')
+acceleration = np.diff(last, 2)  # 2nd derivative of the distances
+acceleration_rev = acceleration[::-1]
+plt.plot(idxs[:-2] + 1, acceleration_rev)
+plt.show()
+
+
+from scipy.cluster.hierarchy import fcluster
+max_d = 15
+clusters = fcluster(R1[0], max_d, criterion='distance')
+df3_filtered['cluster']=clusters
+```
+
+From the plots, a cut with 5 clusters gives the most desired result.
+Now to visualise the results.
+
+```{r}
+from scipy.cluster.hierarchy import fcluster
+max_d = 15
+clusters = fcluster(R1[0], max_d, criterion='distance')
+df3_filtered['cluster']=clusters
+
+#To visualise results
+C1=df3_filtered[df3_filtered.cluster==1]
+C1=C1.drop(C1.columns[57], axis=1)
+C1=C1.describe()
+C2=df3_filtered[df3_filtered.cluster==2]
+C2=C2.drop(C2.columns[57], axis=1)
+C2=C2.describe()
+C3=df3_filtered[df3_filtered.cluster==3]
+C3=C3.drop(C3.columns[57], axis=1)
+C3=C3.describe()
+C4=df3_filtered[df3_filtered.cluster==4]
+C4=C4.drop(C4.columns[57], axis=1)
+C4=C4.describe()
+C5=df3_filtered[df3_filtered.cluster==5]
+C5=C5.drop(C5.columns[57], axis=1)
+C5=C5.describe()
+
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 1:Unknown Restaurants')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C1.ix[1,1:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==1]
+```
+
+Cluster 1 contains 382 restaurants. Most of these restaurants do not provide much information for classification.
+
+```{r}
+plt.show()
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 2:Classy Restaurants')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C2.ix[1,0:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==2]
+```
+
+Cluster 2 contains 119 restaurants. They are the most expensive and classy type of restaurants, providing mainly dinner service. 
+Most of them require customers to be dressy. They are more the quiet type of restaurants and some of them provide background music.
+Those stylish restaurants with classy, romantic, intimate, trendy and upscale atmosphere are mainly in this cluster. 
+They are generally good for groups and dating.
+
+```{r}
+plt.show()
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 3:Stylish restaurants and Pubs & Bars')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C3.ix[1,0:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==3]
+```
+
+Cluster 3 contains 310 restaurants. These are stylish restaurants and pubs & bars priced at level 2, providing mainly dinner and lunch. 
+
+They are less quiet, few of them can even be loud or very loud. This clusters contain most of the restaurants that provide dj, jukebox, live and video music and also TV boardcast.
+Some of these restaurants are quite stylish with lipster, intimate or trendy style.
+They are mainly good for groups.
+
+```{r}
+plt.show()
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 4: Fastfood & Takeaways')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C4.ix[1,0:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==4]
+```
+
+There are 171 restaurants in cluster 4. These are mainly the cheapest kind of restaurants, probably fastfood restaurants as most of them do not provide waiter service, wine nor having any bars.
+Their embience level is quite average.
+They are mainly good for kids and also suitable for groups. 
+
+```{r}
+plt.show()
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 5: General Restaurants')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C5.ix[1,0:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==5]
+```
+
+Cluster 5 contains 233 restaurants. They are mainly general restaurants, providing brunch, dinner and lunch. 
+They are less quiet but not the noisiest type. 
+This restaurants are not very stylish and almost none of them provide any music.
+They are generally group and kids friendly.
+
+
+##Performance Analysis
+
+Now we can visualise the distribution of different types of restaurants in different zips and analyse the supply of different kind of restaurants. 
+
+```{r}
+df3_filtered["zip"]=df2["zip"]
+df3_filtered.to_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/d3_filtered.csv")
+from __future__ import division
+df3_filtered["Type"]=df3_filtered.cluster
+df3_filtered.Type=df3_filtered.Type.map({1:"Unknown", 2:"Classy",3:"stylish and Pubs & Bars",4:"Fastfood & Takeaways",5:"General"})
+supply=pd.crosstab(df3_filtered["Type"],df3_filtered["zip"]).apply(lambda r: r*100/r.sum(), axis=1)
+supply
+```
+
+Table above shows the percentage of distribution of specific type of restaurants across the zips. 
+
+```{r}
+review=pd.read_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/final_group_project/Kane Wu/edinReview.csv",header=0)
+review=review.merge(df3_filtered, on=['business_id'], how='outer')
+review_stars=review[((review.stars==4) == True) | ((review.stars==5) == True)]
+demand=pd.crosstab(review_stars["Type"],review_stars["zip"]).apply(lambda r: r*100/r.sum(), axis=1)
+demand
+```
+
+Similarly, we can look at the the distribution of top rating review for each restaurant types in different zips and use it as an indicator of popular location for certain type of restaurants.
+
+By from the above, we further calculate the ratio of restaurants receiving top reiviews. For instance, fastfood and takeaways in EH1 receives 39.7% of top reviews in the Fastfood & Takeaways category with only 22.8% of Fastfood & Takeaway restaurants located in the zip. It therefore implies that the quality of Fastfood & Takeaways in EH1 are generally more satisfying than those located in other zip.
+
+We can create a ratio as an indicator of high quality region as an indicator of out-performing region.
+
+$$\frac{(\text{top review%} - \text{restaurants%})}{\text{%restaurants}}$$
+
+```{r}
+(demand-supply)/supply
+```
+
+From the calculation above, we can make a conclude:
+
+Out-performing regions:
+
+Classy: EH2, EH7, EH8, EH1 
+
+Fastfood & Takeaways: EH1, EH7, EH3
+
+General: EH2, EH1, EH3, EH8
+
+Stylish and Pubs & Bars: EH1, EH8, EH2
+
+Under-performing regions:
+
+Classy: EH5, EH10, EH12, EH11 
+
+Fastfood & Takeaways: EH14, EH16, EH12, EH14, EH6
+
+General: EH12, EH16, EH15, EH4
+
+Stylish and Pubs & Bars: EH10, EH11, EH5, EH3
+
+For a strategic purpose, we also want to consider the net difference between top rating reviews and number of restaurants.
+
+```{r}
+demand-supply
+```
+
+##Sectional Conclusion and suggestions
+
+Now, depends on the estimated quality of our service, we can make strategic consideration based on the the results above. 
+
+If we want to open a restaurant to provide a average level of services, we should locate our restaurant at a zip with high percentage of reviews but under-performing reviews to avoid competition with top quality restaurants and take up those unsatisfied demand in the zip. Also, as these areas are generally less popular, the rents are also generally lower and therefore the cost and potential risk will be lower.
+
+Classy: EH10
+
+Fastfood & Takeaways: EH9
+
+General:EH6
+
+Stylish and Pubs & Bars: EH4
+
+If we want to open a top quality restaurants, we should locate our restaurant at a zip with high out-performing ratio so that we can save our advertising cost and take advantage of the popularity of the location.
+
+Classy: EH2
+
+Fastfood & Takeaways: EH1
+
+General: EH2
+
+Stylish and Pubs & Bars: EH1
+
+
 # Analysis - Price, Volume and Revenue
 
 # Managerial Recommendations
