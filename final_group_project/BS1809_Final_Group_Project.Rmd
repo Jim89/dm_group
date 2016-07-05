@@ -1,0 +1,414 @@
+---
+title: "BS1808 Digital Marketing Analytics"
+author: "Siang Lau, Jone Leung, C.K. Poon, Kane Wu, Jim Leach"
+date: "4 July 2016"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    code_folding: hide
+    theme: spacelab
+    number_sections: yes
+---
+```{r setup, include=FALSE}
+# Set all code chunks to be printed in to the document (echo = T) but do not _run_
+# the code inside them (eval = F)
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+```{r include=FALSE}
+# Load Python packages
+import json
+import ftfy
+import nltk
+import pycountry
+import random 
+import seaborn
+import numpy as np
+import pandas as pd
+import collections as cllt
+import sklearn as sk
+import matplotlib.pyplot as plt
+
+from nltk import word_tokenize
+from os import path
+from glob import glob
+from scipy.misc import imread
+from textblob import TextBlob
+from wordcloud import WordCloud
+from IPython.display import display, HTML
+from sklearn.decomposition import NMF
+from sklearn.feature_extraction.text import TfidfVectorizer
+```
+
+
+# Executive Summary
+
+## Goals and Introduction
+
+You work for a large corporation that owns a collection of restaurants of different types. Currently it is evaluating the location, type, and characteristics (cuisine, price point, design, marketing strategy) and positioning of a new restaurant in Edinburgh (if you know the local habits, you can give better insight).
+Your task is to analyse the dataset and give recommendations on strategy, based on the reviews, location (either neighbourhood or zipcode level) and competition. Also estimates on volumes and revenues of the potential undertaking. You may have to check out what the price-range attributes signify by visiting the Yelp website.
+
+## Methodology
+
+# Analysis - Review 
+
+## Introduction
+
+The goal of this analysis is to point out demand and preference of customers from a large amount of reviews, with high dimensionality. These topics can provide meaningful insights to opening a new restaurant by considering what customers care about in order to increase the Yelp ratings, which directly affects the revenue. But how can restaurant understand the demands of its customers from a large amount of reviews? For a relatively small collection of reviews, it may be possible to manually inspect and classify the contents of reviews into specific categories based on similarity. But to partition large volumes of text, the process would be extremely time consuming. Topic modelling greatly reduces the time needed to perform the classification and understand the actual contents. We hope to use topic modelling to identify what users care about most when giving their rating stars, and ultimately determine what a new restaurant should be doing in order to receive high ratings.
+
+In this study, I applied a non-negative matrix factorization (NMF) approach for the extraction and detection of concepts or topics from reviews. NMF introduces a technique that simultaneously perform dimension reduction and clustering that identifies semantic features in a document collection and groups the documents into clusters on the basis of shared semantic features [1]. The extracted topics from 1-star and 2-star reviews were used as an indicator of bad practice whereas extracted topics from 4-star and 5-star reviews were used as an indicator of good practice for operating a restaurant.
+
+## Description of datasets
+
+Import the datasets.
+
+```{r}
+business = pd.read_csv("edinburgh.csv",header=0)
+checkin = pd.read_csv("edinCheckin.csv",header=0)
+review = pd.read_csv("edinReview.csv",header=0)
+tip = pd.read_csv("edinTip.csv",header=0)
+user = pd.read_csv("edinUser.csv",header=0,usecols=range(0,23))
+```
+
+The main dataset in this study was 'yelp_academic_dataset_review.json' and summary of the dataset is shown below.
+
+```{r}
+# Replace nan with blank space
+review=review.replace(np.nan,' ', regex=True)
+
+# Summary of dataset
+review.info()
+```
+
+
+The text of reviews is full of punctuations, numbers and capital letters, further cleansing of data is required for text analysis.
+
+```{r}
+review.head(3)
+review.text.head(10)
+```
+
+## Data Cleansing
+
+Clean up the text in review dataset.
+```{r}
+# Referenced Regular Expression for email cleanup idea: 
+def cleanup(text):
+
+    # Make text lower case
+    for f in re.findall("([A-Z]+)", text):
+        text = text.replace(f, f.lower())
+    
+    # Remove escape symbols
+    text = text.replace('\r', " ")
+    text = text.replace('\n', " ")
+    
+    # Remove all non-ascii characters in the string
+    text=unicode(text, 'ascii', 'ignore')
+
+    # Creata a list of reg tools
+    cleanuptools = [
+    # Dates
+    r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)",
+    # Removing months
+    r"january|february|march|april|may|june|july|august|september|october|november|december",
+    # Punctuation and numbers to be removed
+    r'[-|.|?|!|,|"|:|;|()|0-9]',
+    ]
+    
+    for tool in cleanuptools:
+        text = re.sub(tool," ", text)
+    return text
+
+
+# Constructing a list for stopwords 
+stopwords = []
+
+# Add scikit-learn's CountVectorizer's stop list to the created list
+stopwords = sk.feature_extraction.text.ENGLISH_STOP_WORDS
+
+# Apply the created functions to clean up text
+review.text=review.text.apply(cleanup)
+
+# Cleaned text
+review.text[28]
+```
+
+## Inspection of review contents
+
+### Reviews VS Stars
+It is crucial to only include reviews with a considerable amount of contents as the topic modelling will not be able to extract any insight from a short review. The length of reviews was therefore analysed and a minimum requirement on the length of review was implemented.
+
+```{r}
+f, ax = plt.subplots(figsize=(15,7.5))
+n, bins, patches = ax.hist(review.text.apply(len),facecolor='black',bins=20)
+ax.set_xticks(bins)
+bin_centers = 0.5 * np.diff(bins) + bins[:-1]
+for count, x in zip(n, bin_centers):
+    percent = '{:.2f}%'.format((float(count) / n.sum())*100)
+    ax.annotate(percent, xy=(x, 0), xycoords=('data', 'axes fraction'),
+    xytext=(0, -32), textcoords='offset points', va='top', ha='center')
+ax.set_xlabel('Count of reviews')
+ax.set_ylabel('Count of words in review')
+```
+
+It can be seen that almost 95% of reviews have length of more than 500 words, therefore, it is not necessary to remove any short reviews. The distribution of ratings was also examined to avoid inbalanced datasets.
+
+```{r}
+review.stars.value_counts(sort=False).plot(kind='bar',color="black")
+plt.title('Reviews By Star');
+```
+
+Inituitively, we thought there would be more 1-star and 5-star reviews, however, the data shows otherwise, and the majority of reviews were 4-star and 5-star. It is also important to check the quality of reviews by examining their numbers of votes.
+
+### Reviews VS Votes
+The majority of reviews have only one vote regardless of the type of vote (cool, useful or funny). Originally, we planned to only include reviews with at least two votes. However, by doing so, it would remove a significant amount of text from this analysis. We decided not to remove any reviews based on their numbers of votes.
+
+#### Vote for cool
+
+```{r}
+pd.crosstab(review.stars,review.votes_cool[review.votes_cool!=0],margins=True)
+```
+
+#### Vote for funny
+
+```{r}
+pd.crosstab(review.stars,review.votes_funny[review.votes_funny!=0],margins=True)
+```
+
+#### Vote for useful
+
+```{r}
+pd.crosstab(review.stars,review.votes_useful[review.votes_useful!=0],margins=True)
+```
+
+
+## Methodology and Procedure
+
+### Dividing dataset
+
+To simplify the classification of topics - Good or Bad reviews. Reviews were split into two groups and 3-star reviews were excluded in this analysis due to the mixed expression of customers (three stars could be a good or a bad review). First group contains 1-star and 2-star reviews, which were later interpreted as bad reviews and second group contains 4-star and 5-star reviews, which were later interpreted as good reviews.
+
+```{r}
+# Split the dataset into 2 categories: 1,2 stars and 4,5 stars
+
+review_bad = review[(review.stars == 1) | (review.stars == 2)]
+review_good = review[(review.stars == 4) | (review.stars == 5)]
+
+review_good.text.head(10)
+```
+
+### Text feature extraction
+
+The text is a sequence of alphabets that cannot be fed directly to the algorithms themselves as most of them expect numerical feature vectors with a fixed size rather than the raw text documents with variable length. Therefore, a range of functions from python scikit-learn package was used to extract numerical features from text content, namely [1]-[3]:
+
+* tokenizing strings and giving an integer id for each possible token, for instance by using white-spaces and punctuation as token separators.
+* counting the occurrences of tokens in each document.
+* normalizing and weighting with diminishing importance tokens that occur in the majority of samples / documents.
+
+In a large text corpus, some words will be very present (e.g. “the”, “a”, “is” in English) hence carrying very little meaningful information about the actual contents of the document. If we were to feed the direct count data directly to a classifier those very frequent terms would shadow the frequencies of rarer yet more interesting terms. In order to reduce the influence of terms appearing frequently across the entire corpus, we applied TF-IDF term re-weighting functions to normalize the data. TfidfVectorizer function combines the functions of TF-IDF and vectorization (Vectorization is a process combining tokenizing, counting and normalization) allowing to build a document-term matrix for the corpus of documents:
+
+```{r}
+#Vectorization
+tfidfvectorizer_bad = TfidfVectorizer(max_features=15000, ngram_range=(1, 2), stop_words = stopwords,
+                                 strip_accents="unicode", use_idf=True, norm="l2", min_df = 5)
+tfidfvectorizer_good = TfidfVectorizer(max_features=15000, ngram_range=(1, 2), stop_words = stopwords,
+                                 strip_accents="unicode", use_idf=True, norm="l2", min_df = 5)
+
+#Create term document matrix for separate datasets
+term_document_matrix_bad = tfidfvectorizer_bad.fit_transform(review_bad.text)
+term_document_matrix_good = tfidfvectorizer_good.fit_transform(review_good.text)
+```
+
+### Topic Modelling
+
+In topic modeling, there are several methods for learning abstract topics in a collection of documents. NMF is a new and emerging method of unsupervised learning to discover hidden topics. We applied the scikit-learn implementation of NMF with NNDSVD initialization. Nonnegative Double Singular Value Decomposition (NNDSVD) is typically used for overcoming sparseness of data in document-term matrix [8]. Here I set the number of topics to be equal to 25 and run NMF for 200 iterations, and then get the factors W and H from the resulting model:
+
+```{r}
+# 1-star + 2-star reviews
+nmfmodel_bad = sk.decomposition.NMF(init="nndsvd", n_components=25, max_iter=200).fit(term_document_matrix_bad)
+W_bad = nmfmodel_bad.fit_transform(term_document_matrix_bad);
+H_bad = nmfmodel_bad.components_
+# W (number of reviews,number of topics) and H (number of topics, number of features)
+print "Generated factor W of size %s and factor H of size %s for bad reviews" \
+% ( str(W_bad.shape), str(H_bad.shape) )
+
+# 4-star + 5-star reviews
+nmfmodel_good = sk.decomposition.NMF(init="nndsvd", n_components=25, max_iter=200).fit(term_document_matrix_good)
+W_good = nmfmodel_good.fit_transform(term_document_matrix_good);
+H_good = nmfmodel_good.components_
+# W (number of reviews,number of topics) and H (number of topics, number of features)
+print "Generated factor W of size %s and factor H of size %s for good reviews" \
+% ( str(W_good.shape), str(H_good.shape) )
+```
+
+## Results
+
+### Top Terms by each topic {.tabset .tabset-fade}
+
+Write a range of functions to plot graphs to present the top topics discovered by NMF model and create a list of features (tokenized words) generated from NMF model.
+
+```{r}
+# Create a colour series for graph plotting
+def grey_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+    return "hsl(0, 0%%, %d%%)" % random.randint(60, 100)
+
+# Writting functions to show top words in each topic
+def TopTermsByTopic(nmfmodel, features, top):
+    for index, topic in enumerate(nmfmodel.components_):
+        print "\n Topic {}: \n".format(index+1)
+        print "Percentage of Words: {:.2%}\n".format(np.count_nonzero(topic) / 41961.)
+        
+        top_words = [features[i] for i in nmfmodel.components_[index].argsort()[::-1][:top]]
+        topic_words = ' '.join(top_words)
+
+        #Prepare data for horizontal bar charts
+        top15_index = nmfmodel.components_[index].argsort()[::-1][:15]
+        top15_topic = sorted(topic[top15_index],reverse=False)
+
+        #Prepare data for wordclouds
+        wc = WordCloud(max_font_size=80,relative_scaling=.5,width=800,height=500).generate(topic_words)
+       
+        #Create a space for graphs
+        fig, ax = plt.subplots(2,figsize=(12,10))
+        rect1 = ax[0].barh(.5 + np.arange(15) + .5, top15_topic, color="black", align="center")
+        rect2 = ax[1].imshow(wc.recolor(color_func=grey_color_func, random_state=3))
+        
+        #Subplot 1 - Horizontal Bar Chart
+        ax[0].set_title("Top 15 Terms in Topic {}".format(index + 1))
+        ax[0].set_xlabel("Weight")
+        ax[0].set_yticks(.5 + np.arange(15)+ .5)
+        ax[0].set_yticklabels([features[i] for i in topic.argsort()[::-1][:15]])
+        ax[0].grid(True)
+        
+        #Subplot 2 - WordCloud
+        ax[1].axis("off")
+        ax[1].set_title("Wordcloud of Topic {}".format(index + 1))
+        
+        #Show the graphs
+        plt.tight_layout()
+        plt.show()
+        
+        
+#Extracting the feature names
+features_bad= tfidfvectorizer_bad.get_feature_names()
+features_good= tfidfvectorizer_good.get_feature_names()
+ 
+```
+
+
+This section shows the most significant topics discovered by NML model, also, the top 15 highest weighted terms were presented on a horizontal bar chart along with the rest of the terms on a word cloud. Experiments suggests 25 topics are optimal, this number allows a clearer separation of topics.
+
+#### Bad Reviews: 1-star and 2-star reviews
+```{r}
+TopTermsByTopic(nmfmodel_bad, features_bad, 100)
+```
+
+#### Good Reviews: 4-star and 5-star reviews
+
+```{r}
+TopTermsByTopic(nmfmodel_good, features_good, 100)
+```
+
+
+###Summary of topics {.tabset .tabset-fade}
+
+This section summarises topics discovered by NMF model from bad reviews text. An attempt to interpret the contents of each topic was made, keywords in each topic were manually examined and a description of each topic was then assigned.
+
+#### Bad Reviews: 1-star and 2-star reviews
+```{r}
+
+data_bad = {'Index of Topics':['Topic 1','Topic 2','Topic 3','Topic 4','Topic 5','Topic 6','Topic 7','Topic 8'
+                           ,'Topic 9','Topic 10','Topic 11','Topic 12','Topic 13','Topic 14','Topic 15'
+                           ,'Topic 16','Topic 17','Topic 18','Topic 19','Topic 20',
+                            'Topic 21','Topic 22','Topic 23','Topic 24','Topic 25']
+        ,'Type of Topics':['Bad service from manager and waiter/waitress ', 'Bad Coffee Shop',
+                           'Bad Chicken Dishes (Fried, Boiled, Curry)',
+                           'Bad Italian Foods (Pizza and Pasta: Toppings, base, sauce, etc.)',
+                           'Bad Fried Chips (Soggy Batter)','Bad Burger', 'Unknown Topic',
+                           'Bad wait and time management','Bad Experience and Services',
+                           'Bad Restaurant (Birthplace of Harry Potter)','Bad Afternoon Tea',
+                           'Unfriendly and Rude Staffs','Bad Chinese Sweet and Sour Foods',
+                           'Unknown Topic','Bad Mexican Foods','Bad Place for drinks (too quiet)',
+                           'Bad Japanese Foods (Tuna, Miso Soup)','Bad Prices','Bad Breakfast (Eggs Benedict)',
+                           'Bad Wait and Time Management','Bad Noodles', 'Good Comments in Bad Reviews',
+                           'Expensive Place for Tourists', 'Hot Temperature','Bad Thai Foods'                           
+                           ]
+       } 
+
+topic_table_bad = pd.DataFrame(data_bad)
+display(topic_table_bad)
+```
+
+#### Good Reviews: 4-star and 5-star reviews
+
+```{r}
+data_good = {'Index of Topics':['Topic 1','Topic 2','Topic 3','Topic 4','Topic 5','Topic 6','Topic 7','Topic 8'
+                           ,'Topic 9','Topic 10','Topic 11','Topic 12','Topic 13','Topic 14','Topic 15'
+                           ,'Topic 16','Topic 17','Topic 18','Topic 19','Topic 20',
+                            'Topic 21','Topic 22','Topic 23','Topic 24','Topic 25']
+        ,'Type of Topics':['Unknown Topic','Good Quality foods','Good Place and Atmosphere',
+                           'Good Bars and Pubs', 'Good Scottish Breakfast',
+                           'Good Fish and Chips with nice peas','Good Thai Foods with decent prawn',
+                           'Good Indian Foods', 'Good Menu','Good Beef Burger with decent sweet potatoes',
+                           'Good Price and Value','Good Sandwiches', 'Good Italian Foods (Pasta and Pizza)',
+                           'Good chocolates and ice creams','Good Coffee Shops with Nice Artisan and Expresso',
+                           'Good Japanese foods (Bento,Nigiri,Kanpai)','Good Mexican Burritos and Tacos',
+                           'Excellent Services', 'Good Afternoon Tea', 'Good BBQ Shops (crackling pork, haggis)',
+                           'Unknown German Reviews', 'Friendly Staff','Good Foods', 'Good Vegetarian Restaurants',
+                           'Good Potato Shops'
+                           ]
+       } 
+
+topic_table_good = pd.DataFrame(data_good)
+display(topic_table_good)
+```
+
+## Recommendation
+
+The topics extracted by NMF model from both good and bad reviews were used to make the recommendation below.
+
+**Opportunities to explore when opening a restaurant in Edinburgh:**
+
+* Customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy. (Bad Review Topic 5)
+* Customers are also not particularly happy with chicken dishes in Edinburgh. (Bad Review Topic 3)
+* Foods and drinks at a cafe where JK Rowling visited were not satisfying and received a lot of complaints. (Bad Review Topic 10)
+* Sweet and sour chickens are not satisfying at chinese restaurants in Edinburgh. (Bad Review Topic 13)
+* Thai Foods for lunch are not good (Bad Review Topic 25)
+* Current noodle shops in Edinburgh are bad (Bad Review Topic 21)
+* Good atmosphere, location, friendly staff and price-to-value could enhance customer experience (Good Review Topics 2,3,11 and 22)
+
+**Areas to avoid and improve when opening a restaurant in Edinburgh:**
+
+* Customers complained about bad services from rude and unfriendly waiter and waitress (Bad Review Topics 1 and 12)
+* Customers complained about long wait (Bad Review Topic 8)
+* Customers complained about room temperature (Bad Review Topic 24)
+* Customers complained about bars and pubs that are too quiet (Bad Review Topic 16)
+
+**For sectors where businesses are doing very well would also mean new entrants could face a big challenge to enter these sectors.**
+
+* Good Review Topic 4 appeared in 16.57% of reviews, that implies bars and pubs are providing very good services in Edinburgh.
+* Good Review Topic 15 appeared in 13.32% of reviews, that means current coffee shops are providing very good coffees and services.
+* BBQ shops are doing very well in Edinburgh. (Good Review Topic 20)
+* Potato shops are doing very well in Edinburgh. (Good Review Topic 25)
+
+# Analysis - Location and Competition
+
+
+# Analysis - Type and Characteristics
+
+# Analysis - Price, Volume and Revenue
+
+# Managerial Recommendations
+
+# Reference
+
+[1] D. Cai, X. He, J. Han, and T. S. Huang. Graph regularized nonnegative matrix factorization for data representation. IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 33(8):1548–1560, 2011.
+
+[2] J. Choo, C. Lee, C. K. Reddy, and H. Park. UTOPIAN: User-driven topic modeling based on interactive nonnegative matrix factorization. IEEE Transactions on Visualization and Computer Graphics (TVCG), 19(12):1992–2001, 2013
+
+[3] A. Cichocki, R. Zdunek, A. H. Phan, and S. Amari. Nonnegative Matrix and Tensor Factorizations: Applications to Exploratory Multi-Way Data Analysis and Blind Source Separation. Wiley, 2009.
+
