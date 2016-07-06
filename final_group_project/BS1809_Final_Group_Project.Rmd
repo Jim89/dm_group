@@ -687,7 +687,7 @@ Using the topic modeling method, two recommendations we found is customers are n
 
 # Analysis - Type and Characteristics
 
-In this part, we will classify different kind of restaurants with hierachical clustering technique to find out different category of restaurants and analyse their performance in different zips. From the result, we can then analyse the best location of our restaurants by recognising out-performing and under-performing areas for each type of restaurants.
+In this part, we will classify different kind of restaurants with hierachical clustering technique to find out different types of restaurants. After that we would analyse the distribution of these restaurants and compare it with the distribution of reviews given to these restaurants. By analysing the distribution difference between top reviews and restaurants, we can find out areas where customers do not receive enough satisfying services and locate a strategic location for our restaurant.
 
 ```{r include=FALSE}
 
@@ -1013,8 +1013,8 @@ Table above shows the percentage of distribution of specific type of restaurants
 review=pd.read_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/final_group_project/Kane Wu/edinReview.csv",header=0)
 review=review.merge(df3_filtered, on=['business_id'], how='outer')
 review_stars=review[((review.stars==4) == True) | ((review.stars==5) == True)]
-demand=pd.crosstab(review_stars["Type"],review_stars["zip"]).apply(lambda r: r*100/r.sum(), axis=1)
-demand
+top_views=pd.crosstab(review_stars["Type"],review_stars["zip"]).apply(lambda r: r*100/r.sum(), axis=1)
+top_views
 ```
 
 Similarly, we can look at the the distribution of top rating review for each restaurant types in different zips and use it as an indicator of popular location for certain type of restaurants.
@@ -1026,10 +1026,10 @@ We can create a ratio as an indicator of high quality region as an indicator of 
 $$\frac{(\text{top review%} - \text{restaurants%})}{\text{%restaurants}}$$
 
 ```{r}
-(demand-supply)/supply
+(top_views-supply)/supply
 ```
 
-From the calculation above, we can make a conclude:
+From the calculation above, we can make a out-performing zips for different types of restaurants.
 
 Out-performing regions:
 
@@ -1040,6 +1040,7 @@ Fastfood & Takeaways: EH1, EH7, EH3
 General: EH2, EH1, EH3, EH8
 
 Stylish and Pubs & Bars: EH1, EH8, EH2
+
 
 Under-performing regions:
 
@@ -1054,14 +1055,14 @@ Stylish and Pubs & Bars: EH10, EH11, EH5, EH3
 For a strategic purpose, we also want to consider the net difference between top rating reviews and number of restaurants.
 
 ```{r}
-demand-supply
+top_views-supply
 ```
 
 ##Sectional Conclusion and suggestions
 
 Now, depends on the estimated quality of our service, we can make strategic consideration based on the the results above. 
 
-If we want to open a restaurant to provide a average level of services, we should locate our restaurant at a zip with high percentage of reviews but under-performing reviews to avoid competition with top quality restaurants and take up those unsatisfied demand in the zip. Also, as these areas are generally less popular, the rents are also generally lower and therefore the cost and potential risk will be lower.
+If we want to open a restaurant to provide a average level of services, we should locate our restaurant at a zip with lower percentage of top then percentage of restaurants to avoid competition with top quality restaurants and take up those unsatisfied demand in the zip. Also, as these areas are generally less popular, the rents are also generally lower and therefore the cost and potential risk will be lower. Here are the suggestion of post codes for different type of restaurants.
 
 Classy: EH10
 
@@ -1071,7 +1072,7 @@ General:EH6
 
 Stylish and Pubs & Bars: EH4
 
-If we want to open a top quality restaurants, we should locate our restaurant at a zip with high out-performing ratio so that we can save our advertising cost and take advantage of the popularity of the location.
+If we want to open a top quality restaurants and we are not afraid of competition, we should locate our restaurant at a zip with high out-performing ratio so that we can save our advertising cost and take advantage of the popularity of the location. Here are the recommendation of post codes for different type of restaurants.
 
 Classy: EH2
 
