@@ -1110,6 +1110,7 @@ For pricing, we decide to take the average price for British Cusine at Eh3. As s
 
 2.5 is between the second price range and the third price range so we decided to use the average price of 30 dollars. We calculated that if we open a restaurant with a Yelp price range of 2.5 we can expect to make 9470 * 2.5 which is $284,100 per year. 
 
+# Final Recommendations
 
 # Reference
 
