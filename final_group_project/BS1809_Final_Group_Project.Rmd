@@ -154,7 +154,8 @@ knitr::include_graphics("Siang/3.png")
 
 ## Inspection of review contents
 
-### Reviews VS Stars
+### Distribution of number of words
+
 It is crucial to only include reviews with a considerable amount of contents as the topic modelling will not be able to extract any insight from a short review. The length of reviews was therefore analysed and a minimum requirement on the length of review was implemented.
 
 ```{r}
@@ -175,6 +176,8 @@ knitr::include_graphics("Siang/4.png")
 ```
 
 It can be seen that almost 95% of reviews have length of more than 500 words, therefore, it is not necessary to remove any short reviews. The distribution of ratings was also examined to avoid inbalanced datasets.
+
+### Reviews VS Stars
 
 ```{r}
 review.stars.value_counts(sort=False).plot(kind='bar',color="black")
