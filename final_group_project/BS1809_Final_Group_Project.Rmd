@@ -858,6 +858,10 @@ clusters = fcluster(R1[0], max_d, criterion='distance')
 df3_filtered['cluster']=clusters
 ```
 
+!["Fig 1: Dendrogram on style clustering" ](kin_fig1.png)
+
+
+
 Now to determine cuts by different measures.
 
 ```{r}
@@ -899,6 +903,12 @@ clusters = fcluster(R1[0], max_d, criterion='distance')
 df3_filtered['cluster']=clusters
 ```
 
+!["Fig 2: Inconsistency Measure of last 20 merges" ](kin_fig2.png)
+
+!["Fig 3: Height of the last 20 merges" ](kin_fig3.png)
+
+!["Fig 4: Rate of increase in Height of the last 20 merges" ](kin_fig4.png)
+
 From the plots, a cut with 5 clusters gives the most desired result.
 Now to visualise the results.
 
@@ -933,6 +943,8 @@ C1.ix[1,1:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==1]
 ```
 
+!["Fig 5: Cluster 1: Unknowns" ](kin_fig5.png)
+
 Cluster 1 contains 382 restaurants. Most of these restaurants do not provide much information for classification.
 
 ```{r}
@@ -945,6 +957,7 @@ C2.ix[1,0:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==2]
 ```
 
+!["Fig 6: Cluster 2: The Classies" ](kin_fig6.png)
 Cluster 2 contains 119 restaurants. They are the most expensive and classy type of restaurants, providing mainly dinner service. 
 Most of them require customers to be dressy. They are more the quiet type of restaurants and some of them provide background music.
 Those stylish restaurants with classy, romantic, intimate, trendy and upscale atmosphere are mainly in this cluster. 
@@ -959,6 +972,8 @@ plt.ylabel('Proportion of population')
 C3.ix[1,0:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==3]
 ```
+
+!["Fig 7: Cluster 3: The Stylish and Pubs & Bars" ](kin_fig7.png)
 
 Cluster 3 contains 310 restaurants. These are stylish restaurants and pubs & bars priced at level 2, providing mainly dinner and lunch. 
 
@@ -976,6 +991,8 @@ C4.ix[1,0:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==4]
 ```
 
+!["Fig 8: Cluster 4: The Fastfood and Takeaways" ](kin_fig8.png)
+
 There are 171 restaurants in cluster 4. These are mainly the cheapest kind of restaurants, probably fastfood restaurants as most of them do not provide waiter service, wine nor having any bars.
 Their embience level is quite average.
 They are mainly good for kids and also suitable for groups. 
@@ -989,6 +1006,8 @@ plt.ylabel('Proportion of population')
 C5.ix[1,0:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==5]
 ```
+
+!["Fig 9: Cluster 5: The Generals" ](kin_fig9.png)
 
 Cluster 5 contains 233 restaurants. They are mainly general restaurants, providing brunch, dinner and lunch. 
 They are less quiet but not the noisiest type. 
@@ -1010,7 +1029,10 @@ supply=pd.crosstab(df3_filtered["Type"],df3_filtered["zip"]).apply(lambda r: r*1
 supply
 ```
 
-Table above shows the percentage of distribution of specific type of restaurants across the zips. 
+
+!["Table 1: Restaurants distributions across zips" ](kin_fig10.png)
+
+Table 1 above shows the percentage of distribution of the same type of restaurants across the zips, each row sums up to 100% of that respective style. 
 
 ```{r}
 review=pd.read_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/final_group_project/Kane Wu/edinReview.csv",header=0)
@@ -1020,13 +1042,26 @@ top_views=pd.crosstab(review_stars["Type"],review_stars["zip"]).apply(lambda r: 
 top_views
 ```
 
+
+
 Similarly, we can look at the the distribution of top rating review for each restaurant types in different zips and use it as an indicator of popular location for certain type of restaurants.
 
-By from the above, we further calculate the ratio of restaurants receiving top reiviews. For instance, fastfood and takeaways in EH1 receives 39.7% of top reviews in the Fastfood & Takeaways category with only 22.8% of Fastfood & Takeaway restaurants located in the zip. It therefore implies that the quality of Fastfood & Takeaways in EH1 are generally more satisfying than those located in other zip.
+!["Table 2: Reviews distributions across zips" ](kin_fig11.png)
 
-We can create a ratio as an indicator of high quality region as an indicator of out-performing region.
+Table 2 above shows the percentage of distribution of reviews for the same type of restaurants across the zips, each row sums up to 100% of that respective style. 
+
+From the tables the above, we further calculate the ratio of restaurants receiving top reiviews. For instance, fastfood and takeaways in EH1 receives 39.7% of top reviews in the Fastfood & Takeaways category with only 22.8% of Fastfood & Takeaway restaurants located in the zip. It implies that the quality of Fastfood & Takeaways in EH1 are generally more satisfying than those located in other zip.
+
+To observe the differences, we can look at Table 3 below.
+
+!["Table 3: Disagreement of percentage distributions of review and restaurant across zips" ](kin_fig13.png)
+
+To observe the performance level, we created a ratio as an indicator of high quality region as an indicator of out-performing region in Table 4 below.
 
 $$\frac{(\text{top review%} - \text{restaurants%})}{\text{%restaurants}}$$
+
+!["Table 4: Ratio of disagreement of percentage distributions of review and restaurant across zips" ](kin_fig12.png)
+
 
 ```{r}
 (top_views-supply)/supply
@@ -1055,27 +1090,32 @@ General: EH12, EH16, EH15, EH4
 
 Stylish and Pubs & Bars: EH10, EH11, EH5, EH3
 
-For a strategic purpose, we also want to consider the net difference between top rating reviews and number of restaurants.
 
-```{r}
-top_views-supply
-```
 
 ##Sectional Conclusion and suggestions
 
 Now, depends on the estimated quality of our service, we can make strategic consideration based on the the results above. 
 
-If we want to open a restaurant to provide a average level of services, we should locate our restaurant at a zip with lower percentage of top then percentage of restaurants to avoid competition with top quality restaurants and take up those unsatisfied demand in the zip. Also, as these areas are generally less popular, the rents are also generally lower and therefore the cost and potential risk will be lower. Here are the suggestion of post codes for different type of restaurants.
+###Strategy 1 - Competition Avoidance:
 
-Classy: EH10
+We locate our restaurant at a zip with a relatively lower percentage of top reviews than the the percentage of restaurants to avoid competition with top quality restaurants and take up those unsatisfied demand in the zip.
+However, as the amount of reviews is also a proxy of traffic, we may want to as well avoid under-performing zips as well. Hence, the best location would be zips having the supply demand ratio close to zero while having a certain amount of of restaurants of the same type. 
 
-Fastfood & Takeaways: EH9
+To select the best location, we first locate the zips with performance level clost to zero and then look for the zips with the highest amount of restaurants of the same type. The recommendations are listed below.
 
-General:EH6
+Classy: EH6
 
-Stylish and Pubs & Bars: EH4
+Fastfood & Takeaways: EH8, EH3
 
-If we want to open a top quality restaurants and we are not afraid of competition, we should locate our restaurant at a zip with high out-performing ratio so that we can save our advertising cost and take advantage of the popularity of the location. Here are the recommendation of post codes for different type of restaurants.
+General:EH8, EH9
+
+Stylish and Pubs & Bars: EH2, EH15
+
+###Strategy 2 - Business AgglomerationL
+
+Being very confident on the quality of our service, We locate our restaurant at a zip with high out-performing ratio to save our advertising cost and take advantage of the popularity of the location to ensure the source of customers. Here are the recommendation of post codes for different type of restaurants.
+
+To select our best location, we first locate the zips with highest performing ratio and then look for the zips with the highest amount of restaurants of the same type.
 
 Classy: EH2
 
