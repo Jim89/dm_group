@@ -46,20 +46,22 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Executive Summary
 
+
 ## Goals and Introduction
 
-You work for a large corporation that owns a collection of restaurants of different types. Currently it is evaluating the location, type, and characteristics (cuisine, price point, design, marketing strategy) and positioning of a new restaurant in Edinburgh (if you know the local habits, you can give better insight).
-Your task is to analyse the dataset and give recommendations on strategy, based on the reviews, location (either neighbourhood or zipcode level) and competition. Also estimates on volumes and revenues of the potential undertaking. You may have to check out what the price-range attributes signify by visiting the Yelp website.
+You work for a large corporation that owns a collection of restaurants of different types. Currently it is evaluating the location, type, characteristics (cuisine, price point, design, marketing strategy) and positioning of a new restaurant in Edinburgh (if you know the local habits, you can give better insight).
+Your task is to analyse the dataset and give recommendations on strategy, based on the reviews, location (either neighbourhood or zipcode level) and competition. Also give estimates on volumes and revenues of the potential undertaking. You may have to check out what the price-range attributes signify by visiting the Yelp website.
 
 ## Methodology
+We decided to perform this analysis for Edinburgh. This was because we found extensive demographic data that could be easily integrated with the Yelp data.  We also had better knowledge of the zip codes as Edinburgh is still in the UK. The Yelp data were provided as JSON files. 
 
-# Analysis - Review 
 
-## Introduction
 
-The goal of this analysis is to point out demand and preference of customers from a large amount of reviews, with high dimensionality. These topics can provide meaningful insights to opening a new restaurant by considering what customers care about in order to increase the Yelp ratings, which directly affects the revenue. But how can restaurant understand the demands of its customers from a large amount of reviews? For a relatively small collection of reviews, it may be possible to manually inspect and classify the contents of reviews into specific categories based on similarity. But to partition large volumes of text, the process would be extremely time consuming. Topic modelling greatly reduces the time needed to perform the classification and understand the actual contents. We hope to use topic modelling to identify what users care about most when giving their rating stars, and ultimately determine what a new restaurant should be doing in order to receive high ratings.
+# Review and data exploration -Analysis
+This analysis points out demand and preference of customers from a large amount of reviews, with high dimensionality. These topics can provide meaningful insights to opening a new restaurant by considering what customers care about in order to increase the Yelp ratings, which directly affects the revenue. But how can restaurant understand the demands of its customers from a large amount of reviews? For a relatively small collection of reviews, it may be possible to manually inspect and classify the contents of reviews into specific categories based on similarity. But to partition large volumes of text, the process would be extremely time consuming. Topic modelling greatly reduces the time needed to perform the classification and understand the actual contents. We hope to use topic modelling to identify what users care about most when giving their rating stars, and ultimately determine what a new restaurant should be doing in order to receive high ratings.
 
-In this study, I applied a non-negative matrix factorization (NMF) approach for the extraction and detection of concepts or topics from reviews. NMF introduces a technique that simultaneously perform dimension reduction and clustering that identifies semantic features in a document collection and groups the documents into clusters on the basis of shared semantic features [1]. The extracted topics from 1-star and 2-star reviews were used as an indicator of bad practice whereas extracted topics from 4-star and 5-star reviews were used as an indicator of good practice for operating a restaurant.
+In this study, we applied a non-negative matrix factorization (NMF) approach for the extraction and detection of concepts or topics from reviews. NMF introduces a technique that simultaneously perform dimension reduction and clustering that identifies semantic features in a document collection and groups the documents into clusters on the basis of shared semantic features [1]. The extracted topics from 1-star and 2-star reviews were used as an indicator of bad practice whereas extracted topics from 4-star and 5-star reviews were used as an indicator of good practice for operating a restaurant.
+
 
 ## Description of datasets
 
@@ -188,10 +190,10 @@ plt.title('Reviews By Star');
 knitr::include_graphics("Siang/5.png")
 ```
 
-Inituitively, we thought there would be more 1-star and 5-star reviews, however, the data shows otherwise, and the majority of reviews were 4-star and 5-star. It is also important to check the quality of reviews by examining their numbers of votes.
+Inituitively, we thought there would be more 1-star and 5-star reviews, however, the data shows otherwise, and the majority of reviews were 4-star and 5-star. It is also important to check the usefulness/reliability of reviews by examining their numbers of votes.
 
 ### Reviews VS Votes
-The majority of reviews have only one vote regardless of the type of vote (cool, useful or funny). Originally, we planned to only include reviews with at least two votes. However, by doing so, it would remove a significant amount of text from this analysis. We decided not to remove any reviews based on their numbers of votes.
+The majority of reviews have only one vote regardless of vote type (cool, useful or funny). So we decided not to remove reviews based on their numbers of votes (doing so would remove a significant amount of text from this analysis).
 
 #### Vote for cool
 
@@ -228,9 +230,7 @@ knitr::include_graphics("Siang/8.png")
 
 ### Dividing dataset
 
-To simplify the classification of topics - Good or Bad reviews. Reviews were split into two groups and 3-star reviews were excluded in this analysis due to the mixed expression of customers (three stars could be a good or a bad review). First group contains 1-star and 2-star reviews, which were later interpreted as bad reviews and second group contains 4-star and 5-star reviews, which were later interpreted as good reviews.
-
-
+Reviews were split into two groups, 1 and 2 star reviews were interpreted as bad reviews and 4 and 5-star reviews were interpreted as good reviews. 3-star reviews were excluded in this analysis due to the mixed expression of customers (three stars could be a good or bad review).
 ```{r}
 # Split the dataset into 2 categories: 1,2 stars and 4,5 stars
 
@@ -248,13 +248,13 @@ knitr::include_graphics("Siang/9.png")
 
 ### Text feature extraction
 
-The text is a sequence of alphabets that cannot be fed directly to the algorithms themselves as most of them expect numerical feature vectors with a fixed size rather than the raw text documents with variable length. Therefore, a range of functions from python scikit-learn package was used to extract numerical features from text content, namely [1]-[3]:
+A range of functions from the python scikit-learn package was used to extract features(words) from textual reviews content and create a document-term matrix, namely [1]-[3]:
 
-* tokenizing strings and giving an integer id for each possible token, for instance by using white-spaces and punctuation as token separators.
+* tokenizing strings and documenting each possible token in a matrix, where white-space and punctuation were token separators.
 * counting the occurrences of tokens in each document.
-* normalizing and weighting with diminishing importance tokens that occur in the majority of samples / documents.
+* normalizing and weighting with diminishing importance tokens which occur in the majority of samples / documents.
 
-In a large text corpus, some words will be very present (e.g. “the”, “a”, “is” in English) hence carrying very little meaningful information about the actual contents of the document. If we were to feed the direct count data directly to a classifier those very frequent terms would shadow the frequencies of rarer yet more interesting terms. In order to reduce the influence of terms appearing frequently across the entire corpus, we applied TF-IDF term re-weighting functions to normalize the data. TfidfVectorizer function combines the functions of TF-IDF and vectorization (Vectorization is a process combining tokenizing, counting and normalization) allowing to build a document-term matrix for the corpus of documents:
+In a large text corpus, stopwords are common (e.g. "the", "a", "is", "and" in English) and carry little meaningful information about the actual contents of the document. In order to reduce the influence of stop words appearing frequently across the entire corpus, TF-IDF term re-weighting functions normalized the data. TfidfVectorizer function combines the functions of TF-IDF and vectorization (Vectorization is a process combining tokenization, counting and normalization) allowing to build a document-term matrix for the corpus of documents:
 
 ```{r}
 #Vectorization
@@ -270,7 +270,9 @@ term_document_matrix_good = tfidfvectorizer_good.fit_transform(review_good.text)
 
 ### Topic Modelling
 
-In topic modeling, there are several methods for learning abstract topics in a collection of documents. NMF is a new and emerging method of unsupervised learning to discover hidden topics. We applied the scikit-learn implementation of NMF with NNDSVD initialization. Nonnegative Double Singular Value Decomposition (NNDSVD) is typically used for overcoming sparseness of data in document-term matrix [8]. Here I set the number of topics to be equal to 25 and run NMF for 200 iterations, and then get the factors W and H from the resulting model:
+NMF (Non-negative Matix Factorization) is a method of unsupervised learning for grouping a collection of documents and finding out abstract topics.  We applied the scikit-learn implementation of NMF with NNDSVD initialization.
+
+Nonnegative Double Singular Value Decomposition (NNDSVD) is typically used for overcoming sparseness of data in document-term matrix [8]. Here we set the number of topics to be equal to 25 and run NMF for 200 iterations, then get the factors W and H from the resulting model:
 
 ```{r}
 # 1-star + 2-star reviews
@@ -298,9 +300,9 @@ knitr::include_graphics("Siang/10.png")
 
 ### Top Terms by each topic {.tabset .tabset-fade}
 
-Write a range of functions to plot graphs to present the top topics discovered by NMF model and create a list of features (tokenized words) generated from NMF model.
-
 ```{r}
+#Write functions to plot graphs which present the top topics discovered by the NMF model and create a list of features generated from the NMF model.
+
 # Create a colour series for graph plotting
 def grey_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
     return "hsl(0, 0%%, %d%%)" % random.randint(60, 100)
@@ -349,7 +351,7 @@ features_good= tfidfvectorizer_good.get_feature_names()
 ```
 
 
-This section shows the most significant topics discovered by NML model, also, the top 15 highest weighted terms were presented on a horizontal bar chart along with the rest of the terms on a word cloud. Experiments suggests 25 topics are optimal, this number allows a clearer separation of topics.
+Horizontal barchart of the top 15 highest weighted terms for the most significant topic - in bad and good reviews - discovered by the NMF model. The rest of the terms are shown in a word cloud. 
 
 #### Bad Reviews: 1-star and 2-star reviews
 ```{r}
@@ -375,7 +377,7 @@ knitr::include_graphics("Siang/12.png")
 
 ###Summary of topics {.tabset .tabset-fade}
 
-This section summarises topics discovered by NMF model from bad reviews text. An attempt to interpret the contents of each topic was made, keywords in each topic were manually examined and a description of each topic was then assigned.
+A summary of the 25 topics from the bad and good reviews - NMF model. An attempt to interpret the contents of each topic was made, keywords in each topic were manually examined and a description of each topic was then assigned. Experiments suggest 25 topics is optimal, allowing for a clear separation of topics. 
 
 #### Bad Reviews: 1-star and 2-star reviews
 ```{r}
@@ -436,10 +438,7 @@ display(topic_table_good)
 knitr::include_graphics("Siang/14.png")
 ```
 
-## Recommendation
-
-The topics extracted by NMF model from both good and bad reviews were used to make the recommendation below.
-
+###Comments
 **Opportunities to explore when opening a restaurant in Edinburgh:**
 
 * Customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy. (Bad Review Topic 5)
@@ -467,41 +466,34 @@ The topics extracted by NMF model from both good and bad reviews were used to ma
 In conclusion, insights above that were extracted by topic modelling are very useful for a company that plans to open a new restaurant in Edinburgh, for example, it was clear that customers are not satisfied with the current fish and chips and chicken dishes in Edinburgh, a new restaurant could potentially target these specific sectors to fullfill the customer demand. Also, company should be careful with certain issues that were discovered from bad reviews, for example, topics such as unfriendly staffs, long wait and uncomfortable room temperature that frequently appeared in bad reviews could negatively affect customer experience. Finally, sectors that are doing very well in Edinburgh such as bars, pubs, BBQ and Potato shops are the areas that a new restraunt may not want to consider in order to avoid fierce competition.
 
 
-# Analysis - Location and Competition
-## Objective
-The objective of this part of analysis was to  use data provided by Yelp in order to estimate the demand for restaurants in an area (zip code) of a chosen city, and to find out which type of cuisine people are looking for. 
+# Location and Competition - Analysis
+This part of the analysis estimates the demand for restaurants in a zip code for Edinburgh and finds out which type of cuisine people are looking for. 
 
-In order to undertake this analysis, we performed the following steps: 
+The following steps were performed: 
 1.	Data cleaning to extract zip codes and restaurant types;
-2.	Integrate external data sources with the Yelp data in order to gather more detail on the zip code demographics; and
+2.	Integrated external demographic data; population, income, and hotels data with the Yelp data.
 3.	Calculate metrics for each area in order to address the main objective.
 
-##Analysing Restaurant In Edinburgh
-We decided to perform this analysis for Edinburgh. This was because we found extensive demographic data that could be easily integrated with the Yelp data.  We also has better knowledge of the zip codes as Edinburgh is still in the UK.
+###Preparing the Data for Competition Analysis.
+We used the pandas Python package to filter the data to just that relevant to Edinburgh. Noting that the data contained many business types, we made the assumption that the business was a restaurant if it's category field stated resturant. We then used this filtered data to extract the relevant tables for check-ins, reviews, tips and users. This provided us with data on 1215 restaurants in Edinburgh that were registered on Yelp.
 
-###Cleaning the Data
-The Yelp data were provided as JSON files. We used the pandas Python package to process this data, and  filtered the larger data to just that relevant to Edinburgh. Noting that the data contained many business types, we made the assumption that the business was a restaurant if it category field stated as such. We then used this filtered data to extract the relevant tables for check-ins, reviews, tips and users. This provided us with data on 1215 restaurants in Edinburgh that were registered on Yelp.
+Regarding restaurant cuisine type, we noticed that many different attributes were used to explain the restaurant category. For example: "Gastropubs,Bars,Scottish,Nightlife,Restaurants". As we were primarily interested in cuisine, we made a list of cuisine keywords such as "Italian" or "Scottish". We searched the category for such keywords in order to assign each restaurant to a cuisine type. If there more than one cuisine was detected, we will focused on the cuisine that was the most expressive of the type of food. 
 
-Regarding restaurant cuisine type, we noticed that many different attributes were used to explain the restaurant category was . For example: "Gastropubs,Bars,Scottish,Nightlife,Restaurants". As we were primarily interested in cuisine, we made a list of cuisine keywords such as "Italian" or "Scottish". We searched the category for such keywords in order to assign each restaurant to a cuisine type. If there are more than one cuisine detected, we will focus on the cuisine that is the most expressive of the type of food, which is usually the country type of the food. 
+In order to combine the external demographic data, we extracted the zip code from each restaurant's address. In doing so we only focused on the general area, the first three or four letters of the zip code. For example EH6 or EH12.
 
-In order to combine the external demographic data with the Yelp data, we  extracted the zip code from each restaurant's address. In doing so we only focused on the general area, the first three or four letters of the zip code. For example EH6 or EH12.
+The data obtained from the Edinburgh government website [4] provided locality and ward demographic profiles. It contained data on; gender, age, housing, employment, education and professions, income, benefits, health and disability, lifestyle, satisfaction with services, and Scottish Index of Multiple Deprivation data - of which population, income and property prices were of primary interest. However, this data was organized by ward, with each ward containing many zip codes. Figure 1 maps different polling districts and figure 2 maps wards districts. 
 
-The data obtained from the Edinburgh government website [4] provided locality and ward demographic profiles. It contained data on -gender, age, housing, employment, education and professions, income, benefits, health and disability, lifestyle, satisfaction with services, and Scottish Index of Multiple Deprivation data. 
-
-We used this data in order to compare the population, income and property prices with the amount of restaurants there are. However, this data was organized by ward. Therefore it was necessary for us to map each ward to a zip code. 
-We used a second external data set  of polling districts from the City of Edinburgh Mapping portal [5]. Figure 1 below is a demonstration of the different polling districts and figure 2 are the wards districts. 
-
-!["Figure 1:Polling Districts" ](figure1.png)
+ 
+!["Figure 1: Polling Districts" ](figure1.png)
 
 
 !["Figure 2: Wards" ](figure2.png)
 
-We noticed that each polling location was assigned to a zip code. We therefore used the zip code of the polling districts in order to map back to ward. As some wards had numerous polling districts within them, we used the zip code with the largest number of occurrences in the ward (as long as the zip code was from EH1-16 - our area of interest). For example if the ward "Almond" has 4 zip codes in EH4 and only 1 in EH2 we considered Almond to be part of EH4. 
+To attribute ward demographic data to each zip we used an external data set of polling districts from the City of Edinburgh Mapping portal [5]. Each polling location has a zip code and a ward. Where a zip code makes up the majority of occurances in the ward, the demographic data is all attributed to the zip. For example if the ward "Almond" has 4 zip codes in EH4 and 1 in EH2, EH4 will be considered as Almond ward, and takes the Almond demographic data.
 
-As some zip codes are really small such as EH1 and EH2, there are some zip codes that were not assigned to any single ward using the method above. For those zip codes we found wards that contained that zip divided the population numbers in two and assigned half of the population in the ward to each of the two zip codes. For example the ward central city in general encompass EH1 and EH2. So we split the population for central city into two by half and assign it to the population of EH1 and EH2.   Income and property prices remained the same.
+As some zip codes such as EH1 and EH2 are really small, some zip codes were not assigned to any single ward using the method above. For these zip codes, population numbers were attributed in proportion to how many polling stations zip's are in the ward. For example the central city  ward in general is made up of EH1 and EH2. So the population for central city ward is  assigned evenly into the populations of EH1 and EH2. Income and property prices remained the same.
 
-We also downloaded data on all the hotels in Edinburgh from booking.com. We cleansed this data to extract the zip code so that the data will be useful.
-
+Data on all the hotels in Edinburgh was also downloaded from booking.com and integrated. This data was cleansed, to get hotel counts by zip code.
 
 ```{r eval=FALSE}
 
