@@ -1059,7 +1059,7 @@ $$\frac{(\text{top review%} - \text{restaurants%})}{\text{%restaurants}}$$
 (top_views-supply)/supply
 ```
 
-From the calculation above, we can make a out-performing zips for different types of restaurants.
+From the calculation above, we can find an out-performing zips for different types of restaurants.
 
 Out-performing regions:
 
@@ -1086,7 +1086,7 @@ Stylish and Pubs & Bars: EH10, EH11, EH5, EH3
 
 ##Sectional Recommendations
 
-Now, depends on the estimated quality of our service, we can make strategic consideration based on the the results above. 
+Now, depends on the estimated quality of our service, we make strategic considerations based on the the result. 
 
 ###Strategy 1 - Competition Avoidance:
 
@@ -1104,7 +1104,7 @@ General:EH8, EH9
 Stylish and Pubs & Bars: EH2, EH15
 
 
-###Strategy 2 - Business AgglomerationL
+###Strategy 2 - Business Agglomeration:
 
 Being very confident on the quality of our service, We locate our restaurant at a zip with high out-performing ratio to save our advertising cost and take advantage of the popularity of the location to ensure the source of customers. Here are the recommendation of post codes for different type of restaurants.
 
@@ -1126,7 +1126,7 @@ For strategy 2, it involves renting a place in the most popular region. As a res
 
 ####Choice of location
 
-For Fastfood & Takeaways, both EH3 and EH8 have a performance ratio close to zero and a fair amount of restaurants in the region. However EH3 and EH8 are quite different in terms of our two main consideration.First, EH3 has a performance level closer to zero while EH8 has a more negative performance level. On the otherhand, EH8 has much more Fastfood and Takeaways shops then EH3. 
+For Fastfood & Takeaways, both EH3 and EH8 have a performance ratio close to zero and a fair amount of restaurants in the region. However EH3 and EH8 are quite different in terms of our two main considerations.First, EH3 has a performance level closer to zero while EH8 has a more negative performance level. On the otherhand, EH8 has much more Fastfood and Takeaways shops then EH3. 
 
 ##Sessional Conclusion
 Consider that the negative performance ratio may indicate a saturated supply and EH3 is therefore decided to be a better location than EH8. SUch decision agrees well with our location decision in our previous session. 
