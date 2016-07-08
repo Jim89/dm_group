@@ -57,10 +57,12 @@ We decided to perform this analysis for Edinburgh. This was because we found ext
 
 
 
-# Review and data exploration -Analysis
-This analysis points out demand and preference of customers from a large amount of reviews, with high dimensionality. These topics can provide meaningful insights to opening a new restaurant by considering what customers care about in order to increase the Yelp ratings, which directly affects the revenue. But how can restaurant understand the demands of its customers from a large amount of reviews? For a relatively small collection of reviews, it may be possible to manually inspect and classify the contents of reviews into specific categories based on similarity. But to partition large volumes of text, the process would be extremely time consuming. Topic modelling greatly reduces the time needed to perform the classification and understand the actual contents. We hope to use topic modelling to identify what users care about most when giving their rating stars, and ultimately determine what a new restaurant should be doing in order to receive high ratings.
+# Exploration of Reviews 
+This analysis looks through reviews for topics or opportunities to take into account when opening a resturant in Edinburgh. For a relatively small collection of reviews, it may be possible to manually inspect and classify the contents of reviews into specific categories based on similarity, but this becomes time consuming for a dataset of 14,000+ reviews. 
 
-In this study, we applied a non-negative matrix factorization (NMF) approach for the extraction and detection of concepts or topics from reviews. NMF introduces a technique that simultaneously perform dimension reduction and clustering that identifies semantic features in a document collection and groups the documents into clusters on the basis of shared semantic features [1]. The extracted topics from 1-star and 2-star reviews were used as an indicator of bad practice whereas extracted topics from 4-star and 5-star reviews were used as an indicator of good practice for operating a restaurant.
+This section uses topic modelling to identify the topics users care about most when giving their rating stars, ultimately determining what a new restaurant should be doing in order to receive high ratings.
+
+A non-negative matrix factorization (NMF) approach is used to detect topics from reviews. NMF simultaneously performs dimensionality reduction and clustering to identify semantic features in a document collection and groups the documents into clusters on the basis of shared semantic features [1]. The extracted topics from 1-star and 2-star reviews were used as an indicator of bad practice whereas extracted topics from 4-star and 5-star reviews were used as an indicator of good practice for operating a restaurant.
 
 
 ## Description of datasets
@@ -101,9 +103,9 @@ review.text.head(10)
 knitr::include_graphics("Siang/2.png")
 ```
 
-## Data Cleansing
+**Data Cleansing**
 
-Clean up the text in review dataset.
+Text after cleaning up the text in review dataset:
 ```{r}
 # Referenced Regular Expression for email cleanup idea: 
 def cleanup(text):
@@ -147,7 +149,7 @@ review.text=review.text.apply(cleanup)
 review.text[28]
 ```
 
-Text after cleansing:
+
 
 ```{r eval = TRUE, echo=FALSE}
 knitr::include_graphics("Siang/3.png")
@@ -156,9 +158,7 @@ knitr::include_graphics("Siang/3.png")
 
 ## Inspection of review contents
 
-### Distribution of number of words
-
-It is crucial to only include reviews with a considerable amount of contents as the topic modelling will not be able to extract any insight from a short review. The length of reviews was therefore analysed and a minimum requirement on the length of review was implemented.
+**Distribution of number of words**
 
 ```{r}
 f, ax = plt.subplots(figsize=(15,7.5))
@@ -169,17 +169,18 @@ for count, x in zip(n, bin_centers):
     percent = '{:.2f}%'.format((float(count) / n.sum())*100)
     ax.annotate(percent, xy=(x, 0), xycoords=('data', 'axes fraction'),
     xytext=(0, -32), textcoords='offset points', va='top', ha='center')
-ax.set_xlabel('Count of reviews')
-ax.set_ylabel('Count of words in review')
+ax.set_xlabel('Count of words in review')
+ax.set_ylabel('Count of reviews')
 ```
 
 ```{r eval = TRUE, echo=FALSE}
 knitr::include_graphics("Siang/4.png")
 ```
+Only reviews with a considerable amount of contents should be included as the topic modelling will not be able to extract insights from short reviews. The length of reviews was therefore analysed and a minimum requirement on the length of review was implemented.
 
 It can be seen that almost 95% of reviews have length of more than 500 words, therefore, it is not necessary to remove any short reviews. The distribution of ratings was also examined to avoid inbalanced datasets.
 
-### Reviews VS Stars
+**Reviews VS Stars**
 
 ```{r}
 review.stars.value_counts(sort=False).plot(kind='bar',color="black")
@@ -192,10 +193,11 @@ knitr::include_graphics("Siang/5.png")
 
 Inituitively, we thought there would be more 1-star and 5-star reviews, however, the data shows otherwise, and the majority of reviews were 4-star and 5-star. It is also important to check the usefulness/reliability of reviews by examining their numbers of votes.
 
-### Reviews VS Votes
+**Reviews VS Votes**
+
 The majority of reviews have only one vote regardless of vote type (cool, useful or funny). So we decided not to remove reviews based on their numbers of votes (doing so would remove a significant amount of text from this analysis).
 
-#### Vote for cool
+**Votes for cool**
 
 ```{r}
 pd.crosstab(review.stars,review.votes_cool[review.votes_cool!=0],margins=True)
@@ -205,7 +207,7 @@ pd.crosstab(review.stars,review.votes_cool[review.votes_cool!=0],margins=True)
 knitr::include_graphics("Siang/6.png")
 ```
 
-#### Vote for funny
+**Votes for funny**
 
 ```{r}
 pd.crosstab(review.stars,review.votes_funny[review.votes_funny!=0],margins=True)
@@ -215,7 +217,7 @@ pd.crosstab(review.stars,review.votes_funny[review.votes_funny!=0],margins=True)
 knitr::include_graphics("Siang/7.png")
 ```
 
-#### Vote for useful
+**Votes for useful**
 
 ```{r}
 pd.crosstab(review.stars,review.votes_useful[review.votes_useful!=0],margins=True)
@@ -226,9 +228,9 @@ knitr::include_graphics("Siang/8.png")
 ```
 
 
-## Methodology and Procedure
+## Topic Modelling
 
-### Dividing dataset
+**Dividing the dataset**
 
 Reviews were split into two groups, 1 and 2 star reviews were interpreted as bad reviews and 4 and 5-star reviews were interpreted as good reviews. 3-star reviews were excluded in this analysis due to the mixed expression of customers (three stars could be a good or bad review).
 ```{r}
@@ -246,7 +248,7 @@ Example of good reviews:
 knitr::include_graphics("Siang/9.png")
 ```
 
-### Text feature extraction
+**Text feature extraction**
 
 A range of functions from the python scikit-learn package was used to extract features(words) from textual reviews content and create a document-term matrix, namely [1]-[3]:
 
@@ -268,9 +270,9 @@ term_document_matrix_bad = tfidfvectorizer_bad.fit_transform(review_bad.text)
 term_document_matrix_good = tfidfvectorizer_good.fit_transform(review_good.text)
 ```
 
-### Topic Modelling
+**Topic Modelling**
 
-NMF (Non-negative Matix Factorization) is a method of unsupervised learning for grouping a collection of documents and finding out abstract topics.  We applied the scikit-learn implementation of NMF with NNDSVD initialization.
+NMF (Non-negative Matix Factorization) is a method of unsupervised learning for grouping a collection of documents and finding out abstract topics. The scikit-learn package has an implementation of NMF with NNDSVD initialization.
 
 Nonnegative Double Singular Value Decomposition (NNDSVD) is typically used for overcoming sparseness of data in document-term matrix [8]. Here we set the number of topics to be equal to 25 and run NMF for 200 iterations, then get the factors W and H from the resulting model:
 
@@ -296,7 +298,6 @@ print "Generated factor W of size %s and factor H of size %s for good reviews" \
 knitr::include_graphics("Siang/10.png")
 ```
 
-## Results
 
 ### Top Terms by each topic {.tabset .tabset-fade}
 
@@ -375,7 +376,7 @@ knitr::include_graphics("Siang/12.png")
 ```
 
 
-###Summary of topics {.tabset .tabset-fade}
+### Topics in bad and good reviews {.tabset .tabset-fade}
 
 A summary of the 25 topics from the bad and good reviews - NMF model. An attempt to interpret the contents of each topic was made, keywords in each topic were manually examined and a description of each topic was then assigned. Experiments suggest 25 topics is optimal, allowing for a clear separation of topics. 
 
@@ -438,7 +439,7 @@ display(topic_table_good)
 knitr::include_graphics("Siang/14.png")
 ```
 
-###Comments
+### Analysis
 **Opportunities to explore when opening a restaurant in Edinburgh:**
 
 * Customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy. (Bad Review Topic 5)
@@ -463,23 +464,26 @@ knitr::include_graphics("Siang/14.png")
 * BBQ shops are doing very well in Edinburgh. (Good Review Topic 20)
 * Potato shops are doing very well in Edinburgh. (Good Review Topic 25)
 
-In conclusion, insights above that were extracted by topic modelling are very useful for a company that plans to open a new restaurant in Edinburgh, for example, it was clear that customers are not satisfied with the current fish and chips and chicken dishes in Edinburgh, a new restaurant could potentially target these specific sectors to fullfill the customer demand. Also, company should be careful with certain issues that were discovered from bad reviews, for example, topics such as unfriendly staffs, long wait and uncomfortable room temperature that frequently appeared in bad reviews could negatively affect customer experience. Finally, sectors that are doing very well in Edinburgh such as bars, pubs, BBQ and Potato shops are the areas that a new restraunt may not want to consider in order to avoid fierce competition.
+In conclusion, the insights which were extracted by topic modelling are very useful for planing openning a new restaurant in Edinburgh, for example, it was clear that customers are not satisfied with the current fish and chips and chicken dishes in Edinburgh, a new restaurant could potentially target these specific sectors to full fill the customer demand. Also, the resturant should be careful with certain issues from bad reviews, for example, unfriendly staff, long waitign times, and uncomfortable room temperatures frequently impacted the customer experience. Finally, sectors that are doing very well in Edinburgh such as bars, pubs, BBQ and Potato shops are areas that a new restraunt may not want to consider to avoid fierce competition.
 
 
-# Location and Competition - Analysis
-This part of the analysis estimates the demand for restaurants in a zip code for Edinburgh and finds out which type of cuisine people are looking for. 
 
+
+
+#Location and Competition 
+This section estimates the demand for different restaurants per Edinburgh zip code, and looks at the competition per zip.
 The following steps were performed: 
-1.	Data cleaning to extract zip codes and restaurant types;
+
+1.	Data cleaning to extract zip codes and restaurant types.
 2.	Integrated external demographic data; population, income, and hotels data with the Yelp data.
-3.	Calculate metrics for each area in order to address the main objective.
+3.	Calculate metrics for each area in order to recommend a location and cusine type.
 
-###Preparing the Data for Competition Analysis.
-We used the pandas Python package to filter the data to just that relevant to Edinburgh. Noting that the data contained many business types, we made the assumption that the business was a restaurant if it's category field stated resturant. We then used this filtered data to extract the relevant tables for check-ins, reviews, tips and users. This provided us with data on 1215 restaurants in Edinburgh that were registered on Yelp.
+## Cleaning the Data
+The pandas Python package was used to filter the yelp data to resturants, check-ins, reviews, tips, and users in Edinburgh. This provided data on 1215 restaurants in Edinburgh registered on Yelp.
 
-Regarding restaurant cuisine type, we noticed that many different attributes were used to explain the restaurant category. For example: "Gastropubs,Bars,Scottish,Nightlife,Restaurants". As we were primarily interested in cuisine, we made a list of cuisine keywords such as "Italian" or "Scottish". We searched the category for such keywords in order to assign each restaurant to a cuisine type. If there more than one cuisine was detected, we will focused on the cuisine that was the most expressive of the type of food. 
+Regarding restaurant cuisine type, where many different attributes were used to explain the restaurant category, the most expressive type of cuisine type was assigned. For example a resturant might have "Gastropubs,Bars,Scottish,Nightlife,Restaurants", so the cuisine keyword "Scottish" might be assigned. 
 
-In order to combine the external demographic data, we extracted the zip code from each restaurant's address. In doing so we only focused on the general area, the first three or four letters of the zip code. For example EH6 or EH12.
+The first three or four letters of each resturant's zip code was extracted from their address, which enables the joining of external demographic data. For example EH6 or EH12.
 
 The data obtained from the Edinburgh government website [4] provided locality and ward demographic profiles. It contained data on; gender, age, housing, employment, education and professions, income, benefits, health and disability, lifestyle, satisfaction with services, and Scottish Index of Multiple Deprivation data - of which population, income and property prices were of primary interest. However, this data was organized by ward, with each ward containing many zip codes. Figure 1 maps different polling districts and figure 2 maps wards districts. 
 
@@ -489,9 +493,9 @@ The data obtained from the Edinburgh government website [4] provided locality an
 
 !["Figure 2: Wards" ](figure2.png)
 
-To attribute ward demographic data to each zip we used an external data set of polling districts from the City of Edinburgh Mapping portal [5]. Each polling location has a zip code and a ward. Where a zip code makes up the majority of occurances in the ward, the demographic data is all attributed to the zip. For example if the ward "Almond" has 4 zip codes in EH4 and 1 in EH2, EH4 will be considered as Almond ward, and takes the Almond demographic data.
+To attribute ward demographic data to each zip an external data set of polling districts from the City of Edinburgh Mapping portal [5] was used. Each polling location has a zip code and a ward. When a zip code makes up the majority of occurances in a ward, the demographic data is all attributed to that zip. For example if the ward "Almond" has 4 zip codes in EH4 and 1 in EH2, EH4 will be considered as ward Almond, and takes the Almond demographic data.
 
-As some zip codes such as EH1 and EH2 are really small, some zip codes were not assigned to any single ward using the method above. For these zip codes, population numbers were attributed in proportion to how many polling stations zip's are in the ward. For example the central city  ward in general is made up of EH1 and EH2. So the population for central city ward is  assigned evenly into the populations of EH1 and EH2. Income and property prices remained the same.
+As some zip codes such as EH1 and EH2 are really small, they were not assigned to any single ward using the method above. For these zip codes, population numbers were attributed in proportion to the number of polling stations zip's in the ward. For example the central city ward in general is made up of EH1 and EH2. So the population for central city ward is assigned evenly into the populations of EH1 and EH2. Income and property prices remained the same.
 
 Data on all the hotels in Edinburgh was also downloaded from booking.com and integrated. This data was cleansed, to get hotel counts by zip code.
 
@@ -610,27 +614,27 @@ wardsMelt.to_csv('edinPopulation.csv')
 ```
 
 ## Analysis
-We used Tableau to undertake an initial exploratory data analysis. Figure 3 below shows the number of stores in Edinburgh. Figure 4 shows the type of cuisine that has the most stores. We noticed that in general, Italian and British cuisine are the most popular. The city centre (zip codes EH1 and EH2) contained the greatest number of restaurants.
+Figure 3 below shows the number of stores in Edinburgh. Figure 4 shows the type of cuisine that has the most stores. In general, Italian and British cuisine are the most popular. The city centre (zip codes EH1 and EH2) contained the greatest number of restaurants.
 
 
-!["Figure 3: Density Map of Restaurants/ Figure 4 Number of Restaurants by Cuisine " ](figure3.png)
+!["Figure 3: Density Map of Restaurants / Figure 4 Number of Restaurants by Cuisine " ](figure3.png)
 
-We also looked at the relationship between cuisine type and the number of reviewed. We decided to use the amount of reviews for a restaurant as an indicator of the number of visitors. We decided against using the number of users as an indicator because a user can visit a restaurant twice and give two reviews which will be counted as two visits. This information was then used as an estimate of demand within each zip code.
+The relationship between cuisine type and the number of reviews (demand) was also inspected (figure 5). 
 
 
 !["Figure 5: Cuisines with Reviews" ](figure5.png)
 
-Figure 5  shows that British food has a very high number of reviews in Edinburgh, combined with the knowledge that there are more Italian than British restaurant in general, it might show that British restaurants are quite popular. 
+Figure 5 shows that British food has a very high number of reviews in Edinburgh, despite there being more Italian resturants than British (figure 4). It suggests that British restaurants are quite popular and under supplied. 
 
-In certain places, such as EH2 which is shown below in Figure 6 shows that there are more Italian than British restaurants and so we can capitalize on the lack of British food to open a British restaurant there.
+In certain places, such as EH2 (Figure 6) there are substantially more Italian resturants than British. It might be worth capitalising on the gap in the market in EH2.
 
 !["Figure 6 EH2 Number of Stores and Amount of Cuisines in Edinburgh" ](figure6.png)
 
-Interestingly, the restaurants in the city centre (EH1 and EH2) had the lowest rating average rating (Figure 7).  An explanation for this is that there are many restaurants in the city centre and hence many low scores pull down the overall average. From this we can potentially infer that if our restaurant wants to focus on ratings, we should not try to put our restaurant in the city centre.
+Interestingly, the restaurants in the city centre (EH1 and EH2) had the lowest rating average rating (Figure 7, lightpatch in centre), which is contrary to intuition: the centre should have the best resturants. This could be explained by many of the restaurants in the city centre having low scores which pull down the overall average. If one had wanted to keep the resturant in a high ratings area (which attracts visitors) then the restaurant should not be placed in the city centre.
 
-!["Figure 7: Average rating per zip code" ](figure7.png)
+!["Figure 7: Average rating per zip code and number of resturants by cuisine" ](figure7.png)
 
-We  decided to calculate the demand using the number of reviews. We understand the number of reviews may not be the best indicator of how many customers a restaurant had, but it served as a good proxy in the absence of more concrete data. Figure 8 shows that the locations with the most reviews are EH1, EH2, EH3 and EH8. We used this information in order to focus our analysis on these areas.
+The demand a resturant or zip recieves was proxied using the amount of reviews. Note that the number of users could have also been used as an proxy, but was decided against as users can visit a restaurant twice and give two reviews. Figure 8 shows the locations with the most reviews: EH1, EH2, EH3 and EH8. The analysis is focused on these areas.
 
 
 !["Figure 8: Number Reviews per Restaurant and zip" ](figure8.png)
@@ -664,25 +668,27 @@ statistics.columns = ['pop/rest','income/rest','property/rest','hotels/rest','Nu
 statistics = statistics.dropna()
 ```
 
-We generated metrics for each zip code (table 1). We considered the ratios of: total population per zip to number of restaurants per zip; average income per zip to the number of restaurants per zip; the total number of properties to the number of restaurants per zip; and the total number of hotels to the number of restaurants per zip. 
+Metrics for each zip code are shown in table 1. Included are the ratios of: total population to number of restaurants per zip, average income to the number of restaurants per zip, the total number of properties to the number of restaurants per zip, and the total number of hotels to the number of restaurants per zip. 
 
 !["Table 1: Metrics on zip code" ](table1.png)
 
 
-The results of our exploratory analysis led us to choose to build a restaurant at a central location (EH1, EH2, EH3 and EH8). We refer to these areas as our "candidate areas".  EH8 has the largest ratio of population to restaurants compared to the other candidate areas. However, it also has the lowest number of hotels per restaurant. This may mean that there are fewer tourists in the area (who we may wish to attend our restaurant). In contrast, EH3 has attractive population to restaurant and  hotel to restaurant ratios. Furthermore, its property value to restaurant ratio is low potentially making it not too expensive to buy a restaurant there. 
+Stating again, the analysis is focused on candidate areas with high demand EH1, EH2, EH3 and EH8. EH8 has the largest ratio of population to restaurants compared to the other candidate areas. However, it also has the lowest number of hotels per restaurant. This suggests that there will be fewer tourists in the area. In contrast, EH3 has high population to restaurant and hotel to restaurant ratios. Furthermore, EH3's property value to restaurant ratio is low potentially making it cheaper to buy a restaurant there. 
 
 ##Recommendation
 
 !["Figure 9: Density Map of Restaurant and Number of Restaurant by Cuising for zip EH3" ](figure9.png)
 
 
-As mention in the analysis, we decided that we will focus on the zip code of EH3. As shown above in Figure 9, British cuisine is not too saturated as there are actually more Chinese restaurants than British restaurants and also a lot of Indian Italian and Thai restaurants. Further using Figure 5, British restaurants seems to be the most popular and hence we should capitalize on the popularity. 
+Figure 9 shows British cuisine is not too saturated in EH3 as there are more Chinese restaurants than British restaurants and also a lot of Indian Italian and Thai restaurants. EH3 is therefore a potentially good area to open a British resturant.
 
-Using the topic modeling method, two recommendations we found is customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy and customers are also not particularly happy with chicken dishes in Edinburgh. Therefore in EH3, we should focus on being really good at making chicken as well as Fish. We further recommend that "Chicken and Fish" are the only food offered in the restaurant so that we can specialize in making it good.
+The topic modeling analysis from the first section, found two recommendations 1) that customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy and 2) that customers are also not particularly happy with chicken dishes in Edinburgh. Therefore in EH3, teh resturant should focus on being really good at making chicken as well as Fish. It is further recommended that "Chicken and Fish" are the only foods offered in the restaurant so that it can specialize in making it good.
 
-# Analysis - Type and Characteristics
+# Type and Characteristics
 
-In this part, we will classify different kind of restaurants with hierachical clustering technique to find out different types of restaurants. After that we would analyse the distribution of these restaurants and compare it with the distribution of reviews given to these restaurants. By analysing the distribution difference between top reviews and restaurants, we can find out areas where customers do not receive enough satisfying services and locate a strategic location for our restaurant.
+This section classifies different kinds of restaurants using hierachical clustering to.........
+
+After that we would analyse the distribution of these restaurants and compare it with the distribution of reviews given to these restaurants. By analysing the distribution difference between top reviews and restaurants, we can find out areas where customers do not receive enough satisfying services and locate a strategic location for our restaurant.
 
 ```{r include=FALSE}
 
@@ -1088,7 +1094,7 @@ Stylish and Pubs & Bars: EH10, EH11, EH5, EH3
 
 Now, depends on the estimated quality of our service, strategic considerations are made based on the the result. 
 
-###Strategy 1 - Competition Avoidance:
+**Strategy 1 - Competition Avoidance:**
 
 We locate our restaurant at a zip with a relatively lower percentage of top reviews than the the percentage of restaurants to avoid competition with top quality restaurants and take up those unsatisfied demand in the zip.
 However, as the amount of reviews is also a proxy of traffic, we may want to as well avoid under-performing zips as well. Hence, the best location would be zips having the supply demand ratio close to zero while having a certain amount of of restaurants of the same type. 
@@ -1104,7 +1110,7 @@ General:EH8, EH9
 Stylish and Pubs & Bars: EH2, EH15
 
 
-###Strategy 2 - Business Agglomeration:
+**Strategy 2 - Business Agglomeration:**
 
 Being very confident on the quality of our service, We locate our restaurant at a zip with high out-performing ratio to save our advertising cost and take advantage of the popularity of the location to ensure the source of customers. Here are the recommendation of post codes for different type of restaurants.
 
@@ -1118,17 +1124,17 @@ General: EH2
 
 Stylish and Pubs & Bars: EH1
 
-###Choice and recommendation for our restaurant
+**Choice and recommendation for our restaurant**
 
-####Choice of strategy
+**Choice of strategy**
 
 For strategy 2, it involves renting a place in the most popular region. As a result, the cost of investment would be higher than strategy 1. Without further knowledge about the taste and preference of the customers, strategy 2 will impose much more risk than strategy 1. Therefore in the experimental stage, strategy 1 is more preferred for its lower risk exposure. 
 
-####Choice of location
+**Choice of location**
 
 For Fastfood & Takeaways, both EH3 and EH8 have a performance ratio close to zero and a fair amount of restaurants in the region. However EH3 and EH8 are quite different in terms of our two main considerations.First, EH3 has a performance level closer to zero while EH8 has a more negative performance level. On the otherhand, EH8 has much more Fastfood and Takeaways shops then EH3. 
 
-##Sessional Conclusion
+**Sessional Conclusion**
 Consider that the negative performance ratio may indicate a saturated supply and EH3 is therefore decided to be a better location than EH8. SUch decision agrees well with our location decision in our previous session. 
 
 
