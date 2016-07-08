@@ -902,7 +902,7 @@ df3_filtered['cluster']=clusters
 !["Fig 4: Rate of increase in Height of the last 20 merges" ](kin_fig4.png)
 
 From the plots, a cut with 5 clusters gives the most desired result.
-Now to visualise the results.
+The clustering result is shown below.
 
 ```{r}
 from scipy.cluster.hierarchy import fcluster
@@ -1009,7 +1009,7 @@ They are generally group and kids friendly.
 
 ##Performance Analysis
 
-Now we can visualise the distribution of different types of restaurants in different zips and analyse the supply of different kind of restaurants. 
+The distribution of different types of restaurants in different zips and the distribution of supply of different kind of restaurants are analysed in the following tables.
 
 ```{r}
 df3_filtered["zip"]=df2["zip"]
@@ -1036,19 +1036,19 @@ top_views
 
 
 
-Similarly, we can look at the the distribution of top rating review for each restaurant types in different zips and use it as an indicator of popular location for certain type of restaurants.
+Similar analysis can be done for the distribution of top rating review for each restaurant types in different zips. It is used as an indicator of popular location for certain type of restaurants.
 
 !["Table 2: Reviews distributions across zips" ](kin_fig11.png)
 
 Table 2 above shows the percentage of distribution of reviews for the same type of restaurants across the zips, each row sums up to 100% of that respective style. 
 
-From the tables the above, we further calculate the ratio of restaurants receiving top reiviews. For instance, fastfood and takeaways in EH1 receives 39.7% of top reviews in the Fastfood & Takeaways category with only 22.8% of Fastfood & Takeaway restaurants located in the zip. It implies that the quality of Fastfood & Takeaways in EH1 are generally more satisfying than those located in other zip.
+From the tables the above, the ratio of restaurants receiving top reiviews is calculated. For instance, fastfood and takeaways in EH1 receives 39.7% of top reviews in the Fastfood & Takeaways category with only 22.8% of Fastfood & Takeaway restaurants located in the zip. It implies that the quality of Fastfood & Takeaways in EH1 are generally more satisfying than those located in other zip.
 
-To observe the differences, we can look at Table 3 below.
+To observe the differences, please look at Table 3 below.
 
 !["Table 3: Disagreement of percentage distributions of review and restaurant across zips" ](kin_fig13.png)
 
-To observe the performance level, we created a ratio as an indicator of high quality region as an indicator of out-performing region in Table 4 below.
+To observe the performance level, a ratio as an indicator of high quality region is created. The indicator of out-performing region is displayed in Table 4 below.
 
 $$\frac{(\text{top review%} - \text{restaurants%})}{\text{%restaurants}}$$
 
@@ -1059,7 +1059,7 @@ $$\frac{(\text{top review%} - \text{restaurants%})}{\text{%restaurants}}$$
 (top_views-supply)/supply
 ```
 
-From the calculation above, we can find an out-performing zips for different types of restaurants.
+From the calculation above, out-performing zips for different types of restaurants can be identified.
 
 Out-performing regions:
 
@@ -1086,7 +1086,7 @@ Stylish and Pubs & Bars: EH10, EH11, EH5, EH3
 
 ##Sectional Recommendations
 
-Now, depends on the estimated quality of our service, we make strategic considerations based on the the result. 
+Now, depends on the estimated quality of our service, strategic considerations are made based on the the result. 
 
 ###Strategy 1 - Competition Avoidance:
 
