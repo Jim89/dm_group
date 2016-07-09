@@ -53,8 +53,17 @@ You work for a large corporation that owns a collection of restaurants of differ
 Your task is to analyse the dataset and give recommendations on strategy, based on the reviews, location (either neighbourhood or zipcode level) and competition. Also give estimates on volumes and revenues of the potential undertaking. You may have to check out what the price-range attributes signify by visiting the Yelp website.
 
 ## Methodology
-We decided to perform this analysis for Edinburgh. This was because we found extensive demographic data that could be easily integrated with the Yelp data.  We also had better knowledge of the zip codes as Edinburgh is still in the UK. The Yelp data were provided as JSON files. 
+This analysis is conduced for Edinburgh only. This was because extensive demographic data was found that could be easily integrated with the Yelp dataset. The team also had better knowledge of the zip codes as Edinburgh is still in the UK. 
+This report is split into three main analyses, then concluded with an estimation of revenues and a summary.
 
+**Topic Modelling Analysis**
+The reviews of Edinburgh's resturants are grouped into topics using a NMF topic modelling method to look for potential topics or opportunities to exploit.
+
+**Demand and Location Analysis**
+Summary statistics such the number of reviews per resturant and by cuisine are mapped out, to give an indiaciton of relative demand by location, which allows for a recommendation of location.
+
+**Competition and Style Analysis**
+A metric of competition is computed for different styles of resturant to recommend the appropriate attributes of the resturant.
 
 
 # Exploration of Reviews 
@@ -176,9 +185,9 @@ ax.set_ylabel('Count of reviews')
 ```{r eval = TRUE, echo=FALSE}
 knitr::include_graphics("Siang/4.png")
 ```
-Only reviews with a considerable amount of contents should be included as the topic modelling will not be able to extract insights from short reviews. The length of reviews was therefore analysed and a minimum requirement on the length of review was implemented.
+Only reviews with a considerable amount of contents should be included as the topic modelling will not be able to extract insights from short reviews. The length of reviews was therefore analysed and a minimum requirement on the length of review was implemented. But in general even without cutting out reviews, the number of words are high, more than 85% of reviews have more than  250  words. 
 
-It can be seen that almost 95% of reviews have length of more than 500 words, therefore, it is not necessary to remove any short reviews. The distribution of ratings was also examined to avoid inbalanced datasets.
+The distribution of ratings was also examined to avoid inbalanced datasets.
 
 **Reviews VS Stars**
 
@@ -439,7 +448,7 @@ display(topic_table_good)
 knitr::include_graphics("Siang/14.png")
 ```
 
-### Analysis
+###Recommendation
 **Opportunities to explore when opening a restaurant in Edinburgh:**
 
 * Customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy. (Bad Review Topic 5)
@@ -470,7 +479,7 @@ In conclusion, the insights which were extracted by topic modelling are very use
 
 
 
-#Location and Competition 
+#Location and Demand  
 This section estimates the demand for different restaurants per Edinburgh zip code, and looks at the competition per zip.
 The following steps were performed: 
 
@@ -682,13 +691,14 @@ Stating again, the analysis is focused on candidate areas with high demand EH1, 
 
 Figure 9 shows British cuisine is not too saturated in EH3 as there are more Chinese restaurants than British restaurants and also a lot of Indian Italian and Thai restaurants. EH3 is therefore a potentially good area to open a British resturant.
 
-The topic modeling analysis from the first section, found two recommendations 1) that customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy and 2) that customers are also not particularly happy with chicken dishes in Edinburgh. Therefore in EH3, teh resturant should focus on being really good at making chicken as well as Fish. It is further recommended that "Chicken and Fish" are the only foods offered in the restaurant so that it can specialize in making it good.
+The topic modeling analysis from the first section, found two recommendations 1) that customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy and 2) that customers are also not particularly happy with chicken dishes in Edinburgh. Therefore in EH3, the resturant should focus on being really good at making chicken as well as Fish. It is further recommended that "Chicken and Fish" are the only foods offered in the restaurant so that it can specialize in making it good.
 
-# Type and Characteristics
+# Attributes and Competition
 
-This section classifies different kinds of restaurants using hierachical clustering to.........
+This section clusters restaurants by their attributes into 5 groups using hierachical clustering and analyses the competition in each zip code to find opportunities by resturant group. 
 
-After that we would analyse the distribution of these restaurants and compare it with the distribution of reviews given to these restaurants. By analysing the distribution difference between top reviews and restaurants, we can find out areas where customers do not receive enough satisfying services and locate a strategic location for our restaurant.
+Groups are defined as classy, general, fastfood, stylish pub & bars, and other. A metric of competition is defined for these groups for each zip code to recommend the attributes of the new resturant.
+
 
 ```{r include=FALSE}
 
@@ -803,11 +813,11 @@ def hclst(data,method,distance):
     
 ```
 
-##Restaurants Types Analysis
+##Attributes
 
-We have total 1215 restaurants in our dataset with 55 of them having no attributes at all. Amount these 1215 restaurants, we clustered them in to 5 different categories to analyse the location and density of different type restaurants in different regions within the city.
+There are a total 1215 restaurants in dataset, with 55 having no attributes at all. Attributes are factors such as casual, classy, open bar, desert, good for groups, good for children, etc. These 1215 resturants are first clustered into 5 different categories.
 
-After considering different distance metrics and linkage, Euclidean distance metric and ward linkage are chosen for their simplicity and better structured dendrogram. 
+After considering different distance metrics and linkages, the Euclidean distance and ward linkage was chosen for their simplicity and better structured dendrogram. 
 
 ```{r}
 #Consider a few different linkage 
@@ -856,7 +866,7 @@ clusters = fcluster(R1[0], max_d, criterion='distance')
 df3_filtered['cluster']=clusters
 ```
 
-!["Fig 1: Dendrogram on style clustering" ](kin_fig1.png)
+!["Fig 10: Dendrogram on style clustering" ](kin_fig1.png)
 
 
 
@@ -901,14 +911,14 @@ clusters = fcluster(R1[0], max_d, criterion='distance')
 df3_filtered['cluster']=clusters
 ```
 
-!["Fig 2: Inconsistency Measure of last 20 merges" ](kin_fig2.png)
+!["Fig 11: Inconsistency Measure of last 20 merges" ](kin_fig2.png)
 
-!["Fig 3: Height of the last 20 merges" ](kin_fig3.png)
+!["Fig 12: Height of the last 20 merges" ](kin_fig3.png)
 
-!["Fig 4: Rate of increase in Height of the last 20 merges" ](kin_fig4.png)
+!["Fig 13: Rate of increase in Height of the last 20 merges" ](kin_fig4.png)
 
 From the plots, a cut with 5 clusters gives the most desired result.
-The clustering result is shown below.
+The each cluster's attribute count as a percentage of the population is shown below, as barplots.
 
 ```{r}
 from scipy.cluster.hierarchy import fcluster
@@ -941,7 +951,9 @@ C1.ix[1,1:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==1]
 ```
 
-!["Fig 5: Cluster 1: Unknowns" ](kin_fig5.png)
+**Cluster 1**
+
+!["Fig 14: Cluster 1: Unknowns" ](kin_fig5.png)
 
 Cluster 1 contains 382 restaurants. Most of these restaurants do not provide much information for classification.
 
@@ -955,11 +967,12 @@ C2.ix[1,0:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==2]
 ```
 
-!["Fig 6: Cluster 2: The Classies" ](kin_fig6.png)
-Cluster 2 contains 119 restaurants. They are the most expensive and classy type of restaurants, providing mainly dinner service. 
-Most of them require customers to be dressy. They are more the quiet type of restaurants and some of them provide background music.
-Those stylish restaurants with classy, romantic, intimate, trendy and upscale atmosphere are mainly in this cluster. 
-They are generally good for groups and dating.
+**Cluster 2**
+
+!["Fig 15: Cluster 2: The Classies" ](kin_fig6.png)
+
+Cluster 2 contains 119 restaurants. They are the most expensive and classy type of restaurants (3x$), with classy, romantic, intimate, trendy and upscale atmospheres. The bar plot shows they are characterised by a full bar, dinner service, waiters, and taking reservations. Most of them require customers to be 'dressy', and are good for groups and dating. They are more quiet and some provide background music.
+
 
 ```{r}
 plt.show()
@@ -971,13 +984,13 @@ C3.ix[1,0:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==3]
 ```
 
-!["Fig 7: Cluster 3: The Stylish and Pubs & Bars" ](kin_fig7.png)
+**Cluster 3**
 
-Cluster 3 contains 310 restaurants. These are stylish restaurants and pubs & bars priced at level 2, providing mainly dinner and lunch. 
+!["Fig 16: Cluster 3: The Stylish and Pubs & Bars" ](kin_fig7.png)
 
-They are less quiet, few of them can even be loud or very loud. This clusters contain most of the restaurants that provide dj, jukebox, live and video music and also TV boardcast.
-Some of these restaurants are quite stylish with lipster, intimate or trendy style.
-They are mainly good for groups.
+Cluster 3 contains 310 restaurants. These are stylish restaurants and pubs & bars priced at level 2 (2x$sign on yelp => $11-30 ), providing mainly dinner and lunch. 
+
+These are less quiet, few of them can even be loud or very loud. These clusters contain most of the restaurants that provide dj, jukebox, live and video music and also TV boardcast. Some of these restaurants are quite stylish with lipster, intimate or trendy styles. They are mainly good for groups.
 
 ```{r}
 plt.show()
@@ -989,11 +1002,11 @@ C4.ix[1,0:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==4]
 ```
 
-!["Fig 8: Cluster 4: The Fastfood and Takeaways" ](kin_fig8.png)
+**Cluster 4**
 
-There are 171 restaurants in cluster 4. These are mainly the cheapest kind of restaurants, probably fastfood restaurants as most of them do not provide waiter service, wine nor having any bars.
-Their embience level is quite average.
-They are mainly good for kids and also suitable for groups. 
+!["Fig 17: Cluster 4: The Fastfood and Takeaways" ](kin_fig8.png)
+
+There are 171 restaurants in cluster 4. This group are the cheapest kind of restaurants ($ sign), probably fastfood restaurants as most of them do not provide waiter service, wine nor have bars. They are associated by being casual, being good for groups, and kids, having an average noise level, and takeout.
 
 ```{r}
 plt.show()
@@ -1005,17 +1018,15 @@ C5.ix[1,0:56].plot(kind='bar',ylim=[0,1])
 df3_filtered[df3_filtered.cluster==5]
 ```
 
-!["Fig 9: Cluster 5: The Generals" ](kin_fig9.png)
+**Cluster 5**
 
-Cluster 5 contains 233 restaurants. They are mainly general restaurants, providing brunch, dinner and lunch. 
-They are less quiet but not the noisiest type. 
-This restaurants are not very stylish and almost none of them provide any music.
-They are generally group and kids friendly.
+!["Fig 18: Cluster 5: The Generals" ](kin_fig9.png)
+
+Cluster 5 contains 233 restaurants. They are general restaurants, providing brunch, dinner and lunch. They are less quiet but not the noisiest type. These restaurants are not very stylish and almost none of them provide any music. They are generally group and kids friendly.
 
 
-##Performance Analysis
-
-The distribution of different types of restaurants in different zips and the distribution of supply of different kind of restaurants are analysed in the following tables.
+##Competition Analysis
+**Distribution of Resturant clusters across zip codes**
 
 ```{r}
 df3_filtered["zip"]=df2["zip"]
@@ -1027,11 +1038,13 @@ supply=pd.crosstab(df3_filtered["Type"],df3_filtered["zip"]).apply(lambda r: r*1
 supply
 ```
 
+!["Table 2: Restaurants distributions across zips" ](kin_fig10.png)
 
-!["Table 1: Restaurants distributions across zips" ](kin_fig10.png)
+Table 2 shows the distribution of the same type of restaurants across the zips as a percentage, each row sums up to 100%. For example, 35.6% of classy resturant are located in EH1.
 
-Table 1 above shows the percentage of distribution of the same type of restaurants across the zips, each row sums up to 100% of that respective style. 
+<br>
 
+**Distribution of good reviews across zip codes by resturant cluster**
 ```{r}
 review=pd.read_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/final_group_project/Kane Wu/edinReview.csv",header=0)
 review=review.merge(df3_filtered, on=['business_id'], how='outer')
@@ -1040,108 +1053,37 @@ top_views=pd.crosstab(review_stars["Type"],review_stars["zip"]).apply(lambda r: 
 top_views
 ```
 
+!["Table 3: Reviews distributions across zips" ](kin_fig11.png)
 
+Table 3 similarly shows the distribution of good reviews for each restaurant cluster in different zips. Each row sums to 100%. For instance, for fastfood and takeaways 39.7% of 4and 5 star reviews are in from EH1.
 
-Similar analysis can be done for the distribution of top rating review for each restaurant types in different zips. It is used as an indicator of popular location for certain type of restaurants.
+<br>
 
-!["Table 2: Reviews distributions across zips" ](kin_fig11.png)
-
-Table 2 above shows the percentage of distribution of reviews for the same type of restaurants across the zips, each row sums up to 100% of that respective style. 
-
-From the tables the above, the ratio of restaurants receiving top reiviews is calculated. For instance, fastfood and takeaways in EH1 receives 39.7% of top reviews in the Fastfood & Takeaways category with only 22.8% of Fastfood & Takeaway restaurants located in the zip. It implies that the quality of Fastfood & Takeaways in EH1 are generally more satisfying than those located in other zip.
-
-To observe the differences, please look at Table 3 below.
-
-!["Table 3: Disagreement of percentage distributions of review and restaurant across zips" ](kin_fig13.png)
-
-To observe the performance level, a ratio as an indicator of high quality region is created. The indicator of out-performing region is displayed in Table 4 below.
-
-$$\frac{(\text{top review%} - \text{restaurants%})}{\text{%restaurants}}$$
-
-!["Table 4: Ratio of disagreement of percentage distributions of review and restaurant across zips" ](kin_fig12.png)
-
-
+**Measure of outperformance (or competition) per zip code**
 ```{r}
 (top_views-supply)/supply
 ```
 
-From the calculation above, out-performing zips for different types of restaurants can be identified.
+!["Table 4: Ratio of disagreement of percentage distributions of review and restaurant across zips" ](kin_fig12.png)
 
-Out-performing regions:
+A ratio is created to observe the performance (or the competition) of a resturant type per zip code (table 4):
 
-Classy: EH2, EH7, EH8, EH1 
+$$competition= \frac{(\text{good reviews%} - \text{restaurants%})}{\text{restaurants%}}$$
 
-Fastfood & Takeaways: EH1, EH7, EH3
+It can also be thought of as $\frac{\text{good reviews%}}{\text{restaurants%}} -1$, which is really asking whether there are more good reviews in a zip code than one would expect as a proportion of the resturants?". The piviot is 0, where +ve is yes and -ve is no.
 
-General: EH2, EH1, EH3, EH8
-
-Stylish and Pubs & Bars: EH1, EH8, EH2
+<br>
 
 
-Under-performing regions:
+##Recommendation
 
-Classy: EH5, EH10, EH12, EH11 
+A potential strategy to pursue in choosing the resturant location is to pick a zip code with a high out-performance (or competition) ratio. Since the ratio is a proxy for volumes, customers will be drawn to these places, it could also save advertising costs. However, such a strategy would also be high risk as there will be high set up costs and intense competition in a popular location. 
 
-Fastfood & Takeaways: EH14, EH16, EH12, EH14, EH6
-
-General: EH12, EH16, EH15, EH4
-
-Stylish and Pubs & Bars: EH10, EH11, EH5, EH3
+Given that the location analysis already choosen a zip code, EH3, choosing the theme/type of resturant is all that's left. For EH3, classy has a competition ratio of -0.2, styish bars & pubs has a ratio of -0.2, fastfood & takeaways 0.0, unknown 0.0, and general 0.2. Based off the gap in the markets in EH3, the resturant should consider being either a classy resturant or a  stylish bar & pub with good fish & chips and chicken dishes. The latter makes more sense, as the population income at EH3 is not relatively high.
 
 
-
-##Sectional Recommendations
-
-Now, depends on the estimated quality of our service, strategic considerations are made based on the the result. 
-
-**Strategy 1 - Competition Avoidance:**
-
-We locate our restaurant at a zip with a relatively lower percentage of top reviews than the the percentage of restaurants to avoid competition with top quality restaurants and take up those unsatisfied demand in the zip.
-However, as the amount of reviews is also a proxy of traffic, we may want to as well avoid under-performing zips as well. Hence, the best location would be zips having the supply demand ratio close to zero while having a certain amount of of restaurants of the same type. 
-
-To select the best location, we first locate the zips with performance level clost to zero and then look for the zips with the highest amount of restaurants of the same type. The recommendations are listed below.
-
-Classy: EH6
-
-Fastfood & Takeaways: EH8, EH3
-
-General:EH8, EH9
-
-Stylish and Pubs & Bars: EH2, EH15
-
-
-**Strategy 2 - Business Agglomeration:**
-
-Being very confident on the quality of our service, We locate our restaurant at a zip with high out-performing ratio to save our advertising cost and take advantage of the popularity of the location to ensure the source of customers. Here are the recommendation of post codes for different type of restaurants.
-
-To select our best location, we first locate the zips with highest performing ratio and then look for the zips with the highest amount of restaurants of the same type.
-
-Classy: EH2
-
-Fastfood & Takeaways: EH1
-
-General: EH2
-
-Stylish and Pubs & Bars: EH1
-
-**Choice and recommendation for our restaurant**
-
-**Choice of strategy**
-
-For strategy 2, it involves renting a place in the most popular region. As a result, the cost of investment would be higher than strategy 1. Without further knowledge about the taste and preference of the customers, strategy 2 will impose much more risk than strategy 1. Therefore in the experimental stage, strategy 1 is more preferred for its lower risk exposure. 
-
-**Choice of location**
-
-For Fastfood & Takeaways, both EH3 and EH8 have a performance ratio close to zero and a fair amount of restaurants in the region. However EH3 and EH8 are quite different in terms of our two main considerations.First, EH3 has a performance level closer to zero while EH8 has a more negative performance level. On the otherhand, EH8 has much more Fastfood and Takeaways shops then EH3. 
-
-**Sessional Conclusion**
-Consider that the negative performance ratio may indicate a saturated supply and EH3 is therefore decided to be a better location than EH8. SUch decision agrees well with our location decision in our previous session. 
-
-
-
-# Analysis - Price, Volume and Revenue
-In order to calculate potential revenue, we have  estimated the amount of customers a restaurant may receive. 
-In order to do this we first considered the check-in dataset. However, we realised that it did not provide a good estimate of the number of customers as check-ins are based on the amount of offers and so represent a biased value for our analysis. The Yelp site [6] states that "Certain businesses offer discounts when yelpers check in to that business" and further states "You check in with the yelp app on an iPhone/iPad or Android device. You have to be within a close proximity to a location to check-in and the app used your phones GPS to measure your location." Hence it is likely that most of the customer visits will not have a check-in event (even if the customer came from Yelp) as the customer will most likely not open the application and check-in. 
+#Price, Volume and Revenue
+To calculate potential revenue, the amount of customers a restaurant may receive was estimated as a multiple of the number of british restaurant reviews. (figure 19) It's assumed that the number of reviews indicate approximately .1% of total visits for a year. For EH3 there are 161 reviews for British restaurants and 17 British restaurants in total, hence there are 9.47 average number of Reviews per British Restaurant for EH3. There is estimated to be around 9470 customers per year (9.47 * 1000). Note that the check-in dataset could also have been used as an alternative indicator of volumes, but check-ins are based on the amount of offers and so may represent a biased value for analysis. 
 
 ```{r eval=FALSE}
 british = edinburgh[edinburgh.cusine == 'British']
@@ -1151,23 +1093,25 @@ reviewGroup = edinReview.groupby(['zip']).size()
 grouped = pd.concat([britishGroup,reviewGroup, reviewGroup/britishGroup],axis=1)
 ```
 
-We therefore decided to use a mutliple of the number of reviews for a british restaurant as an indicator for the number of visitors.(figure 10) We assumed that the number of reviews indicate approximately .1% of total visits. For EH3 there are 161 reviews for British restaurant and 17 British restaurants in total and hence there are 9.47 average number of Reviews per British Restaurant for EH3. We can expect that for a year there will be around 9470 customers per year (9.47 * 1000). 
 
-!["Table2: Average number of Reviews for British Restaurant per Zip"](Table2.png)
+!["Table5: Average number of Reviews for British Restaurant per Zip"](Table2.png)
 
-For pricing, we decide to take the average price for British Cusine at Eh3. As shown in figure10 below the average price range is around 2.53.
+The average price for British Cusine at EH3 was calculated for pricing. As shown in figure19 below the average price range is around 2.53.
 
-!["Figure 10: Average Price for British Cusine"](figure10.png)
+!["Figure 19: Average Price for British Cusine"](figure10.png)
 
- We used data on prices obtained from the Yelp site in order to calculate our expected revenue at a given level of price. The mapping of Yelp price symbols to dollar ($) value is given in table 3.
-
-
-!["Table 3: Table 3: Yelp Symbol to Value" ](table3.png)
+Data on prices obtained from the Yelp site is used to calculate expected revenues. The mapping of Yelp price symbols to dollar ($) value is given in table 6.
 
 
-2.5 is between the second price range and the third price range so we decided to use the average price of 30 dollars. We calculated that if we open a restaurant with a Yelp price range of 2.5 we can expect to make 9470 * 2.5 which is $284,100 per year. 
+!["Table 6: Yelp Symbol to Value" ](table3.png)
 
-# Final Recommendations
+
+2.5 is between the second and the third price range so an estimate of 30 pounds of average spend is multiplied by 9470  which is 284,100 pounds per year. This is a fairly conservative estimate or revenues. 
+
+# Summary
+To summarise, the demand and location analysis suggested an appropriate place to set up the resturant is EH3, a high volume area with an under supplied market for British cuisine. The competition and theme analysis, gave additional information by providing a metric of competition (the market in EH3 had competition metrics close to zero, implying fair competition in general), and suggested that there was low competition for stylish bars & pubs. The topic analysis of reviews concluded that making good fish & chips and chicken dishes could be a potentially successful endeavour, because this was found to be an area which people frequently complained about. A potential point to avoid is making the stylish bar/pub with food too quiet, as customers had complained about that in reviews. Also the table service and waiters would be polite and speedy, and the room tempreture should be monitored. 
+
+The revenue analysis helped to set a price range for the resturant and bar at a medium price, 30 pounds, and estimated 9470 customers a year for a revenue of 284,100.
 
 # Reference
 
