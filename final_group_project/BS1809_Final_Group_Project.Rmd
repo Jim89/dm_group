@@ -60,7 +60,7 @@ This report is split into three main analyses, then concluded with an estimation
 The reviews of Edinburgh's resturants are grouped into topics using a NMF topic modelling method to look for potential topics or opportunities to exploit.
 
 **Demand and Location Analysis**
-Summary statistics such the number of reviews per resturant and by cuisine are mapped out, to give an indiaciton of relative demand by location, which allows for a recommendation of location.
+Summary statistics such the number of reviews per resturant and number of reviews by cuisine are mapped out, to give an indication of relative demand by location, which allows for a recommendation of location.
 
 **Competition and Style Analysis**
 A metric of competition is computed for different styles of resturant to recommend the appropriate attributes of the resturant.
@@ -259,7 +259,7 @@ knitr::include_graphics("Siang/9.png")
 
 **Text feature extraction**
 
-A range of functions from the python scikit-learn package was used to extract features(words) from textual reviews content and create a document-term matrix, namely [1]-[3]:
+A range of functions from the python scikit-learn package was used to extract features (words) from textual reviews content and create a document-term matrix, namely [1]-[3]:
 
 * tokenizing strings and documenting each possible token in a matrix, where white-space and punctuation were token separators.
 * counting the occurrences of tokens in each document.
@@ -971,7 +971,7 @@ df3_filtered[df3_filtered.cluster==2]
 
 !["Fig 15: Cluster 2: The Classies" ](kin_fig6.png)
 
-Cluster 2 contains 119 restaurants. They are the most expensive and classy type of restaurants (3x$), with classy, romantic, intimate, trendy and upscale atmospheres. The bar plot shows they are characterised by a full bar, dinner service, waiters, and taking reservations. Most of them require customers to be 'dressy', and are good for groups and dating. They are more quiet and some provide background music.
+Cluster 2 contains 119 restaurants. They are the most expensive and classy type of restaurants (3x$), with classy, romantic, intimate, trendy and upscale atmospheres. The bar plot shows they are characterised by a full bar, dinner service, waiters, and taking reservations. Most of them require customers to be 'dressy', and are good for groups and dating. They are generally quiet and some provide background music.
 
 
 ```{r}
@@ -990,7 +990,7 @@ df3_filtered[df3_filtered.cluster==3]
 
 Cluster 3 contains 310 restaurants. These are stylish restaurants and pubs & bars priced at level 2 (2x$sign on yelp => $11-30 ), providing mainly dinner and lunch. 
 
-These are less quiet, few of them can even be loud or very loud. These clusters contain most of the restaurants that provide dj, jukebox, live and video music and also TV boardcast. Some of these restaurants are quite stylish with lipster, intimate or trendy styles. They are mainly good for groups.
+These are less quiet places, some can even be loud or very loud. These clusters contain most of the restaurants that provide dj, jukebox, live and video music and also TV broadcasts. Some of these restaurants are quite stylish with hipster, intimate or trendy styles. They are mainly good for groups.
 
 ```{r}
 plt.show()
@@ -1006,7 +1006,7 @@ df3_filtered[df3_filtered.cluster==4]
 
 !["Fig 17: Cluster 4: The Fastfood and Takeaways" ](kin_fig8.png)
 
-There are 171 restaurants in cluster 4. This group are the cheapest kind of restaurants ($ sign), probably fastfood restaurants as most of them do not provide waiter service, wine nor have bars. They are associated by being casual, being good for groups, and kids, having an average noise level, and takeout.
+There are 171 restaurants in cluster 4. This group are the cheapest kind of restaurants ($ sign), probably fastfood restaurants as most of them do not provide waiter service, wine nor have bars. They are associated with being casual, being good for groups, and kids, having an average noise level, and takeout.
 
 ```{r}
 plt.show()
@@ -1040,7 +1040,7 @@ supply
 
 !["Table 2: Restaurants distributions across zips" ](kin_fig10.png)
 
-Table 2 shows the distribution of the same type of restaurants across the zips as a percentage, each row sums up to 100%. For example, 35.6% of classy resturant are located in EH1.
+Table 2 shows the distribution of the same type of restaurants across the zips as a percentage, each row sums up to 100%. For example, 35.6% of classy resturants are located in EH1.
 
 <br>
 
@@ -1094,7 +1094,7 @@ grouped = pd.concat([britishGroup,reviewGroup, reviewGroup/britishGroup],axis=1)
 ```
 
 
-!["Table5: Average number of Reviews for British Restaurant per Zip"](Table2.png)
+!["Table 5: Average number of Reviews for British Restaurant per Zip"](Table2.png)
 
 The average price for British Cusine at EH3 was calculated for pricing. As shown in figure19 below the average price range is around 2.53.
 

@@ -1,0 +1,1116 @@
+---
+title: "BS1808 Digital Marketing Analytics"
+author: "Siang Lau, Jone Leung, C.K. Poon, Kane Wu, Jim Leach"
+date: "4 July 2016"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    code_folding: hide
+    theme: spacelab
+    number_sections: yes
+---
+```{r setup, include=FALSE}
+# Set all code chunks to be printed in to the document (echo = T) but do not _run_
+# the code inside them (eval = F)
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+```{r include=FALSE}
+# Load Python packages
+import json
+import ftfy
+import nltk
+import pycountry
+import random 
+import seaborn
+import numpy as np
+import pandas as pd
+import collections as cllt
+import sklearn as sk
+import matplotlib.pyplot as plt
+
+from nltk import word_tokenize
+from os import path
+from glob import glob
+from scipy.misc import imread
+from textblob import TextBlob
+from wordcloud import WordCloud
+from IPython.display import display, HTML
+from sklearn.decomposition import NMF
+from sklearn.feature_extraction.text import TfidfVectorizer
+```
+
+
+# Executive Summary
+
+## Goals and Introduction
+
+You work for a large corporation that owns a collection of restaurants of different types. Currently it is evaluating the location, type, characteristics (cuisine, price point, design, marketing strategy) and positioning of a new restaurant in Edinburgh (if you know the local habits, you can give better insight).
+Your task is to analyse the dataset and give recommendations on strategy, based on the reviews, location (either neighbourhood or zipcode level) and competition. Also give estimates on volumes and revenues of the potential undertaking. You may have to check out what the price-range attributes signify by visiting the Yelp website.
+
+## Methodology
+We decided to perform this analysis for Edinburgh. This was because we found extensive demographic data that could be easily integrated with the Yelp data.  We also had better knowledge of the zip codes as Edinburgh is still in the UK.The Yelp data were provided as JSON files. 
+
+
+
+# Review and data exploration -Analysis
+This analysis points out demand and preference of customers from a large amount of reviews, with high dimensionality. These topics can provide meaningful insights to opening a new restaurant by considering what customers care about in order to increase the Yelp ratings, which directly affects the revenue. But how can restaurant understand the demands of its customers from a large amount of reviews? For a relatively small collection of reviews, it may be possible to manually inspect and classify the contents of reviews into specific categories based on similarity. But to partition large volumes of text, the process would be extremely time consuming. Topic modelling greatly reduces the time needed to perform the classification and understand the actual contents. We hope to use topic modelling to identify what users care about most when giving their rating stars, and ultimately determine what a new restaurant should be doing in order to receive high ratings.
+
+In this study, we applied a non-negative matrix factorization (NMF) approach for the extraction and detection of concepts or topics from reviews. NMF introduces a technique that simultaneously perform dimension reduction and clustering that identifies semantic features in a document collection and groups the documents into clusters on the basis of shared semantic features [1]. The extracted topics from 1-star and 2-star reviews were used as an indicator of bad practice whereas extracted topics from 4-star and 5-star reviews were used as an indicator of good practice for operating a restaurant.
+
+## Description of datasets
+
+Import the datasets.
+
+```{r}
+business = pd.read_csv("edinburgh.csv",header=0)
+checkin = pd.read_csv("edinCheckin.csv",header=0)
+review = pd.read_csv("edinReview.csv",header=0)
+tip = pd.read_csv("edinTip.csv",header=0)
+user = pd.read_csv("edinUser.csv",header=0,usecols=range(0,23))
+```
+
+The main dataset in this study was 'yelp_academic_dataset_review.json' and summary of the dataset is shown below.
+
+```{r}
+# Replace nan with blank space
+review=review.replace(np.nan,' ', regex=True)
+
+# Summary of dataset
+review.info()
+
+```
+
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/1.png")
+```
+
+The text of reviews is full of punctuations, numbers and capital letters, further cleansing of data is required for text analysis.
+
+```{r}
+review.text.head(10)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/2.png")
+```
+
+## Data Cleansing
+
+Clean up the text in review dataset.
+```{r}
+# Referenced Regular Expression for email cleanup idea: 
+def cleanup(text):
+
+    # Make text lower case
+    for f in re.findall("([A-Z]+)", text):
+        text = text.replace(f, f.lower())
+    
+    # Remove escape symbols
+    text = text.replace('\r', " ")
+    text = text.replace('\n', " ")
+    
+    # Remove all non-ascii characters in the string
+    text=unicode(text, 'ascii', 'ignore')
+
+    # Creata a list of reg tools
+    cleanuptools = [
+    # Dates
+    r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)",
+    # Removing months
+    r"january|february|march|april|may|june|july|august|september|october|november|december",
+    # Punctuation and numbers to be removed
+    r'[-|.|?|!|,|"|:|;|()|0-9]',
+    ]
+    
+    for tool in cleanuptools:
+        text = re.sub(tool," ", text)
+    return text
+
+
+# Constructing a list for stopwords 
+stopwords = []
+
+# Add scikit-learn's CountVectorizer's stop list to the created list
+stopwords = sk.feature_extraction.text.ENGLISH_STOP_WORDS
+
+# Apply the created functions to clean up text
+review.text=review.text.apply(cleanup)
+
+# Cleaned text
+review.text[28]
+```
+
+Text after cleansing:
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/3.png")
+```
+
+
+## Inspection of review contents
+
+### Reviews VS Stars
+Onlyreviews with a considerable amount of contents were included as topic modelling is unable to extract insight from short reviews. The length of reviews was therefore analysed and a minimum requirement on review length was implemented.
+
+```{r}
+f, ax = plt.subplots(figsize=(15,7.5))
+n, bins, patches = ax.hist(review.text.apply(len),facecolor='black',bins=20)
+ax.set_xticks(bins)
+bin_centers = 0.5 * np.diff(bins) + bins[:-1]
+for count, x in zip(n, bin_centers):
+    percent = '{:.2f}%'.format((float(count) / n.sum())*100)
+    ax.annotate(percent, xy=(x, 0), xycoords=('data', 'axes fraction'),
+    xytext=(0, -32), textcoords='offset points', va='top', ha='center')
+ax.set_xlabel('Count of reviews')
+ax.set_ylabel('Count of words in review')
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/4.png")
+```
+
+It can be seen that almost 95% of reviews have length of more than 500 words, therefore, it is not necessary to remove any short reviews. The distribution of ratings was also examined to avoid inbalanced datasets.
+
+```{r}
+review.stars.value_counts(sort=False).plot(kind='bar',color="black")
+plt.title('Reviews By Star');
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/5.png")
+```
+
+Inituitively, we thought there would be more 1-star and 5-star reviews, however, the data shows otherwise, and the majority of reviews were 4-star and 5-star. It is also important to examine the number of votes of a review whihc indicate the reliability/usefulness.
+
+### Reviews VS Votes
+The majority of reviews have only one vote regardless of vote type (cool, useful or funny). So we decided not to remove reviews based on their numbers of votes (doing so would remove a significant amount of text from this analysis).
+
+#### Vote for cool
+
+```{r}
+pd.crosstab(review.stars,review.votes_cool[review.votes_cool!=0],margins=True)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/6.png")
+```
+
+#### Vote for funny
+
+```{r}
+pd.crosstab(review.stars,review.votes_funny[review.votes_funny!=0],margins=True)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/7.png")
+```
+
+#### Vote for useful
+
+```{r}
+pd.crosstab(review.stars,review.votes_useful[review.votes_useful!=0],margins=True)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/8.png")
+```
+
+
+## Methodology and Procedure
+
+### Dividing the dataset
+
+Reviews were split into two groups, 1 and 2 star reviews were interpreted as bad reviews and 4 and 5-star reviews were interpreted as good reviews. 3-star reviews were excluded in this analysis due to the mixed expression of customers (three stars could be a good or bad review).
+
+
+```{r}
+# Split the dataset into 2 categories: 1,2 stars and 4,5 stars
+
+review_bad = review[(review.stars == 1) | (review.stars == 2)]
+review_good = review[(review.stars == 4) | (review.stars == 5)]
+
+review_good.text.head(10)
+```
+
+Example of good reviews:
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/9.png")
+```
+
+### Text feature extraction
+
+A range of functions from the python scikit-learn package was used to extract features(words) from textual reviews content and create a document-term matrix, namely [1]-[3]:
+
+* tokenizing strings and documenting each possible token in a matrix, where white-space and punctuation were token separators.
+* counting the occurrences of tokens in each document.
+* normalizing and weighting with diminishing importance tokens which occur in the majority of samples / documents.
+
+In a large text corpus, stopwords are common (e.g. "the", "a", "is", "and" in English) and carry little meaningful information about the actual contents of the document. In order to reduce the influence of stop words appearing frequently across the entire corpus, TF-IDF term re-weighting functions normalized the data. TfidfVectorizer function combines the functions of TF-IDF and vectorization (Vectorization is a process combining tokenization, counting and normalization) allowing to build a document-term matrix for the corpus of documents:
+
+```{r}
+#Vectorization
+tfidfvectorizer_bad = TfidfVectorizer(max_features=15000, ngram_range=(1, 2), stop_words = stopwords,
+                                 strip_accents="unicode", use_idf=True, norm="l2", min_df = 5)
+tfidfvectorizer_good = TfidfVectorizer(max_features=15000, ngram_range=(1, 2), stop_words = stopwords,
+                                 strip_accents="unicode", use_idf=True, norm="l2", min_df = 5)
+
+#Create term document matrix for separate datasets
+term_document_matrix_bad = tfidfvectorizer_bad.fit_transform(review_bad.text)
+term_document_matrix_good = tfidfvectorizer_good.fit_transform(review_good.text)
+```
+
+### Topic Modelling
+
+NMF (Non-negative Matix Factorization) is a method of unsupervised learning for grouping a collection of documents and finding out abstract topics.  We applied the scikit-learn implementation of NMF with NNDSVD initialization.
+
+Nonnegative Double Singular Value Decomposition (NNDSVD) is typically used for overcoming sparseness of data in document-term matrix [8]. Here we set the number of topics to be equal to 25 and run NMF for 200 iterations, then get the factors W and H from the resulting model:
+
+```{r}
+# 1-star + 2-star reviews
+nmfmodel_bad = sk.decomposition.NMF(init="nndsvd", n_components=25, max_iter=200).fit(term_document_matrix_bad)
+W_bad = nmfmodel_bad.fit_transform(term_document_matrix_bad);
+H_bad = nmfmodel_bad.components_
+# W (number of reviews,number of topics) and H (number of topics, number of features)
+print "Generated factor W of size %s and factor H of size %s for bad reviews" \
+% ( str(W_bad.shape), str(H_bad.shape) )
+
+# 4-star + 5-star reviews
+nmfmodel_good = sk.decomposition.NMF(init="nndsvd", n_components=25, max_iter=200).fit(term_document_matrix_good)
+W_good = nmfmodel_good.fit_transform(term_document_matrix_good);
+H_good = nmfmodel_good.components_
+# W (number of reviews,number of topics) and H (number of topics, number of features)
+print "Generated factor W of size %s and factor H of size %s for good reviews" \
+% ( str(W_good.shape), str(H_good.shape) )
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/10.png")
+```
+
+## Results
+
+### Top Terms by each topic {.tabset .tabset-fade}
+
+```{r}
+#Write functions to plot graphs which present the top topics discovered by the NMF model and create a list of features generated from the NMF model.
+
+# Create a colour series for graph plotting
+def grey_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+    return "hsl(0, 0%%, %d%%)" % random.randint(60, 100)
+
+# Writting functions to show top words in each topic
+def TopTermsByTopic(nmfmodel, features, top):
+    for index, topic in enumerate(nmfmodel.components_):
+        print "\n Topic {}: \n".format(index+1)
+        print "Percentage of Words: {:.2%}\n".format(np.count_nonzero(topic) / 41961.)
+        
+        top_words = [features[i] for i in nmfmodel.components_[index].argsort()[::-1][:top]]
+        topic_words = ' '.join(top_words)
+
+        #Prepare data for horizontal bar charts
+        top15_index = nmfmodel.components_[index].argsort()[::-1][:15]
+        top15_topic = sorted(topic[top15_index],reverse=False)
+
+        #Prepare data for wordclouds
+        wc = WordCloud(max_font_size=80,relative_scaling=.5,width=800,height=500).generate(topic_words)
+       
+        #Create a space for graphs
+        fig, ax = plt.subplots(2,figsize=(12,10))
+        rect1 = ax[0].barh(.5 + np.arange(15) + .5, top15_topic, color="black", align="center")
+        rect2 = ax[1].imshow(wc.recolor(color_func=grey_color_func, random_state=3))
+        
+        #Subplot 1 - Horizontal Bar Chart
+        ax[0].set_title("Top 15 Terms in Topic {}".format(index + 1))
+        ax[0].set_xlabel("Weight")
+        ax[0].set_yticks(.5 + np.arange(15)+ .5)
+        ax[0].set_yticklabels([features[i] for i in topic.argsort()[::-1][:15]])
+        ax[0].grid(True)
+        
+        #Subplot 2 - WordCloud
+        ax[1].axis("off")
+        ax[1].set_title("Wordcloud of Topic {}".format(index + 1))
+        
+        #Show the graphs
+        plt.tight_layout()
+        plt.show()
+        
+        
+#Extracting the feature names
+features_bad= tfidfvectorizer_bad.get_feature_names()
+features_good= tfidfvectorizer_good.get_feature_names()
+ 
+```
+
+
+Horizontal barchart of the top 15 highest weighted terms for the most significant topic - in bad and good reviews - discovered by the NMF model. The rest of the terms are shown in a word cloud. 
+
+#### Bad Reviews: 1-star and 2-star reviews
+```{r}
+TopTermsByTopic(nmfmodel_bad, features_bad, 100)
+```
+
+Example of Topic 1 for bad reviews: 
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/11.png")
+```
+
+#### Good Reviews: 4-star and 5-star reviews
+
+```{r}
+TopTermsByTopic(nmfmodel_good, features_good, 100)
+```
+
+Example of Topic 1 for good reviews: 
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/12.png")
+```
+
+
+###Summary of topics {.tabset .tabset-fade}
+
+A summary of the 25 topics from the bad and good reviews - discovered by the NMF model. An attempt to interpret the contents of each topic was made, keywords in each topic were manually examined and a description of each topic was then assigned. Experiments suggest 25 topics is optimal, allowing for a clear separation of topics. 
+
+#### Bad Reviews: 1-star and 2-star reviews
+```{r}
+
+data_bad = {'Index of Topics':['Topic 1','Topic 2','Topic 3','Topic 4','Topic 5','Topic 6','Topic 7','Topic 8'
+                           ,'Topic 9','Topic 10','Topic 11','Topic 12','Topic 13','Topic 14','Topic 15'
+                           ,'Topic 16','Topic 17','Topic 18','Topic 19','Topic 20',
+                            'Topic 21','Topic 22','Topic 23','Topic 24','Topic 25']
+        ,'Type of Topics':['Bad service from manager and waiter/waitress ', 'Bad Coffee Shop',
+                           'Bad Chicken Dishes (Fried, Boiled, Curry)',
+                           'Bad Italian Foods (Pizza and Pasta: Toppings, base, sauce, etc.)',
+                           'Bad Fried Chips (Soggy Batter)','Bad Burger', 'Unknown Topic',
+                           'Bad wait and time management','Bad Experience and Services',
+                           'Bad Restaurant (Birthplace of Harry Potter)','Bad Afternoon Tea',
+                           'Unfriendly and Rude Staffs','Bad Chinese Sweet and Sour Foods',
+                           'Unknown Topic','Bad Mexican Foods','Bad Place for drinks (too quiet)',
+                           'Bad Japanese Foods (Tuna, Miso Soup)','Bad Prices','Bad Breakfast (Eggs Benedict)',
+                           'Bad Wait and Time Management','Bad Noodles', 'Good Comments in Bad Reviews',
+                           'Expensive Place for Tourists', 'Hot Temperature','Bad Thai Foods'                           
+                           ]
+       } 
+
+topic_table_bad = pd.DataFrame(data_bad)
+display(topic_table_bad)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/13.png")
+```
+
+
+
+#### Good Reviews: 4-star and 5-star reviews
+
+```{r}
+data_good = {'Index of Topics':['Topic 1','Topic 2','Topic 3','Topic 4','Topic 5','Topic 6','Topic 7','Topic 8'
+                           ,'Topic 9','Topic 10','Topic 11','Topic 12','Topic 13','Topic 14','Topic 15'
+                           ,'Topic 16','Topic 17','Topic 18','Topic 19','Topic 20',
+                            'Topic 21','Topic 22','Topic 23','Topic 24','Topic 25']
+        ,'Type of Topics':['Unknown Topic','Good Quality foods','Good Place and Atmosphere',
+                           'Good Bars and Pubs', 'Good Scottish Breakfast',
+                           'Good Fish and Chips with nice peas','Good Thai Foods with decent prawn',
+                           'Good Indian Foods', 'Good Menu','Good Beef Burger with decent sweet potatoes',
+                           'Good Price and Value','Good Sandwiches', 'Good Italian Foods (Pasta and Pizza)',
+                           'Good chocolates and ice creams','Good Coffee Shops with Nice Artisan and Expresso',
+                           'Good Japanese foods (Bento,Nigiri,Kanpai)','Good Mexican Burritos and Tacos',
+                           'Excellent Services', 'Good Afternoon Tea', 'Good BBQ Shops (crackling pork, haggis)',
+                           'Unknown German Reviews', 'Friendly Staff','Good Foods', 'Good Vegetarian Restaurants',
+                           'Good Potato Shops'
+                           ]
+       } 
+
+topic_table_good = pd.DataFrame(data_good)
+display(topic_table_good)
+```
+
+```{r eval = TRUE, echo=FALSE}
+knitr::include_graphics("Siang/14.png")
+```
+
+
+**Opportunities to explore when opening a restaurant in Edinburgh:**
+
+* Customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy. (Bad Review Topic 5)
+* Customers are also not particularly happy with chicken dishes in Edinburgh. (Bad Review Topic 3)
+* Foods and drinks at a cafe where JK Rowling visited were not satisfying and received a lot of complaints. (Bad Review Topic 10)
+* Sweet and sour chickens are not satisfying at chinese restaurants in Edinburgh. (Bad Review Topic 13)
+* Thai Foods for lunch are not good (Bad Review Topic 25)
+* Current noodle shops in Edinburgh are bad (Bad Review Topic 21)
+* Good atmosphere, location, friendly staff and price-to-value could enhance customer experience (Good Review Topics 2,3,11 and 22)
+
+**Areas to avoid and improve when opening a restaurant in Edinburgh:**
+
+* Customers complained about bad services from rude and unfriendly waiter and waitress (Bad Review Topics 1 and 12)
+* Customers complained about long wait (Bad Review Topic 8)
+* Customers complained about room temperature (Bad Review Topic 24)
+* Customers complained about bars and pubs that are too quiet (Bad Review Topic 16)
+
+**For sectors where businesses are doing very well would also mean new entrants could face a big challenge to enter these sectors.**
+
+* Good Review Topic 4 appeared in 16.57% of reviews, that implies bars and pubs are providing very good services in Edinburgh.
+* Good Review Topic 15 appeared in 13.32% of reviews, that means current coffee shops are providing very good coffees and services.
+* BBQ shops are doing very well in Edinburgh. (Good Review Topic 20)
+* Potato shops are doing very well in Edinburgh. (Good Review Topic 25)
+
+In conclusion, insights above that were extracted by topic modelling are very useful for a company that plans to open a new restaurant in Edinburgh, for example, it was clear that customers are not satisfied with the current fish and chips and chicken dishes in Edinburgh, a new restaurant could potentially target these specific sectors to fullfill the customer demand. Also, company should be careful with certain issues that were discovered from bad reviews, for example, topics such as unfriendly staffs, long wait and uncomfortable room temperature that frequently appeared in bad reviews could negatively affect customer experience. Finally, sectors that are doing very well in Edinburgh such as bars, pubs, BBQ and Potato shops are the areas that a new restraunt may not want to consider in order to avoid fierce competition.
+
+
+# Location and Competition - Analysis
+This part of the analysis estimates the demand for restaurants in an area (zip code) of a chosen city, and finds out which type of cuisine people are looking for. 
+
+
+###Cleaning the Data
+We used the pandas Python package to filter the data to just that relevant to Edinburgh. Noting that the data contained many business types, we made the assumption that the business was a restaurant if it's category field stated resturant. We then used this filtered data to extract the relevant tables for check-ins, reviews, tips and users. This provided us with data on 1215 restaurants in Edinburgh that were registered on Yelp.
+
+Regarding restaurant cuisine type, we noticed that many different attributes were used to explain the restaurant category. For example: "Gastropubs,Bars,Scottish,Nightlife,Restaurants". As we were primarily interested in cuisine, we made a list of cuisine keywords such as "Italian" or "Scottish". We searched the category for such keywords in order to assign each restaurant to a cuisine type. If there are more than one cuisine detected, we will focus on the cuisine that is the most expressive of the type of food, which is usually the country type of the food. 
+
+In order to combine the external demographic data with the Yelp data, we  extracted the zip code from each restaurant's address. In doing so we only focused on the general area, the first three or four letters of the zip code. For example EH6 or EH12.
+
+The data obtained from the Edinburgh government website [4] provided locality and ward demographic profiles. It contained data on -gender, age, housing, employment, education and professions, income, benefits, health and disability, lifestyle, satisfaction with services, and Scottish Index of Multiple Deprivation data. 
+
+We used this data in order to compare the population, income and property prices with the amount of restaurants there are. However, this data was organized by ward. Therefore it was necessary for us to map each ward to a zip code. 
+We used a second external data set  of polling districts from the City of Edinburgh Mapping portal [5]. Figure 1 below is a demonstration of the different polling districts and figure 2 are the wards districts. 
+
+!["Figure 1:Polling Districts" ](figure1.png)
+
+
+!["Figure 2: Wards" ](figure2.png)
+
+We noticed that each polling location was assigned to a zip code. We therefore used the zip code of the polling districts in order to map back to ward. As some wards had numerous polling districts within them, we used the zip code with the largest number of occurrences in the ward (as long as the zip code was from EH1-16 - our area of interest). For example if the ward "Almond" has 4 zip codes in EH4 and only 1 in EH2 we considered Almond to be part of EH4. 
+
+As some zip codes are really small such as EH1 and EH2, there are some zip codes that were not assigned to any single ward using the method above. For those zip codes we found wards that contained that zip divided the population numbers in two and assigned half of the population in the ward to each of the two zip codes. For example the ward central city in general encompass EH1 and EH2. So we split the population for central city into two by half and assign it to the population of EH1 and EH2.   Income and property prices remained the same.
+
+We also downloaded data on all the hotels in Edinburgh from booking.com. We cleansed this data to extract the zip code so that the data will be useful.
+
+
+```{r eval=FALSE}
+
+import json
+import pandas as pd
+from glob import glob
+
+def convert(x):
+    ''' Convert a json string to a flat python dictionary
+    which can be passed into Pandas. '''
+    ob = json.loads(x)
+    for k, v in ob.items():
+        if isinstance(v, list):
+            ob[k] = ','.join(v)
+        elif isinstance(v, dict):
+            for kk, vv in v.items():
+                ob['%s_%s' % (k, kk)] = vv
+            del ob[k]
+    return ob
+
+
+def convert2(x):
+    ''' Convert a json string to a flat python dictionary
+    which can be passed into Pandas. '''
+    ob = json.loads(x)
+    for k, v in ob.items():
+        if isinstance(v, list):
+            ob[k] = ','.join(str(v))
+        elif isinstance(v, dict):
+            for kk, vv in v.items():
+                ob['%s_%s' % (k, kk)] = vv
+            del ob[k]
+    return ob
+
+business = pd.DataFrame([convert(line) for line in file("yelp_academic_dataset_business.json")])
+checkin = pd.DataFrame([convert(line) for line in file("yelp_academic_dataset_checkin.json")])
+review = pd.DataFrame([convert(line) for line in file("yelp_academic_dataset_review.json")])
+tip = pd.DataFrame([convert(line) for line in file("yelp_academic_dataset_tip.json")])
+user = pd.DataFrame([convert2(line) for line in file("yelp_academic_dataset_user.json")])
+
+cusine = ['Scottish', 'Mediterranean','Chinese','French','Italian', 'Thai',  'Indian', 'British', 'European', 'Greek', 'Nepalese', 'German', 'Turkish', 'Mexican', 'Pakistan', 'Seafood', 'Japanese', 'Vegetarian', 'Brazilian', 'American','Spanish','Bakeries', 'Gastropubs', 'Soup','Caterers','Cafes','Smoothies','Bistros','Pubs', 'Coffee & Tea','Burgers', 'Delis','Fast Food', 'Sandwiches', 'Pizza', 'Fish & Chips', 'Polish', 'African', 'Korean', 'Middle Eastern', 'Creperies', 'Brasseries','Chicken Wings'  ]
+
+def cusineCategory(x):
+    for cus in cusine:
+        category = x.categories.encode('ascii','ignore')
+        if cus in category:
+            return cus
+
+def getZip(x, name):
+    start= x[name].find("EH")
+    Zip = x[name][start:start + 4].replace(" ", "")
+    return Zip
+   
+
+edinburgh = business[business.city == "Edinburgh"]
+edinburgh = edinburgh[edinburgh['categories'].str.contains("Restaurants")]
+edinburgh['cusine'] = edinburgh.apply(cusineCategory, axis = 1)
+edinburgh['zip'] = edinburgh.apply(getZip,args=('full_address',),axis=1)
+edinburgh = edinburgh[edinburgh.zip != "EH17"]
+edinburghid = pd.DataFrame(edinburgh.business_id)
+edinReview = pd.merge(edinburghid,review, how='left' ,on="business_id")
+edinCheckin = pd.merge(edinburghid,checkin, how='left' ,on="business_id")
+edinTip = pd.merge(edinburghid,tip, how='left' ,on="business_id")
+
+edinUserIds = pd.concat([edinReview.user_id,edinTip.user_id])
+uniqueIds = pd.DataFrame(edinUserIds.unique())
+uniqueIds.columns = ['user_id']
+
+edinUsers = pd.merge(uniqueIds,user, how = 'left' , on = 'user_id')
+
+edinburgh.to_csv('edinburgh.csv', encoding = 'utf-8')
+edinReview.to_csv('edinReview.csv', encoding = 'utf-8')
+edinCheckin.to_csv('edinCheckin.csv', encoding = 'utf-8')
+edinTip.to_csv('edinTip.csv',encoding = 'utf-8')
+edinUsers.to_csv('edinUser.csv',encoding='utf-8')
+
+
+polling = pd.read_csv('polling.csv')
+polling['zip'] = polling.apply(getZip,args=('POSTCODE',),axis=1)
+polling = polling[['NEWWARD','zip']]
+pollGroup = polling.groupby(['NEWWARD','zip']).size().sort_values(ascending=False)
+pollGroup
+
+wardsList = ['Almond' , 'Drum Brae Gyle' ,'Pentland Hills', 'Forth' , 'Forth.1', 'Inverleith' , 'Corstorphine Murrayfield' , 'Sighthill Gorgie' , 'Colinton Fairmilehead' , 'Fountainbridge Craiglockhart' , 'Meadows Morningside' , 'City Centre' ,'City Centre.1', 'Leith Walk' , 'Leith ' , 'Craigentinny Duddingston' , 'Southside Newington' ,'Southside Newington.1','Liberton Gilmerton' , 'Portobello Craigmillar']
+wards = pd.read_csv('rawwards.csv')
+wards['Forth.1'] = wards['Forth']
+wards['Forth.1'][0] = "EH5"
+wards['Forth.1'][1:17]= pd.to_numeric(wards['Forth'][1:17], errors='coerce')/2
+wards['Forth'][1:17] = wards['Forth.1'][1:17]
+wards['Southside Newington.1'] = wards['Southside Newington']
+wards['Southside Newington.1'][0] = "EH9"
+wards['Southside Newington.1'][1:17]= pd.to_numeric(wards['Southside Newington'][1:17], errors='coerce')/2
+wards['Southside Newington'][1:17] = wards['Southside Newington'][1:17]
+wards['City Centre.1'] = wards['City Centre']
+wards['City Centre.1'][0] = "EH2"
+wards['City Centre.1'][1:17]= pd.to_numeric(wards['City Centre'][1:17], errors='coerce')/2
+wards['City Centre'][1:17] = wards['City Centre.1'][1:17]
+wardsMelt = pd.melt(wards, id_vars=['Indicator'], value_vars=wardsList)
+
+
+zipCode= ""
+wardName = ""
+wardsMelt['Zip'] = ""
+for i, row in wardsMelt.iterrows():
+    if row['Indicator'] == 'Zip':
+        zipCode = row['value']
+    wardsMelt['Zip'][i] = zipCode
+    
+wardsMelt = wardsMelt[wardsMelt.Indicator != 'Zip']
+wardsMelt.columns = ['indicator','type','value','Zip']
+wardsMelt[wardsMelt['type'] == 'City Centre']
+wardsMelt.to_csv('edinPopulation.csv')
+
+```
+
+## Analysis
+We used Tableau to undertake an initial exploratory data analysis. Figure 3 below shows the number of stores in Edinburgh. Figure 4 shows the type of cuisine that has the most stores. We noticed that in general, Italian and British cuisine are the most popular. The city centre (zip codes EH1 and EH2) contained the greatest number of restaurants.
+
+
+!["Figure 3: Density Map of Restaurants/ Figure 4 Number of Restaurants by Cuisine " ](figure3.png)
+
+We also looked at the relationship between cuisine type and the number of reviewed. We decided to use the amount of reviews for a restaurant as an indicator of the number of visitors. We decided against using the number of users as an indicator because a user can visit a restaurant twice and give two reviews which will be counted as two visits. This information was then used as an estimate of demand within each zip code.
+
+
+!["Figure 5: Cuisines with Reviews" ](figure5.png)
+
+Figure 5  shows that British food has a very high number of reviews in Edinburgh, combined with the knowledge that there are more Italian than British restaurant in general, it might show that British restaurants are quite popular. 
+
+In certain places, such as EH2 which is shown below in Figure 6 shows that there are more Italian than British restaurants and so we can capitalize on the lack of British food to open a British restaurant there.
+
+!["Figure 6 EH2 Number of Stores and Amount of Cuisines in Edinburgh" ](figure6.png)
+
+Interestingly, the restaurants in the city centre (EH1 and EH2) had the lowest rating average rating (Figure 7).  An explanation for this is that there are many restaurants in the city centre and hence many low scores pull down the overall average. From this we can potentially infer that if our restaurant wants to focus on ratings, we should not try to put our restaurant in the city centre.
+
+!["Figure 7: Average rating per zip code" ](figure7.png)
+
+We  decided to calculate the demand using the number of reviews. We understand the number of reviews may not be the best indicator of how many customers a restaurant had, but it served as a good proxy in the absence of more concrete data. Figure 8 shows that the locations with the most reviews are EH1, EH2, EH3 and EH8. We used this information in order to focus our analysis on these areas.
+
+
+!["Figure 8: Number Reviews per Restaurant and zip" ](figure8.png)
+
+```{r eval=FALSE}
+
+stats = ['All','Average annual household income','Average property value']
+
+population = wardsMelt[wardsMelt.indicator == stats[0]]
+population.value = pd.to_numeric(population.value)
+populationGroup = population.groupby('Zip').value.sum()
+
+income = wardsMelt[wardsMelt.indicator == stats[1]]
+income.value = pd.to_numeric(income.value)
+incomeGroup = income.groupby('Zip').value.sum()
+
+propertyValue = wardsMelt[wardsMelt.indicator == stats[2]]
+propertyValue.value = pd.to_numeric(propertyValue.value)
+propertyGroup = propertyValue.groupby('Zip').value.sum()
+
+restaurantGroup = edinburgh.groupby('zip').cusine.count()
+
+    
+hotels = pd.read_csv('edinHotels.csv')
+hotels['zip'] = hotels.apply(getZip,args=('zip',),axis=1)
+
+hotelsGroup = hotels.groupby('zip').address.count()
+
+statistics = pd.concat([populationGroup/restaurantGroup,incomeGroup/restaurantGroup,propertyGroup/restaurantGroup, hotelsGroup/restaurantGroup,restaurantGroup],1)
+statistics.columns = ['pop/rest','income/rest','property/rest','hotels/rest','Num of Rest']
+statistics = statistics.dropna()
+```
+
+We generated metrics for each zip code (table 1). We considered the ratios of: total population per zip to number of restaurants per zip; average income per zip to the number of restaurants per zip; the total number of properties to the number of restaurants per zip; and the total number of hotels to the number of restaurants per zip. 
+
+!["Table 1: Metrics on zip code" ](table1.png)
+
+
+The results of our exploratory analysis led us to choose to build a restaurant at a central location (EH1, EH2, EH3 and EH8). We refer to these areas as our "candidate areas".  EH8 has the largest ratio of population to restaurants compared to the other candidate areas. However, it also has the lowest number of hotels per restaurant. This may mean that there are fewer tourists in the area (who we may wish to attend our restaurant). In contrast, EH3 has attractive population to restaurant and  hotel to restaurant ratios. Furthermore, its property value to restaurant ratio is low potentially making it not too expensive to buy a restaurant there. 
+
+##Recommendation
+
+!["Figure 9: Density Map of Restaurant and Number of Restaurant by Cuising for zip EH3" ](figure9.png)
+
+
+As mention in the analysis, we decided that we will focus on the zip code of EH3. As shown above in Figure 9, British cuisine is not too saturated as there are actually more Chinese restaurants than British restaurants and also a lot of Indian Italian and Thai restaurants. Further using Figure 5, British restaurants seems to be the most popular and hence we should capitalize on the popularity. 
+
+Using the topic modeling method, two recommendations we found is customers are not satisfied with the type of batter for fish and chips in Edinburgh, which was complained to be too soggy and customers are also not particularly happy with chicken dishes in Edinburgh. Therefore in EH3, we should focus on being really good at making chicken as well as Fish. We further recommend that "Chicken and Fish" are the only food offered in the restaurant so that we can specialize in making it good.
+
+#  Type and Characteristics - Analysis
+
+In this part, we will classify different kind of restaurants with hierachical clustering technique to find out different category of restaurants and analyse their performance in different zips. From the result, we can then analyse the best location of our restaurants by recognising out-performing and under-performing areas for each type of restaurants.
+
+```{r include=FALSE}
+
+df2=pd.read_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/final_group_project/Kane Wu/edinburgh.csv",header=0)
+df2=df2.set_index(df2.ix[:,0])
+df2.drop(df2.columns[0], axis=1,inplace=True)
+df3=pd.DataFrame()
+df3["business_id"]=df2["business_id"]
+attributes_cols=[col for col in df2.columns if 'attributes' in col]
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Ambience"),axis=1)], axis=1)
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Dietary Restrictions"),axis=1)], axis=1)
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Good For"),axis=1)], axis=1)
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Music"),axis=1)], axis=1)
+df3=pd.concat([df3, df2.apply(lambda x: f(x,"attributes_Parking"),axis=1)], axis=1)
+df3=pd.concat([df3,pd.get_dummies(df2.attributes_Alcohol)], axis=1)
+df3=pd.concat([df3,pd.get_dummies(df2["attributes_Ages Allowed"])], axis=1)
+df3=pd.concat([df3,pd.get_dummies(df2.attributes_Attire)], axis=1)
+df3=pd.concat([df3,pd.get_dummies(df2["attributes_Price Range"])], axis=1)
+df3['attributes_BYOB/Corkage_TF']=df2["attributes_BYOB/Corkage"]=="yes_free"
+df3=pd.concat([df3,pd.get_dummies(df2["attributes_Noise Level"])], axis=1)
+df3 = df3.drop(0, 1)
+#df3['attributes_Noise Level_scaled']=df2['attributes_Noise Level'].replace(to_replace="quiet",value=1)
+#df3['attributes_Noise Level_scaled']=df3['attributes_Noise Level_scaled'].replace(to_replace="average",value=2)
+#df3['attributes_Noise Level_scaled']=df3['attributes_Noise Level_scaled'].replace(to_replace="loud",value=3)
+#df3['attributes_Noise Level_scaled']=df3['attributes_Noise Level_scaled'].replace(to_replace="very_loud",value=4)
+df3['attributes_Smoking_NO']=df2['attributes_Smoking']=="NO"
+df3['attributes_Smoking_OUTDOOR']=df2['attributes_Smoking']=="outdoor"
+df3['attributes_By Appointment Only']=df2['attributes_By Appointment Only']
+df3['attributes_Caters']=df2['attributes_Caters']
+df3['attributes_Coat Check']=df2['attributes_Coat Check']
+df3['attributes_Caters']=df2['attributes_Caters']
+df3['attributes_Drive-Thru']=df2['attributes_Drive-Thru']
+df3['attributes_Good For Dancing']=df2['attributes_Good For Dancing']
+df3['attributes_Good For Groups']=df2['attributes_Good For Groups']
+df3['attributes_Good for Kids']=df2['attributes_Good for Kids']
+df3['attributes_Good for Kids']=df2['attributes_Good for Kids']
+df3['attributes_Happy Hour']=df2['attributes_Happy Hour']
+df3['attributes_Has TV']=df2['attributes_Has TV']
+df3['attributes_Outdoor Seating']=df2['attributes_Outdoor Seating']
+df3['attributes_Has TV']=df2['attributes_Has TV']
+df3['attributes_Take-out']=df2['attributes_Take-out']
+df3['attributes_Takes Reservations']=df2['attributes_Takes Reservations']
+df3['attributes_Waiter Service']=df2['attributes_Waiter Service']
+df3['attributes_Wheelchair Accessible']=df2['attributes_Wheelchair Accessible']
+
+df3=df3.fillna(0)
+df3=df3.replace(to_replace=False,value=0)
+df3=df3.replace(to_replace=True,value=1)
+
+df3["Non-empty"]=(df3!=0).any(1)
+
+df4=pd.read_csv("C:/Users/cheukkin.Warwick/Documents/dm_grp/dm_group/edinburgh.csv")
+df4=df4.set_index(df4.ix[:,0])
+df4.drop(df4.columns[0], axis=1,inplace=True)
+df5=pd.concat([df3,pd.get_dummies(df4.cusine)],axis=1)
+df5["Non-empty"]=(df5!=0).any(1)
+
+#To build the functions for clustering
+def fancy_dendrogram(*args, **kwargs):
+    max_d = kwargs.pop('max_d', None)
+    if max_d and 'color_threshold' not in kwargs:
+        kwargs['color_threshold'] = max_d
+    annotate_above = kwargs.pop('annotate_above', 0)
+
+    ddata = dendrogram(*args, **kwargs)
+
+    if not kwargs.get('no_plot', False):
+        plt.title('Hierarchical Clustering Dendrogram (truncated)')
+        plt.xlabel('sample index or (cluster size)')
+        plt.ylabel('distance')
+        for i, d, c in zip(ddata['icoord'], ddata['dcoord'], ddata['color_list']):
+            x = 0.5 * sum(i[1:3])
+            y = d[1]
+            if y > annotate_above:
+                plt.plot(x, y, 'o', c=c)
+                plt.annotate("%.3g" % y, (x, y), xytext=(0, -5),
+                             textcoords='offset points',
+                             va='top', ha='center')
+        if max_d:
+            plt.axhline(y=max_d, c='k')
+    return ddata
+    
+def hclst(data,method,distance):
+    from scipy.cluster.hierarchy import cophenet
+    from scipy.spatial.distance import pdist
+    Z=linkage(data,method=method,metric=distance)
+    c, coph_dists = cophenet(Z , pdist(data,metric=distance))
+    # calculate full dendrogram'
+    plt.figure(figsize=(25, 10))
+    fancy_dendrogram(
+        Z,
+        truncate_mode='lastp',
+        p=12,
+        leaf_rotation=90.,
+        leaf_font_size=12.,
+        show_contracted=True,
+        annotate_above=10,  # useful in small plots so annotations don't overlap
+    )
+    plt.show()
+    
+    plt.figure(figsize=(25, 10))
+    plt.title('Hierarchical Clustering Dendrogram')
+    plt.xlabel('sample index')
+    plt.ylabel('distance')
+    dendrogram(
+        Z,
+        leaf_rotation=90.,  # rotates the x axis labels
+        leaf_font_size=8.,  # font size for the x axis labels
+    )
+    plt.show()
+    return(Z,c,coph_dists)
+    
+```
+
+##Restaurants Types Analysis
+
+We have total 1215 restaurants in our dataset with 55 of them having no attributes at all. Amount these 1215 restaurants, we clustered them in to 5 different categories to analyse the location and density of different type restaurants in different regions within the city.
+
+After considering different distance metrics and linkage, Euclidean distance metric and ward linkage are chosen for their simplicity and better structured dendrogram. 
+
+```{r}
+#Consider a few different linkage 
+df3_filtered=df3.loc[(df3!=0).any(1)]
+df3_filtered=df3_filtered.iloc[:,0:58]
+R1=hclst(df3_filtered.iloc[:,1:58],"ward","euclidean")
+df3_filtered
+```
+
+```{r}
+#To determine cuts by different measures
+from scipy.cluster.hierarchy import inconsistent
+depth = 20
+incons1 = inconsistent(R1[0], depth)
+incons1[-20:]
+plt.figure(figsize=(25, 10))
+plt.title('Inconsistency Measure of last 20 Merges with deth ' + str(depth))
+plt.xlabel('Merges')
+plt.ylabel('Inconsistency')
+plt.plot(incons1[-20:,3])
+plt.show()
+#Determine cuts By Elbow
+plt.figure(figsize=(25, 10))
+plt.title('Height of the last 20 Merges')
+plt.xlabel('Merges from the last merge')
+plt.ylabel('Height')
+last = R1[0][-20:, 2]
+last_rev = last[::-1]
+idxs = np.arange(1, len(last) + 1)
+plt.plot(idxs, last_rev)
+plt.show()
+
+plt.figure(figsize=(25, 10))
+plt.title('Rate of increase in Height between Merges')
+plt.xlabel('Merges from the last merge')
+plt.ylabel('Rate')
+acceleration = np.diff(last, 2)  # 2nd derivative of the distances
+acceleration_rev = acceleration[::-1]
+plt.plot(idxs[:-2] + 1, acceleration_rev)
+plt.show()
+
+
+from scipy.cluster.hierarchy import fcluster
+max_d = 15
+clusters = fcluster(R1[0], max_d, criterion='distance')
+df3_filtered['cluster']=clusters
+```
+
+Now to determine cuts by different measures.
+
+```{r}
+#To determine cuts by different measures
+from scipy.cluster.hierarchy import inconsistent
+depth = 20
+incons1 = inconsistent(R1[0], depth)
+incons1[-20:]
+plt.figure(figsize=(25, 10))
+plt.title('Inconsistency Measure of last 20 Merges with deth ' + str(depth))
+plt.xlabel('Merges')
+plt.ylabel('Inconsistency')
+plt.plot(incons1[-20:,3])
+plt.show()
+#Determine cuts By Elbow
+plt.figure(figsize=(25, 10))
+plt.title('Height of the last 20 Merges')
+plt.xlabel('Merges from the last merge')
+plt.ylabel('Height')
+last = R1[0][-20:, 2]
+last_rev = last[::-1]
+idxs = np.arange(1, len(last) + 1)
+plt.plot(idxs, last_rev)
+plt.show()
+
+plt.figure(figsize=(25, 10))
+plt.title('Rate of increase in Height between Merges')
+plt.xlabel('Merges from the last merge')
+plt.ylabel('Rate')
+acceleration = np.diff(last, 2)  # 2nd derivative of the distances
+acceleration_rev = acceleration[::-1]
+plt.plot(idxs[:-2] + 1, acceleration_rev)
+plt.show()
+
+
+from scipy.cluster.hierarchy import fcluster
+max_d = 15
+clusters = fcluster(R1[0], max_d, criterion='distance')
+df3_filtered['cluster']=clusters
+```
+
+From the plots, a cut with 5 clusters gives the most desired result.
+Now to visualise the results.
+
+```{r}
+from scipy.cluster.hierarchy import fcluster
+max_d = 15
+clusters = fcluster(R1[0], max_d, criterion='distance')
+df3_filtered['cluster']=clusters
+
+#To visualise results
+C1=df3_filtered[df3_filtered.cluster==1]
+C1=C1.drop(C1.columns[57], axis=1)
+C1=C1.describe()
+C2=df3_filtered[df3_filtered.cluster==2]
+C2=C2.drop(C2.columns[57], axis=1)
+C2=C2.describe()
+C3=df3_filtered[df3_filtered.cluster==3]
+C3=C3.drop(C3.columns[57], axis=1)
+C3=C3.describe()
+C4=df3_filtered[df3_filtered.cluster==4]
+C4=C4.drop(C4.columns[57], axis=1)
+C4=C4.describe()
+C5=df3_filtered[df3_filtered.cluster==5]
+C5=C5.drop(C5.columns[57], axis=1)
+C5=C5.describe()
+
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 1:Unknown Restaurants')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C1.ix[1,1:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==1]
+```
+
+Cluster 1 contains 382 restaurants. Most of these restaurants do not provide much information for classification.
+
+```{r}
+plt.show()
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 2:Classy Restaurants')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C2.ix[1,0:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==2]
+```
+
+Cluster 2 contains 119 restaurants. They are the most expensive and classy type of restaurants, providing mainly dinner service. 
+Most of them require customers to be dressy. They are more the quiet type of restaurants and some of them provide background music.
+Those stylish restaurants with classy, romantic, intimate, trendy and upscale atmosphere are mainly in this cluster. 
+They are generally good for groups and dating.
+
+```{r}
+plt.show()
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 3:Stylish restaurants and Pubs & Bars')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C3.ix[1,0:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==3]
+```
+
+Cluster 3 contains 310 restaurants. These are stylish restaurants and pubs & bars priced at level 2, providing mainly dinner and lunch. 
+
+They are less quiet, few of them can even be loud or very loud. This clusters contain most of the restaurants that provide dj, jukebox, live and video music and also TV boardcast.
+Some of these restaurants are quite stylish with lipster, intimate or trendy style.
+They are mainly good for groups.
+
+```{r}
+plt.show()
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 4: Fastfood & Takeaways')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C4.ix[1,0:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==4]
+```
+
+There are 171 restaurants in cluster 4. These are mainly the cheapest kind of restaurants, probably fastfood restaurants as most of them do not provide waiter service, wine nor having any bars.
+Their embience level is quite average.
+They are mainly good for kids and also suitable for groups. 
+
+```{r}
+plt.show()
+plt.figure(figsize=(25, 10))
+plt.title('Cluster 5: General Restaurants')
+plt.xlabel('Attributes')
+plt.ylabel('Proportion of population')
+C5.ix[1,0:56].plot(kind='bar',ylim=[0,1])
+df3_filtered[df3_filtered.cluster==5]
+```
+
+Cluster 5 contains 233 restaurants. They are mainly general restaurants, providing brunch, dinner and lunch. 
+They are less quiet but not the noisiest type. 
+This restaurants are not very stylish and almost none of them provide any music.
+They are generally group and kids friendly.
+
+
+##Performance Analysis
+
+Now we can visualise the distribution of different types of restaurants in different zips and analyse the supply of different kind of restaurants. 
+
+```{r}
+df3_filtered["zip"]=df2["zip"]
+df3_filtered.to_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/d3_filtered.csv")
+from __future__ import division
+df3_filtered["Type"]=df3_filtered.cluster
+df3_filtered.Type=df3_filtered.Type.map({1:"Unknown", 2:"Classy",3:"stylish and Pubs & Bars",4:"Fastfood & Takeaways",5:"General"})
+supply=pd.crosstab(df3_filtered["Type"],df3_filtered["zip"]).apply(lambda r: r*100/r.sum(), axis=1)
+supply
+```
+
+Table above shows the percentage of distribution of specific type of restaurants across the zips. 
+
+```{r}
+review=pd.read_csv("C:/Users/cheukkin.Warwick/Desktop/dm_group/final_group_project/Kane Wu/edinReview.csv",header=0)
+review=review.merge(df3_filtered, on=['business_id'], how='outer')
+review_stars=review[((review.stars==4) == True) | ((review.stars==5) == True)]
+demand=pd.crosstab(review_stars["Type"],review_stars["zip"]).apply(lambda r: r*100/r.sum(), axis=1)
+demand
+```
+
+Similarly, we can look at the the distribution of top rating review for each restaurant types in different zips and use it as an indicator of popular location for certain type of restaurants.
+
+By from the above, we further calculate the ratio of restaurants receiving top reiviews. For instance, fastfood and takeaways in EH1 receives 39.7% of top reviews in the Fastfood & Takeaways category with only 22.8% of Fastfood & Takeaway restaurants located in the zip. It therefore implies that the quality of Fastfood & Takeaways in EH1 are generally more satisfying than those located in other zip.
+
+We can create a ratio as an indicator of high quality region as an indicator of out-performing region.
+
+$$\frac{(\text{top review%} - \text{restaurants%})}{\text{%restaurants}}$$
+
+```{r}
+(demand-supply)/supply
+```
+
+From the calculation above, we can make a conclude:
+
+Out-performing regions:
+
+Classy: EH2, EH7, EH8, EH1 
+
+Fastfood & Takeaways: EH1, EH7, EH3
+
+General: EH2, EH1, EH3, EH8
+
+Stylish and Pubs & Bars: EH1, EH8, EH2
+
+Under-performing regions:
+
+Classy: EH5, EH10, EH12, EH11 
+
+Fastfood & Takeaways: EH14, EH16, EH12, EH14, EH6
+
+General: EH12, EH16, EH15, EH4
+
+Stylish and Pubs & Bars: EH10, EH11, EH5, EH3
+
+For a strategic purpose, we also want to consider the net difference between top rating reviews and number of restaurants.
+
+```{r}
+demand-supply
+```
+
+##Sectional Conclusion and suggestions
+
+Now, depends on the estimated quality of our service, we can make strategic consideration based on the the results above. 
+
+If we want to open a restaurant to provide a average level of services, we should locate our restaurant at a zip with high percentage of reviews but under-performing reviews to avoid competition with top quality restaurants and take up those unsatisfied demand in the zip. Also, as these areas are generally less popular, the rents are also generally lower and therefore the cost and potential risk will be lower.
+
+Classy: EH10
+
+Fastfood & Takeaways: EH9
+
+General:EH6
+
+Stylish and Pubs & Bars: EH4
+
+If we want to open a top quality restaurants, we should locate our restaurant at a zip with high out-performing ratio so that we can save our advertising cost and take advantage of the popularity of the location.
+
+Classy: EH2
+
+Fastfood & Takeaways: EH1
+
+General: EH2
+
+Stylish and Pubs & Bars: EH1
+
+
+# Price, Volume and Revenue - Analysis
+To calculate potential revenue, we estimate the amount of customers a restaurant may receive as a multiple of the number of british restaurant reviews. (figure 10) We assume that the number of reviews indicate approximately .1% of total visits. For EH3 there are 161 reviews for British restaurants and 17 British restaurants in total and hence there are 9.47 average number of Reviews per British Restaurant for EH3. We can expect that for a year there will be around 9470 customers per year (9.47 * 1000). Note that the check-in dataset could also have been used as an alternative indicator of volumes, but check-ins are based on the amount of offers and so may represent a biased value for our analysis. 
+
+```{r eval=FALSE}
+british = edinburgh[edinburgh.cusine == 'British']
+britishGroup = british.groupby('zip').cusine.count()
+edinReview = pd.merge(reviews,british, how='inner' ,on="business_id")
+reviewGroup = edinReview.groupby(['zip']).size()
+grouped = pd.concat([britishGroup,reviewGroup, reviewGroup/britishGroup],axis=1)
+```
+
+
+!["Table2: Average number of Reviews for British Restaurant per Zip"](Table2.png)
+
+For pricing, we decide to take the average price for British Cusine at Eh3. As shown in figure10 below the average price range is around 2.53.
+
+!["Figure 10: Average Price for British Cusine"](figure10.png)
+
+ We used data on prices obtained from the Yelp site in order to calculate our expected revenue at a given level of price. The mapping of Yelp price symbols to dollar ($) value is given in table 3.
+
+
+!["Table 3: Table 3: Yelp Symbol to Value" ](table3.png)
+
+
+2.5 is between the second price range and the third price range so we decided to use the average price of 30 dollars. We calculated that if we open a restaurant with a Yelp price range of 2.5 we can expect to make 9470 * 2.5 which is $284,100 per year. 
+
+# Final Recommendations
+
+# Reference
+
+[1] D. Cai, X. He, J. Han, and T. S. Huang. Graph regularized nonnegative matrix factorization for data representation. IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 33(8):1548–1560, 2011.
+
+[2] J. Choo, C. Lee, C. K. Reddy, and H. Park. UTOPIAN: User-driven topic modeling based on interactive nonnegative matrix factorization. IEEE Transactions on Visualization and Computer Graphics (TVCG), 19(12):1992–2001, 2013
+
+[3] A. Cichocki, R. Zdunek, A. H. Phan, and S. Amari. Nonnegative Matrix and Tensor Factorizations: Applications to Exploratory Multi-Way Data Analysis and Blind Source Separation. Wiley, 2009.
+
+[4]	Edinburgh ward and locality demographics. Sourced on June 9th 2016 from http://www.edinburgh.gov.uk/info/20247/edinburgh_by_numbers/1393/locality_and_ward_data_profiles
+
+[5]	City of Edinburgh Mapping Portal. Source on June 9th 2016 from http://data.edinburghcouncilmaps.info/datasets/2cee9b18a21344b0879c3c51d71fd2c6_28
+
+[6]	Yelp price symbol mapping to real values. Source on June 14th 2016 from http://www.yelp.com/topic/san-diego-can-anyone-give-me-the-actual-dollar-range-for-the-dollar-sign-symbols-in-rrgards-to-pricing
